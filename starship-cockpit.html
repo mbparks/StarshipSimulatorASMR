@@ -7,6 +7,12 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Courier New',monospace;color:#7ec8e3;user-select:none;cursor:crosshair}
+/* Custom scrollbars */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:rgba(4,8,12,.5);border-radius:3px}
+::-webkit-scrollbar-thumb{background:rgba(94,196,212,.15);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(94,196,212,.3)}
+*{scrollbar-width:thin;scrollbar-color:rgba(94,196,212,.15) rgba(4,8,12,.5)}
 
 #engage{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity 1.2s}
 #engage.hidden{opacity:0;pointer-events:none}
@@ -422,12 +428,43 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .scr-btn.active{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.1)}
 
 /* Schematic */
-.schematic-deck{display:flex;gap:clamp(4px,.5vw,8px);margin-bottom:8px;align-items:center}
-.schematic-deck .deck-label{font-size:clamp(7px,.6vw,9px);color:#2a4a5a;width:60px;text-align:right;letter-spacing:1px}
-.schematic-room{border:1px solid rgba(94,196,212,.12);padding:6px 10px;border-radius:2px;font-size:clamp(7px,.6vw,9px);color:#4a7a8a;position:relative;min-width:60px;text-align:center;transition:border-color .3s}
+.schematic-wrap{display:flex;gap:14px}
+.schematic-main{flex:1}
+.schematic-detail{width:clamp(200px,20vw,280px);border:1px solid rgba(94,196,212,.08);border-radius:3px;background:rgba(4,8,12,.4);display:none;flex-direction:column}
+.schematic-detail.show{display:flex}
+.sd-header{padding:8px 10px;border-bottom:1px solid rgba(94,196,212,.06)}
+.sd-title{font-size:clamp(9px,.85vw,12px);color:#5ec4d4;letter-spacing:2px}
+.sd-deck{font-size:clamp(6px,.55vw,8px);color:#2a4a5a;letter-spacing:1px;margin-top:2px}
+.sd-body{padding:8px 10px;flex:1;overflow-y:auto}
+.sd-row{display:flex;justify-content:space-between;margin-bottom:4px;font-size:clamp(7px,.6vw,9px)}
+.sd-row .sd-label{color:#2a4a5a;letter-spacing:1px}
+.sd-row .sd-val{color:#5ec4d4}
+.sd-row .sd-val.warn{color:#d4a03c}
+.sd-row .sd-val.ok{color:#2ecc71}
+.sd-desc{font-size:clamp(6px,.55vw,8px);color:#3a5a6a;line-height:1.5;margin:8px 0;padding:6px;border:1px solid rgba(94,196,212,.04);border-radius:2px;font-style:italic}
+.sd-occupants{margin:6px 0}
+.sd-occ{font-size:clamp(6px,.55vw,8px);color:#3a6a7a;padding:2px 0;display:flex;align-items:center;gap:4px}
+.sd-occ .sd-occ-dot{width:4px;height:4px;border-radius:50%;background:#2ecc71}
+.sd-actions{padding:6px 10px;border-top:1px solid rgba(94,196,212,.06)}
+.sd-action-btn{width:100%;background:none;border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:clamp(7px,.6vw,9px);padding:5px 8px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s;margin-bottom:4px}
+.sd-action-btn:hover{border-color:#5ec4d4;background:rgba(94,196,212,.06)}
+.sd-action-btn.warn{border-color:rgba(212,160,60,.2);color:#d4a03c}
+.sd-action-btn.warn:hover{border-color:#d4a03c;background:rgba(212,160,60,.06)}
+.schematic-deck{display:flex;gap:0;margin-bottom:clamp(6px,.8vh,12px);align-items:stretch}
+.schematic-deck .deck-label{font-size:clamp(7px,.65vw,9px);color:#2a4a5a;width:clamp(50px,6vw,75px);text-align:right;letter-spacing:1px;padding-right:8px;display:flex;align-items:center;justify-content:flex-end;flex-shrink:0}
+.schematic-room{border:1px solid rgba(94,196,212,.12);padding:clamp(8px,1vh,14px) clamp(8px,1vw,14px);font-size:clamp(7px,.65vw,9px);color:#4a7a8a;position:relative;flex:1;text-align:center;cursor:pointer;transition:all .3s;min-height:clamp(36px,4vh,50px);display:flex;align-items:center;justify-content:center}
+.schematic-room:hover{border-color:rgba(94,196,212,.35);background:rgba(94,196,212,.04)}
+.schematic-room.selected{border-color:#5ec4d4;background:rgba(94,196,212,.06)}
 .schematic-room.has-crew{border-color:rgba(46,204,113,.3)}
-.schematic-room.warn{border-color:rgba(212,160,60,.3);color:#d4a03c}
-.crew-dot{width:5px;height:5px;border-radius:50%;background:#2ecc71;box-shadow:0 0 4px rgba(46,204,113,.4);position:absolute;top:3px;right:3px}
+.schematic-room.warn{border-color:rgba(212,160,60,.3);background:rgba(212,160,60,.02);color:#d4a03c}
+.schematic-room.breach{border-color:rgba(231,76,60,.4);background:rgba(231,76,60,.04);color:#e74c3c}
+.crew-dot{width:5px;height:5px;border-radius:50%;background:#2ecc71;box-shadow:0 0 4px rgba(46,204,113,.4);position:absolute;top:4px;right:4px}
+/* Bulkhead between rooms */
+.bulkhead{width:clamp(6px,.6vw,10px);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;position:relative}
+.bulkhead .bh-line{width:2px;height:60%;background:rgba(94,196,212,.1);border-radius:1px;transition:all .3s}
+.bulkhead:hover .bh-line{background:rgba(94,196,212,.3)}
+.bulkhead.locked .bh-line{background:rgba(231,76,60,.5);width:3px;height:80%;box-shadow:0 0 4px rgba(231,76,60,.2)}
+.bulkhead.locked::after{content:'✕';position:absolute;font-size:6px;color:#e74c3c;top:2px}
 
 /* Comms log */
 .comms-entry{font-size:clamp(8px,.7vw,10px);padding:4px 0;border-bottom:1px solid rgba(94,196,212,.04);line-height:1.5}
@@ -443,29 +480,29 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .lrs-wrap{display:flex;gap:14px;height:calc(100% - 60px)}
 .lrs-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
 .lrs-controls{display:flex;gap:6px;margin-top:8px;justify-content:center}
-.lrs-ctrl-btn{background:none;border:1px solid rgba(94,196,212,.2);color:#4a7a8a;font-family:inherit;font-size:clamp(7px,.6vw,9px);padding:3px 10px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s;text-transform:uppercase}
+.lrs-ctrl-btn{background:none;border:1px solid rgba(94,196,212,.2);color:#4a7a8a;font-family:inherit;font-size:clamp(10px,.9vw,13px);padding:4px 12px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s;text-transform:uppercase}
 .lrs-ctrl-btn:hover{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.06)}
 .lrs-ctrl-btn.active{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.08)}
-.lrs-sidebar{width:clamp(180px,18vw,260px);display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.lrs-sidebar{width:clamp(220px,22vw,320px);display:flex;flex-direction:column;gap:8px;overflow-y:auto}
 .lrs-detail{border:1px solid rgba(94,196,212,.08);border-radius:3px;padding:8px;background:rgba(4,8,12,.5);display:none}
 .lrs-detail.show{display:block}
-.lrs-detail .ld-title{font-size:clamp(9px,.85vw,12px);color:#5ec4d4;letter-spacing:2px;margin-bottom:6px;border-bottom:1px solid rgba(94,196,212,.06);padding-bottom:4px}
-.lrs-detail .ld-row{display:flex;justify-content:space-between;font-size:clamp(7px,.6vw,9px);margin-bottom:3px}
+.lrs-detail .ld-title{font-size:clamp(13px,1.2vw,18px);color:#5ec4d4;letter-spacing:2px;margin-bottom:6px;border-bottom:1px solid rgba(94,196,212,.06);padding-bottom:4px}
+.lrs-detail .ld-row{display:flex;justify-content:space-between;font-size:clamp(10px,.9vw,13px);margin-bottom:3px}
 .lrs-detail .ld-label{color:#2a4a5a}.lrs-detail .ld-val{color:#5ec4d4}
 .lrs-detail .ld-val.warn{color:#d4a03c}.lrs-detail .ld-val.danger{color:#e74c3c}
 .lrs-contact-log{border:1px solid rgba(94,196,212,.06);border-radius:3px;flex:1;overflow-y:auto;background:rgba(4,8,12,.4);min-height:100px}
-.lrs-cl-title{font-size:clamp(7px,.6vw,9px);color:#2a4a5a;letter-spacing:2px;padding:6px 8px;border-bottom:1px solid rgba(94,196,212,.04);text-transform:uppercase}
-.lrs-cl-entry{font-size:clamp(6px,.55vw,8px);padding:4px 8px;border-bottom:1px solid rgba(94,196,212,.02);cursor:pointer;transition:background .2s;display:flex;align-items:center;gap:6px}
+.lrs-cl-title{font-size:clamp(10px,.9vw,13px);color:#2a4a5a;letter-spacing:2px;padding:6px 8px;border-bottom:1px solid rgba(94,196,212,.04);text-transform:uppercase}
+.lrs-cl-entry{font-size:clamp(9px,.8vw,12px);padding:4px 8px;border-bottom:1px solid rgba(94,196,212,.02);cursor:pointer;transition:background .2s;display:flex;align-items:center;gap:6px}
 .lrs-cl-entry:hover{background:rgba(94,196,212,.04)}
 .lrs-cl-entry.selected{background:rgba(94,196,212,.06);border-left:2px solid #5ec4d4}
-.lrs-cl-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.lrs-cl-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .lrs-cl-info{flex:1;color:#3a6a7a}
-.lrs-cl-status{font-size:clamp(5px,.45vw,7px);color:#2a4a5a}
-.lrs-measure{position:absolute;font-size:clamp(7px,.6vw,9px);color:#d4a03c;background:rgba(8,12,16,.8);padding:2px 6px;border-radius:2px;pointer-events:none;display:none;letter-spacing:1px;z-index:2}
+.lrs-cl-status{font-size:clamp(7px,.65vw,10px);color:#2a4a5a}
+.lrs-measure{position:absolute;font-size:clamp(10px,.9vw,13px);color:#d4a03c;background:rgba(8,12,16,.8);padding:3px 8px;border-radius:2px;pointer-events:none;display:none;letter-spacing:1px;z-index:2}
 /* Context menu */
-.lrs-context{position:absolute;z-index:20;background:rgba(6,10,14,.95);border:1px solid rgba(94,196,212,.15);border-radius:3px;display:none;min-width:clamp(120px,12vw,160px)}
+.lrs-context{position:absolute;z-index:20;background:rgba(6,10,14,.95);border:1px solid rgba(94,196,212,.15);border-radius:3px;display:none;min-width:clamp(150px,14vw,200px)}
 .lrs-context.show{display:block}
-.lrs-ctx-item{padding:5px 10px;font-size:clamp(7px,.6vw,9px);color:#4a7a8a;cursor:pointer;letter-spacing:1px;transition:all .15s}
+.lrs-ctx-item{padding:6px 12px;font-size:clamp(10px,.9vw,13px);color:#4a7a8a;cursor:pointer;letter-spacing:1px;transition:all .15s}
 .lrs-ctx-item:hover{background:rgba(94,196,212,.06);color:#5ec4d4}
 .lrs-ctx-item.disabled{opacity:.3;pointer-events:none}
 
@@ -479,51 +516,123 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .db-content .spec{color:#2a4a5a;margin-right:10px;display:inline-block;width:120px}
 
 /* Engineering */
-.eng-graph{width:100%;height:50px;border:1px solid rgba(94,196,212,.08);border-radius:2px;margin:4px 0;background:rgba(4,8,12,.5);cursor:pointer}
+.eng-graph{width:100%;height:60px;border:1px solid rgba(94,196,212,.08);border-radius:2px;margin:4px 0;background:rgba(4,8,12,.5);cursor:pointer}
 .eng-section{margin-bottom:12px;border:1px solid rgba(94,196,212,.06);border-radius:3px;padding:8px 10px;transition:border-color .3s}
 .eng-section:hover{border-color:rgba(94,196,212,.12)}
 .eng-section.degraded{border-color:rgba(212,160,60,.2)}
 .eng-section.offline{border-color:rgba(231,76,60,.2);opacity:.6}
 .eng-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-.eng-section .eng-label{font-size:clamp(9px,.8vw,11px);color:#5ec4d4;letter-spacing:2px}
-.eng-section .eng-val{font-size:clamp(7px,.6vw,9px);color:#3a6a7a}
+.eng-section .eng-label{font-size:clamp(13px,1.2vw,16px);color:#5ec4d4;letter-spacing:2px}
+.eng-section .eng-val{font-size:clamp(10px,.9vw,13px);color:#3a6a7a}
 .eng-actions{display:flex;gap:4px}
-.eng-sm-btn{background:none;border:1px solid rgba(94,196,212,.15);color:#3a6a7a;font-family:inherit;font-size:clamp(6px,.5vw,8px);padding:2px 6px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s}
+.eng-sm-btn{background:none;border:1px solid rgba(94,196,212,.15);color:#3a6a7a;font-family:inherit;font-size:clamp(9px,.75vw,11px);padding:3px 8px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s}
 .eng-sm-btn:hover{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.05)}
 .eng-sm-btn.warn-btn{border-color:rgba(212,160,60,.2);color:#d4a03c}
 .eng-sm-btn.warn-btn:hover{border-color:#d4a03c;background:rgba(212,160,60,.05)}
 .eng-time-btns{display:flex;gap:3px;margin-bottom:4px}
-.eng-time-btn{background:none;border:1px solid rgba(94,196,212,.1);color:#2a4a5a;font-family:inherit;font-size:clamp(5px,.45vw,7px);padding:1px 5px;cursor:pointer;border-radius:2px;transition:all .15s}
+.eng-time-btn{background:none;border:1px solid rgba(94,196,212,.1);color:#2a4a5a;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:2px 7px;cursor:pointer;border-radius:2px;transition:all .15s}
 .eng-time-btn.active{border-color:#5ec4d4;color:#5ec4d4}
-.eng-tuning{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:clamp(6px,.5vw,7px);color:#2a4a5a}
-.eng-tuning input{-webkit-appearance:none;appearance:none;width:80px;height:3px;background:#1a2a32;outline:none;border-radius:2px;cursor:pointer}
+.eng-tuning{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:clamp(8px,.7vw,10px);color:#2a4a5a}
+.eng-tuning input{-webkit-appearance:none;appearance:none;width:100px;height:3px;background:#1a2a32;outline:none;border-radius:2px;cursor:pointer}
 .eng-tuning input::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height:8px;background:#5ec4d4;border-radius:50%;cursor:pointer}
 .eng-tuning .et-label{letter-spacing:1px;width:50px;text-align:center}
 .eng-tuning .et-label.perf{color:#d4a03c}
 .eng-tuning .et-label.long{color:#2ecc71}
-.eng-threshold{display:flex;align-items:center;gap:4px;margin-top:3px;font-size:clamp(5px,.45vw,7px);color:#2a4a5a}
+.eng-threshold{display:flex;align-items:center;gap:4px;margin-top:3px;font-size:clamp(8px,.7vw,10px);color:#2a4a5a}
 .eng-threshold input{-webkit-appearance:none;appearance:none;width:50px;height:2px;background:#1a2a32;outline:none;border-radius:1px;cursor:pointer}
 .eng-threshold input::-webkit-slider-thumb{-webkit-appearance:none;width:6px;height:6px;background:#d4a03c;border-radius:50%;cursor:pointer}
 .eng-detail-panel{display:none;margin-top:6px;padding:6px 8px;border:1px solid rgba(94,196,212,.06);border-radius:2px;background:rgba(4,8,12,.4)}
 .eng-detail-panel.show{display:block}
-.eng-comp{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:clamp(6px,.55vw,8px);border-bottom:1px solid rgba(94,196,212,.02)}
+.eng-comp{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:clamp(9px,.8vw,11px);border-bottom:1px solid rgba(94,196,212,.02)}
 .eng-comp .ec-name{color:#3a6a7a;flex:1}
 .eng-comp .ec-status{width:50px;text-align:center;letter-spacing:1px}
 .eng-comp .ec-status.ok{color:#2ecc71}
 .eng-comp .ec-status.fault{color:#e74c3c;animation:blink-crit 2s infinite}
-.eng-comp .ec-replace{background:none;border:1px solid rgba(231,76,60,.2);color:#e74c3c;font-family:inherit;font-size:clamp(5px,.45vw,7px);padding:1px 5px;cursor:pointer;border-radius:2px;transition:all .2s;margin-left:4px}
+.eng-comp .ec-replace{background:none;border:1px solid rgba(231,76,60,.2);color:#e74c3c;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:2px 6px;cursor:pointer;border-radius:2px;transition:all .2s;margin-left:4px}
 .eng-comp .ec-replace:hover{background:rgba(231,76,60,.08)}
 .eng-restart-bar{width:100%;height:4px;background:#111a20;border-radius:2px;margin-top:4px;overflow:hidden}
 .eng-restart-fill{height:100%;width:0%;background:linear-gradient(90deg,#1a5a6a,#5ec4d4);border-radius:2px;transition:width .1s}
-.eng-bypass{margin-top:4px;padding:4px 8px;border:1px solid rgba(212,160,60,.15);border-radius:2px;font-size:clamp(6px,.5vw,7px);color:#d4a03c;display:none}
+.eng-bypass{margin-top:4px;padding:4px 8px;border:1px solid rgba(212,160,60,.15);border-radius:2px;font-size:clamp(9px,.75vw,10px);color:#d4a03c;display:none}
 .eng-bypass.show{display:flex;justify-content:space-between;align-items:center}
 .eng-bypass .eb-info{flex:1;line-height:1.4}
-.eng-rec{font-size:clamp(7px,.6vw,9px);color:#d4a03c;border-left:2px solid rgba(212,160,60,.3);padding-left:8px;margin-top:8px;font-style:italic}
+.eng-rec{font-size:clamp(10px,.9vw,13px);color:#d4a03c;border-left:2px solid rgba(212,160,60,.3);padding-left:8px;margin-top:8px;font-style:italic}
 .eng-bottom{display:flex;gap:12px;margin-top:12px}
 .eng-maint-log{flex:1;border:1px solid rgba(94,196,212,.06);border-radius:3px;max-height:120px;overflow-y:auto;background:rgba(4,8,12,.4)}
-.eng-ml-title{font-size:clamp(7px,.6vw,9px);color:#2a4a5a;letter-spacing:2px;padding:6px 8px;border-bottom:1px solid rgba(94,196,212,.04);text-transform:uppercase}
-.eng-ml-entry{font-size:clamp(6px,.5vw,8px);padding:3px 8px;border-bottom:1px solid rgba(94,196,212,.02);color:#3a6a7a}
+.eng-ml-title{font-size:clamp(10px,.9vw,13px);color:#2a4a5a;letter-spacing:2px;padding:6px 8px;border-bottom:1px solid rgba(94,196,212,.04);text-transform:uppercase}
+.eng-ml-entry{font-size:clamp(9px,.75vw,11px);padding:4px 8px;border-bottom:1px solid rgba(94,196,212,.02);color:#3a6a7a}
 .eng-ml-entry .eml-time{color:#2a4a5a;margin-right:6px}
+
+/* === WEAPONS SYSTEM === */
+.weapons-panel{position:fixed;inset:0;z-index:14;display:none;pointer-events:auto;background:rgba(4,8,12,.12)}
+.weapons-panel.show{display:flex}
+.wpn-layout{display:flex;width:100%;height:100%}
+/* Left: targeting viewport */
+.wpn-viewport{flex:1;position:relative;display:flex;align-items:center;justify-content:center}
+.wpn-viewport canvas{position:absolute;inset:0;width:100%;height:100%}
+.wpn-reticle{position:absolute;pointer-events:none;z-index:2}
+.wpn-target-info{position:absolute;top:20px;left:20px;z-index:3;pointer-events:none}
+.wpn-ti-row{font-size:clamp(10px,.9vw,13px);color:#e74c3c;letter-spacing:2px;margin-bottom:3px}
+.wpn-ti-row.locked{color:#2ecc71}
+.wpn-ti-row .wti-label{color:#3a4a5a;margin-right:8px}
+.wpn-status-bar{position:absolute;bottom:20px;left:20px;right:320px;z-index:3;display:flex;gap:16px;pointer-events:none}
+.wpn-stat{font-size:clamp(9px,.8vw,11px);letter-spacing:1px}
+.wpn-stat .ws-label{color:#2a4a5a;text-transform:uppercase;font-size:.85em;margin-bottom:2px}
+.wpn-stat .ws-val{color:#5ec4d4}
+.wpn-stat .ws-val.hot{color:#e74c3c}
+.wpn-stat .ws-val.armed{color:#2ecc71}
+/* Right: controls panel */
+.wpn-controls{width:clamp(280px,22vw,360px);background:rgba(6,10,14,.85);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-left:1px solid rgba(94,196,212,.08);display:flex;flex-direction:column;overflow-y:auto;z-index:3}
+.wpn-header{padding:12px 14px;border-bottom:1px solid rgba(94,196,212,.06);display:flex;justify-content:space-between;align-items:center}
+.wpn-header .wh-title{font-size:clamp(12px,1.1vw,16px);color:#e74c3c;letter-spacing:4px;text-transform:uppercase}
+.wpn-section{padding:10px 14px;border-bottom:1px solid rgba(94,196,212,.04)}
+.wpn-sec-title{font-size:clamp(9px,.8vw,11px);color:#3a6a7a;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+/* Targeting */
+.wpn-target-list{max-height:120px;overflow-y:auto}
+.wpn-tgt{display:flex;align-items:center;gap:8px;padding:5px 8px;border:1px solid rgba(94,196,212,.06);border-radius:2px;margin-bottom:4px;cursor:pointer;transition:all .2s;font-size:clamp(9px,.8vw,11px)}
+.wpn-tgt:hover{border-color:rgba(94,196,212,.2);background:rgba(94,196,212,.03)}
+.wpn-tgt.locked{border-color:rgba(231,76,60,.4);background:rgba(231,76,60,.04)}
+.wpn-tgt .wt-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.wpn-tgt .wt-name{flex:1;color:#4a7a8a}
+.wpn-tgt .wt-dist{color:#2a4a5a;font-size:.85em}
+.wpn-tgt .wt-lock{font-size:.8em;color:#e74c3c;letter-spacing:1px}
+/* Laser controls */
+.wpn-laser-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.wpn-laser-label{font-size:clamp(8px,.7vw,10px);color:#3a6a7a;width:70px;letter-spacing:1px}
+.wpn-laser-slider{-webkit-appearance:none;appearance:none;flex:1;height:4px;background:#1a1a20;outline:none;border-radius:2px;cursor:pointer}
+.wpn-laser-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;cursor:pointer;box-shadow:0 0 6px}
+.wpn-laser-slider.intensity::-webkit-slider-thumb{background:#e74c3c;box-shadow:0 0 6px rgba(231,76,60,.4)}
+.wpn-laser-slider.freq::-webkit-slider-thumb{background:#d4a03c;box-shadow:0 0 6px rgba(212,160,60,.4)}
+.wpn-laser-val{font-size:clamp(9px,.8vw,11px);color:#e74c3c;width:45px;text-align:right;font-variant-numeric:tabular-nums}
+.wpn-fire-btn{width:100%;padding:10px;border:2px solid rgba(231,76,60,.3);background:rgba(231,76,60,.06);color:#e74c3c;font-family:inherit;font-size:clamp(11px,1vw,14px);letter-spacing:4px;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all .2s;margin-top:6px}
+.wpn-fire-btn:hover{border-color:#e74c3c;background:rgba(231,76,60,.12)}
+.wpn-fire-btn:active{background:rgba(231,76,60,.25)}
+.wpn-fire-btn:disabled{opacity:.3;pointer-events:none}
+.wpn-fire-btn.cooldown{border-color:#3a3a3a;color:#3a3a3a;background:rgba(20,20,20,.5)}
+.wpn-cooldown-bar{width:100%;height:4px;background:#111;border-radius:2px;margin-top:4px;overflow:hidden}
+.wpn-cooldown-fill{height:100%;width:0%;background:linear-gradient(90deg,#e74c3c,#d4a03c);border-radius:2px;transition:width .1s}
+/* Torpedo */
+.wpn-torp-rack{display:flex;gap:4px;margin:6px 0}
+.wpn-torp{width:clamp(20px,2vw,28px);height:clamp(8px,.8vh,12px);border:1px solid rgba(94,196,212,.2);border-radius:2px;background:rgba(94,196,212,.06);transition:all .3s}
+.wpn-torp.loaded{border-color:rgba(46,204,113,.4);background:rgba(46,204,113,.1)}
+.wpn-torp.fired{border-color:rgba(60,60,60,.3);background:rgba(20,20,20,.3)}
+.wpn-torp-btn{width:100%;padding:8px;border:2px solid rgba(46,204,113,.25);background:rgba(46,204,113,.04);color:#2ecc71;font-family:inherit;font-size:clamp(10px,.9vw,13px);letter-spacing:3px;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all .2s}
+.wpn-torp-btn:hover{border-color:#2ecc71;background:rgba(46,204,113,.1)}
+.wpn-torp-btn:disabled{opacity:.3;pointer-events:none}
+/* Shield direction */
+.shield-grid{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto auto;gap:4px;width:clamp(140px,14vw,180px);margin:0 auto}
+.shield-cell{border:1px solid rgba(94,196,212,.1);border-radius:2px;padding:4px;text-align:center;font-size:clamp(7px,.6vw,9px);color:#3a6a7a;cursor:pointer;transition:all .2s;min-height:28px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.shield-cell:hover{border-color:rgba(94,196,212,.3)}
+.shield-cell.active{border-color:rgba(94,196,212,.5);background:rgba(94,196,212,.08);color:#5ec4d4}
+.shield-cell.reinforced{border-color:rgba(46,204,113,.5);background:rgba(46,204,113,.08);color:#2ecc71}
+.shield-cell.ship{border:none;background:none;cursor:default;color:#5ec4d4;font-size:clamp(10px,.9vw,14px)}
+.shield-pct{font-size:clamp(8px,.7vw,10px);margin-top:2px;font-variant-numeric:tabular-nums}
+/* Weapons log */
+.wpn-log{flex:1;overflow-y:auto;min-height:60px;border-top:1px solid rgba(94,196,212,.04)}
+.wpn-log-title{font-size:clamp(8px,.7vw,10px);color:#2a4a5a;letter-spacing:2px;padding:6px 14px;text-transform:uppercase}
+.wpn-log-entry{font-size:clamp(8px,.7vw,10px);padding:3px 14px;color:#4a5a5a;border-bottom:1px solid rgba(94,196,212,.02)}
+.wpn-log-entry.hit{color:#2ecc71}
+.wpn-log-entry.miss{color:#d4a03c}
+.wpn-log-entry .wle-time{color:#2a3a3a;margin-right:6px}
 
 /* Crew manifest */
 .crew-card{display:flex;gap:12px;padding:10px;border:1px solid rgba(94,196,212,.08);border-radius:3px;margin-bottom:8px}
@@ -748,8 +857,8 @@ canvas#c{position:fixed;inset:0;z-index:0}
 <body>
 
 <div id="name-modal">
-  <div class="nm-title">Deep Space Simulator</div>
-  <div class="nm-sub">A Simulator Authored by M.B. Parks</div>
+  <div class="nm-title">Starship ASMR Simulator</div>
+  <div class="nm-sub">Authored by M.B. Parks</div>
   <div style="font-size:clamp(10px,.9vw,14px);color:#1a3a4a;letter-spacing:5px;margin-bottom:clamp(14px,2.5vh,24px)">Name your vessel</div>
   <input type="text" id="ship-name-input" placeholder="Enter ship name…" maxlength="24">
   <div class="diff-label">Select Mission Profile</div>
@@ -759,6 +868,7 @@ canvas#c{position:fixed;inset:0;z-index:0}
     <div class="diff-btn" data-diff="frontier"><div class="db-name">Deep Frontier</div><div class="db-desc">Frequent events. Resource pressure. Higher burnout risk.</div></div>
   </div>
   <button class="nm-btn" id="nm-engage">Engage Systems</button>
+  <a href="https://www.youtube.com/watch?v=-q4XwtdSxDE" target="_blank" style="display:block;margin-top:clamp(14px,2vh,22px);font-size:clamp(9px,.8vw,12px);color:#3a6a7a;letter-spacing:3px;text-decoration:none;transition:color .3s" onmouseover="this.style.color='#5ec4d4'" onmouseout="this.style.color='#3a6a7a'">♫ Recommended Audio Source</a>
 </div>
 
 <div id="engage" class="hidden"><div class="title">ISS Artemis</div><div class="sub">Click to engage systems</div></div>
@@ -909,6 +1019,7 @@ canvas#c{position:fixed;inset:0;z-index:0}
   <button class="scr-btn" data-screen="comms-init" style="border-color:rgba(46,204,113,.2);color:#2ecc71">Hail</button>
   <button class="scr-btn" data-screen="power">Power</button>
   <button class="scr-btn" data-screen="watch" style="border-color:rgba(212,160,60,.2);color:#d4a03c">Watch</button>
+  <button class="scr-btn" data-screen="weapons" style="border-color:rgba(231,76,60,.2);color:#e74c3c">Wpns</button>
 </div>
 
 <!-- WATCH SUMMARY -->
@@ -929,6 +1040,67 @@ canvas#c{position:fixed;inset:0;z-index:0}
 </div>
 
 <!-- POWER ALLOCATION -->
+
+<!-- WEAPONS SYSTEM -->
+<div class="weapons-panel" id="weapons-panel">
+<div class="wpn-layout">
+  <div class="wpn-viewport">
+    <canvas id="wpn-canvas"></canvas>
+    <div class="wpn-target-info" id="wpn-target-info"></div>
+    <div class="wpn-status-bar" id="wpn-status-bar"></div>
+  </div>
+  <div class="wpn-controls">
+    <div class="wpn-header"><span class="wh-title">◇ Weapons</span><button class="pwr-close" id="wpn-close">Close</button></div>
+
+    <div class="wpn-section">
+      <div class="wpn-sec-title">Targeting</div>
+      <div class="wpn-target-list" id="wpn-targets"></div>
+    </div>
+
+    <div class="wpn-section">
+      <div class="wpn-sec-title">Laser Array</div>
+      <div class="wpn-laser-row"><span class="wpn-laser-label">Intensity</span><input type="range" class="wpn-laser-slider intensity" id="wpn-intensity" min="10" max="100" value="50"><span class="wpn-laser-val" id="wpn-int-val">50%</span></div>
+      <div class="wpn-laser-row"><span class="wpn-laser-label">Frequency</span><input type="range" class="wpn-laser-slider freq" id="wpn-freq" min="0" max="100" value="50"><span class="wpn-laser-val" style="color:#d4a03c" id="wpn-freq-val">UV</span></div>
+      <div class="wpn-laser-row"><span class="wpn-laser-label">Mode</span>
+        <button class="eng-sm-btn" id="wpn-mode-pulse" style="flex:1">Pulse</button>
+        <button class="eng-sm-btn" id="wpn-mode-beam" style="flex:1;border-color:rgba(231,76,60,.3);color:#e74c3c">Beam</button>
+      </div>
+      <button class="wpn-fire-btn" id="wpn-fire-laser">◈ Fire Laser</button>
+      <div class="wpn-cooldown-bar"><div class="wpn-cooldown-fill" id="wpn-cool-fill"></div></div>
+      <div style="font-size:clamp(7px,.6vw,9px);color:#2a4a5a;text-align:center;margin-top:4px" id="wpn-heat">Heat: 0%</div>
+    </div>
+
+    <div class="wpn-section">
+      <div class="wpn-sec-title">Torpedo Bay</div>
+      <div class="wpn-torp-rack" id="wpn-torp-rack"></div>
+      <button class="wpn-torp-btn" id="wpn-fire-torp">▷ Launch Torpedo</button>
+      <div style="font-size:clamp(8px,.7vw,10px);color:#2a4a5a;text-align:center;margin-top:4px" id="wpn-torp-status">8 / 8 loaded</div>
+    </div>
+
+    <div class="wpn-section">
+      <div class="wpn-sec-title">Shield Distribution</div>
+      <div class="shield-grid" id="shield-grid">
+        <div class="shield-cell" data-dir="fl">FWD-L<div class="shield-pct">100%</div></div>
+        <div class="shield-cell" data-dir="f">FWD<div class="shield-pct">100%</div></div>
+        <div class="shield-cell" data-dir="fr">FWD-R<div class="shield-pct">100%</div></div>
+        <div class="shield-cell" data-dir="l">PORT<div class="shield-pct">100%</div></div>
+        <div class="shield-cell ship">◈</div>
+        <div class="shield-cell" data-dir="r">STBD<div class="shield-pct">100%</div></div>
+        <div class="shield-cell" data-dir="al">AFT-L<div class="shield-pct">100%</div></div>
+        <div class="shield-cell" data-dir="a">AFT<div class="shield-pct">100%</div></div>
+        <div class="shield-cell" data-dir="ar">AFT-R<div class="shield-pct">100%</div></div>
+      </div>
+      <div style="font-size:clamp(7px,.6vw,9px);color:#2a4a5a;text-align:center;margin-top:6px">Click to reinforce sector (draws from adjacent)</div>
+    </div>
+
+    <div class="wpn-log">
+      <div class="wpn-log-title">Weapons Log</div>
+      <div id="wpn-log-body"></div>
+    </div>
+  </div>
+</div>
+</div>
+
 <div class="power-panel" id="power-panel">
 <div class="pwr-wrap" style="position:relative">
   <div class="pwr-title">⚡ Power Allocation</div>
@@ -952,7 +1124,10 @@ canvas#c{position:fixed;inset:0;z-index:0}
 <!-- SHIP SCHEMATIC -->
 <div class="screen-overlay" id="scr-schematic"><button class="s-close" data-close>Close</button>
 <div class="s-title">ISS Artemis — Deck Schematic</div>
-<div id="schematic-body"></div>
+<div class="schematic-wrap">
+  <div class="schematic-main" id="schematic-body"></div>
+  <div class="schematic-detail" id="schematic-detail"></div>
+</div>
 </div>
 
 <!-- COMMS LOG -->
@@ -967,7 +1142,7 @@ canvas#c{position:fixed;inset:0;z-index:0}
 <div class="s-title">Long-Range Sensor Array</div>
 <div class="lrs-wrap">
   <div class="lrs-main">
-    <canvas id="lrs-canvas" width="500" height="500" style="width:min(500px,45vw);height:min(500px,45vw)"></canvas>
+    <canvas id="lrs-canvas" width="700" height="700" style="width:min(700px,55vw);height:min(700px,55vw)"></canvas>
     <div class="lrs-controls">
       <button class="lrs-ctrl-btn" id="lrs-ping">Ping</button>
       <button class="lrs-ctrl-btn" id="lrs-track-toggle">Track Mode</button>
@@ -1011,8 +1186,8 @@ canvas#c{position:fixed;inset:0;z-index:0}
 <!-- NAV PLANNER -->
 <div class="screen-overlay" id="scr-navplan"><button class="s-close" data-close>Close</button>
 <div class="s-title">Navigation Planner</div>
-<canvas id="navplan-canvas" width="800" height="600" style="width:100%;max-width:700px;display:block;margin:0 auto;border:1px solid rgba(94,196,212,.08);border-radius:3px;cursor:crosshair"></canvas>
-<div id="navplan-info" style="text-align:center;margin-top:8px;font-size:clamp(7px,.65vw,9px);color:#3a6a7a"></div>
+<canvas id="navplan-canvas" width="1200" height="900" style="width:100%;max-width:1050px;display:block;margin:0 auto;border:1px solid rgba(94,196,212,.08);border-radius:3px;cursor:crosshair"></canvas>
+<div id="navplan-info" style="text-align:center;margin-top:8px;font-size:clamp(10px,.95vw,14px);color:#3a6a7a"></div>
 </div>
 
 <!-- CAMERAS -->
@@ -2233,6 +2408,12 @@ document.querySelectorAll('.scr-btn').forEach(btn=>{
     if(id==='pip'){document.getElementById('pip').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
     if(id==='ai'){document.getElementById('ai-terminal').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
     if(id==='fuelg'){document.getElementById('fuel-graph').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
+    if(id==='weapons'){
+      const wp=document.getElementById('weapons-panel');
+      if(wp.classList.contains('show')){wp.classList.remove('show');btn.classList.remove('active');cancelAnimationFrame(wpnAnimFrame)}
+      else{wp.classList.add('show');btn.classList.add('active');initWeapons();drawWeaponsView()}
+      if(engaged)clickSound();return;
+    }
     if(id==='power'){
       const pp=document.getElementById('power-panel');
       if(pp.classList.contains('show')){pp.classList.remove('show');btn.classList.remove('active')}
@@ -2295,26 +2476,174 @@ function renderCommsLog(){
 }
 
 // === SHIP SCHEMATIC ===
-const deckData=[
+const roomData={
+  'Helm':{deck:'Bridge',desc:'Primary flight control station. Hosts navigation, helm, and autopilot systems.',power:12,temp:21,press:1.01,o2:21,crew:['Cpt. Vasquez'],actions:[]},
+  'Ops':{deck:'Bridge',desc:'Operations management. Monitors all ship systems and coordinates crew activity.',power:18,temp:21,press:1.01,o2:21,crew:[],actions:[]},
+  'Comms':{deck:'Bridge',desc:'Communications array control. Subspace transceiver and signal processing.',power:14,temp:20,press:1.01,o2:21,crew:[],actions:[]},
+  'Nav':{deck:'Bridge',desc:'Stellar cartography and navigation plotting. Houses the main star chart database.',power:10,temp:20,press:1.01,o2:21,crew:[],actions:[]},
+  'Quarters A':{deck:'Deck 1',desc:'Officer quarters. Bunks for 4 crew with personal storage and terminals.',power:4,temp:22,press:1.01,o2:21,crew:['Lt. Park'],actions:[]},
+  'Quarters B':{deck:'Deck 1',desc:'Crew quarters. Standard bunks with shared facilities.',power:4,temp:22,press:1.01,o2:21,crew:[],actions:[]},
+  'Mess Hall':{deck:'Deck 1',desc:'Galley and dining area. Automated meal prep. Seats 8.',power:6,temp:23,press:1.01,o2:21,crew:[],actions:[]},
+  'Med Bay':{deck:'Deck 1',desc:'Medical facility with surgical suite, pharmacy, and diagnostic imaging.',power:15,temp:21,press:1.01,o2:22,crew:['Dr. Okafor'],actions:[{label:'Run Bio-Scan',action:'bioscan'}]},
+  'Lab':{deck:'Deck 2',desc:'Science laboratory. Spectral analysis, sample storage, and research terminals.',power:20,temp:20,press:1.01,o2:21,crew:['Dr. Tanaka'],actions:[]},
+  'Cargo Bay':{deck:'Deck 2',desc:'Primary cargo hold. 2,400 m³ capacity. Pressurized and temperature-controlled.',power:3,temp:18,press:1.00,o2:20,crew:[],actions:[{label:'Inventory Check',action:'inventory'}]},
+  'Armory':{deck:'Deck 2',desc:'Weapons storage and security station. Access restricted to authorized personnel.',power:2,temp:19,press:1.01,o2:21,crew:[],actions:[{label:'Arm Security Protocol',action:'security'}]},
+  'Rec Room':{deck:'Deck 2',desc:'Recreation area. Exercise equipment, entertainment systems, observation window.',power:5,temp:22,press:1.01,o2:21,crew:[],actions:[]},
+  'Engineering':{deck:'Deck 3',desc:'Main engineering. Drive system controls, diagnostic stations, EVA prep area.',power:35,temp:26,press:1.02,o2:21,crew:['Cpl. Reyes'],actions:[]},
+  'Reactor':{deck:'Deck 3',desc:'Dual Tokamak fusion reactor. Restricted access. Radiation-shielded.',power:0,temp:38,press:1.03,o2:20,crew:[],actions:[]},
+  'Cryo Bay':{deck:'Deck 3',desc:'Cryogenic suspension facility. 8 pods, 1 currently occupied.',power:22,temp:4,press:1.00,o2:18,crew:['Sgt. Mensah (cryo)'],actions:[{label:'Wake Crew Member',action:'wake',warn:true}]},
+  'Life Support':{deck:'Deck 3',desc:'Atmospheric processing, water recycling, and environmental control center.',power:25,temp:20,press:1.01,o2:22,crew:[],actions:[]},
+};
+const deckLayout=[
   {name:'Bridge',rooms:['Helm','Ops','Comms','Nav']},
   {name:'Deck 1',rooms:['Quarters A','Quarters B','Mess Hall','Med Bay']},
   {name:'Deck 2',rooms:['Lab','Cargo Bay','Armory','Rec Room']},
   {name:'Deck 3',rooms:['Engineering','Reactor','Cryo Bay','Life Support']},
 ];
-const crewPositions=['Helm','Med Bay','Engineering','Quarters A','Lab','Cryo Bay'];
+const bulkheadStates={};// key: 'deckIdx-roomIdx' = locked boolean
+let selectedRoom=null;
+
 function renderSchematic(){
   const el=document.getElementById('schematic-body');
   let html='';
-  deckData.forEach(d=>{
+  deckLayout.forEach((d,di)=>{
     html+='<div class="schematic-deck"><div class="deck-label">'+d.name+'</div>';
-    d.rooms.forEach(r=>{
-      const hasCrew=crewPositions.includes(r);
+    d.rooms.forEach((r,ri)=>{
+      const rd=roomData[r]||{};
+      const hasCrew=rd.crew&&rd.crew.length>0;
       const isWarn=r==='Engineering'||r==='Reactor';
-      html+='<div class="schematic-room'+(hasCrew?' has-crew':'')+(isWarn?' warn':'')+'">'+(hasCrew?'<div class="crew-dot"></div>':'')+r+'</div>';
+      const isSelected=selectedRoom===r;
+      html+='<div class="schematic-room'+(hasCrew?' has-crew':'')+(isWarn?' warn':'')+(isSelected?' selected':'')+'" data-room="'+r+'">'+(hasCrew?'<div class="crew-dot"></div>':'')+r+'</div>';
+      // Bulkhead between rooms (not after last)
+      if(ri<d.rooms.length-1){
+        const bhKey=di+'-'+ri;
+        const locked=bulkheadStates[bhKey]||false;
+        html+='<div class="bulkhead'+(locked?' locked':'')+'" data-bh="'+bhKey+'"><div class="bh-line"></div></div>';
+      }
     });
     html+='</div>';
   });
   el.innerHTML=html;
+
+  // Attach room click handlers
+  el.querySelectorAll('.schematic-room').forEach(rm=>{
+    rm.addEventListener('click',()=>{
+      selectedRoom=rm.dataset.room;
+      renderSchematic();
+      showRoomDetail(rm.dataset.room);
+      if(engaged)clickSound();
+    });
+  });
+
+  // Attach bulkhead click handlers
+  el.querySelectorAll('.bulkhead').forEach(bh=>{
+    bh.addEventListener('click',()=>{
+      const key=bh.dataset.bh;
+      bulkheadStates[key]=!bulkheadStates[key];
+      logComms('Security','Bulkhead '+key+(bulkheadStates[key]?' LOCKED — sealed':' unlocked — open'));
+      renderSchematic();
+      if(selectedRoom)showRoomDetail(selectedRoom);
+      if(engaged)clickSound();
+    });
+  });
+
+  // Show detail if a room is selected
+  if(selectedRoom)showRoomDetail(selectedRoom);
+}
+
+function showRoomDetail(name){
+  const rd=roomData[name];
+  if(!rd){document.getElementById('schematic-detail').classList.remove('show');return}
+  const det=document.getElementById('schematic-detail');
+  const pressVar=hudPress<.9?rd.press*.8:rd.press;
+  const o2Var=o2Val<75?rd.o2-3:rd.o2;
+
+  let occupantsHtml='';
+  if(rd.crew.length>0){
+    occupantsHtml='<div class="sd-occupants">'+rd.crew.map(c=>'<div class="sd-occ"><div class="sd-occ-dot"></div>'+c+'</div>').join('')+'</div>';
+  } else {
+    occupantsHtml='<div class="sd-occupants"><div class="sd-occ" style="color:#2a4a5a">No occupants</div></div>';
+  }
+
+  let actionsHtml='';
+  if(rd.actions&&rd.actions.length>0){
+    actionsHtml=rd.actions.map(a=>'<button class="sd-action-btn'+(a.warn?' warn':'')+'" data-action="'+a.action+'">'+a.label+'</button>').join('');
+  }
+
+  det.innerHTML=`
+    <div class="sd-header"><div class="sd-title">${name}</div><div class="sd-deck">${rd.deck}</div></div>
+    <div class="sd-body">
+      <div class="sd-desc">${rd.desc}</div>
+      ${occupantsHtml}
+      <div class="sd-row"><span class="sd-label">Temperature</span><span class="sd-val">${rd.temp}°C</span></div>
+      <div class="sd-row"><span class="sd-label">Pressure</span><span class="sd-val ${pressVar<.9?'warn':''}">${pressVar.toFixed(2)} bar</span></div>
+      <div class="sd-row"><span class="sd-label">O₂</span><span class="sd-val ${o2Var<19?'warn':'ok'}">${o2Var.toFixed(1)}%</span></div>
+      <div class="sd-row"><span class="sd-label">Power Draw</span><span class="sd-val">${rd.power} kW</span></div>
+      <div class="sd-row"><span class="sd-label">Last Maint.</span><span class="sd-val">Day ${Math.max(0,Math.floor((Date.now()-missionStart)*100/1000/86400)-Math.floor(Math.random()*5))}</span></div>
+    </div>
+    ${actionsHtml?'<div class="sd-actions">'+actionsHtml+'</div>':''}`;
+  det.classList.add('show');
+
+  // Action handlers
+  det.querySelectorAll('[data-action]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const action=btn.dataset.action;
+      if(action==='bioscan'){
+        btn.textContent='Scanning…';btn.disabled=true;
+        logComms('Med Bay','Running bio-scan on all crew. Estimated time: 10 seconds.');
+        setTimeout(()=>{
+          btn.textContent='✓ Bio-Scan Complete';btn.style.borderColor='#2ecc71';btn.style.color='#2ecc71';
+          logComms('Med Bay','Bio-scan complete. All crew vitals within normal parameters. No anomalies detected.');
+          addDiscovery('medical','Crew bio-scan — all vitals nominal. No pathogens or anomalies detected.');
+        },3000);
+      }
+      if(action==='inventory'){
+        btn.textContent='Checking…';btn.disabled=true;
+        logComms('Cargo','Running cargo manifest inventory check.');
+        setTimeout(()=>{
+          const items=Math.floor(40+Math.random()*60);
+          const mass=Math.floor(800+Math.random()*1200);
+          btn.textContent='✓ Inventory Complete';btn.style.borderColor='#2ecc71';btn.style.color='#2ecc71';
+          logComms('Cargo','Inventory complete. '+items+' items catalogued. Total mass: '+mass+' tonnes. Capacity: 82%.');
+        },2000);
+      }
+      if(action==='security'){
+        btn.textContent='Arming…';btn.disabled=true;
+        logComms('Security','⚠ Security protocol engaging. All decks on alert.');
+        setTimeout(()=>{
+          btn.textContent='✓ Protocol Armed';btn.style.borderColor='#d4a03c';btn.style.color='#d4a03c';
+          logComms('Security','Security protocol active. Armory access restricted. Internal sensors at maximum sensitivity.');
+          addCrewEntry('Security alert: all personnel report to stations.');
+        },2000);
+      }
+      if(action==='wake'){
+        if(btn.dataset.confirmed){
+          btn.textContent='Initiating Wake…';btn.disabled=true;
+          logComms('Cryo Bay','⚠ Cryo-wake sequence initiated for Sgt. Mensah. Estimated time: 30 minutes.');
+          addCrewEntry('Cryo Bay: Pod 1 wake sequence started. Vital monitoring active.');
+          setTimeout(()=>{
+            btn.textContent='✓ Wake In Progress';btn.style.borderColor='#5ec4d4';btn.style.color='#5ec4d4';
+            logComms('Cryo Bay','Sgt. Mensah core temperature rising. Neural activity detected. Wake progressing normally.');
+          },5000);
+        } else {
+          btn.dataset.confirmed='pending';
+          btn.textContent='⚠ Confirm Wake — Cannot be reversed';
+          btn.style.borderColor='rgba(231,76,60,.4)';btn.style.color='#e74c3c';
+          // Add cancel button
+          const cancel=document.createElement('button');
+          cancel.className='sd-action-btn';cancel.textContent='Cancel';cancel.style.marginTop='0';
+          btn.parentElement.appendChild(cancel);
+          cancel.addEventListener('click',()=>{
+            delete btn.dataset.confirmed;
+            btn.textContent='Wake Crew Member';btn.style.borderColor='';btn.style.color='';
+            cancel.remove();
+            if(engaged)clickSound();
+          });
+        }
+      }
+      if(engaged)clickSound();
+    });
+  });
 }
 
 // === LONG RANGE SCANNER ===
@@ -2350,7 +2679,7 @@ function drawLRS(){
   lrsCtx.strokeStyle='rgba(94,196,212,.06)';lrsCtx.lineWidth=.5;
   [.33,.66,1].forEach(s=>{lrsCtx.beginPath();lrsCtx.arc(cx,cy,r*s,0,6.283);lrsCtx.stroke()});
   lrsCtx.beginPath();lrsCtx.moveTo(cx,20);lrsCtx.lineTo(cx,h-20);lrsCtx.moveTo(20,cy);lrsCtx.lineTo(w-20,cy);lrsCtx.stroke();
-  lrsCtx.fillStyle='rgba(94,196,212,.15)';lrsCtx.font="8px 'Courier New'";
+  lrsCtx.fillStyle='rgba(94,196,212,.15)';lrsCtx.font="12px 'Courier New'";
   lrsCtx.fillText('5 ly',cx+r*.33+3,cy-3);lrsCtx.fillText('10 ly',cx+r*.66+3,cy-3);lrsCtx.fillText('15 ly',cx+r-8,cy-3);
 
   // Sweep line
@@ -2428,7 +2757,7 @@ function drawLRS(){
     // Collision check with ship
     const projEndX=o.x+o.vx*projLen,projEndY=o.y+o.vy*projLen;
     if(Math.abs(projEndX)<.03&&Math.abs(projEndY)<.03&&(Math.abs(o.vx)>0||Math.abs(o.vy)>0)){
-      lrsCtx.fillStyle='rgba(231,76,60,.6)';lrsCtx.font="bold 8px 'Courier New'";
+      lrsCtx.fillStyle='rgba(231,76,60,.6)';lrsCtx.font="bold 12px 'Courier New'";
       lrsCtx.fillText('⚠ COLLISION',pos.sx+8,pos.sy-10);
     }
 
@@ -2448,12 +2777,12 @@ function drawLRS(){
       lrsCtx.setLineDash([]);
       // Distance readout
       const tDist=(Math.sqrt(o.x**2+o.y**2)*15).toFixed(1);
-      lrsCtx.fillStyle='rgba(94,196,212,.4)';lrsCtx.font="7px 'Courier New'";
+      lrsCtx.fillStyle='rgba(94,196,212,.4)';lrsCtx.font="11px 'Courier New'";
       lrsCtx.fillText(tDist+' ly',(shipX+pos.sx)/2+5,(shipY+pos.sy)/2-3);
     }
 
     // Label
-    lrsCtx.fillStyle=`rgba(94,196,212,${alpha*.5})`;lrsCtx.font="7px 'Courier New'";
+    lrsCtx.fillStyle=`rgba(94,196,212,${alpha*.5})`;lrsCtx.font="11px 'Courier New'";
     lrsCtx.fillText(o.name,pos.sx+8,pos.sy+3);
   });
 
@@ -2697,6 +3026,14 @@ const engSystems=[
    tuning:.5,alertAmber:70,alertRed:50,expanded:false,restarting:false,bypassed:false,
    bypassInfo:'Borrow from atmospheric processors — 75% capacity',
    components:['O₂ Generator','CO₂ Scrubber','Humidity Control','Air Circulator','Water Recycler','Temp Regulator','Pressure Equalizer','Backup O₂ Tank']},
+  {id:'port_thruster',label:'Port Thruster',color:'#5ec4d4',data:[],val:()=>96+Math.random()*4,unit:'%',
+   tuning:.5,alertAmber:70,alertRed:50,expanded:false,restarting:false,bypassed:false,
+   bypassInfo:'Reroute through RCS maneuvering jets — 50% thrust, limited gimbal',
+   components:['Fuel Injector','Ignition Chamber','Nozzle Assembly','Gimbal Actuator','Thrust Vector Control','Fuel Line','Temperature Sensor','Emergency Cutoff']},
+  {id:'stbd_thruster',label:'Starboard Thruster',color:'#d4a03c',data:[],val:()=>80+Math.random()*10,unit:'%',
+   tuning:.5,alertAmber:70,alertRed:50,expanded:false,restarting:false,bypassed:false,
+   bypassInfo:'Compensate via port thruster differential — reduced maneuverability',
+   components:['Fuel Injector','Ignition Chamber','Nozzle Assembly','Gimbal Actuator','Thrust Vector Control','Fuel Line','Temperature Sensor','Emergency Cutoff']},
 ];
 const engMaintHistory=[];
 let engAnimFrame=0,engTimeWindow=60; // samples to show
@@ -2750,7 +3087,7 @@ function renderEngineering(){
         <button class="eng-time-btn ${engTimeWindow===60?'active':''}" data-tw="60">1m</button>
         <button class="eng-time-btn ${engTimeWindow===300?'active':''}" data-tw="300">5m</button>
       </div>
-      <canvas class="eng-graph" id="eng-cv-${s.id}" width="500" height="50"></canvas>
+      <canvas class="eng-graph" id="eng-cv-${s.id}" width="500" height="60"></canvas>
       <div class="eng-tuning">
         <span class="et-label long">Longevity</span>
         <input type="range" min="0" max="100" value="${s.tuning*100}" data-tune="${si}">
@@ -2824,7 +3161,7 @@ function drawEngGraph(id,data,color,amber,red){
   const cv=document.getElementById('eng-cv-'+id);
   if(!cv)return;
   const cx=cv.getContext('2d');
-  cv.width=cv.offsetWidth||500;cv.height=50;
+  cv.width=cv.offsetWidth||500;cv.height=60;
   cx.fillStyle='rgba(4,8,12,.3)';cx.fillRect(0,0,cv.width,cv.height);
   // Grid
   cx.strokeStyle='rgba(94,196,212,.04)';cx.lineWidth=.5;
@@ -2987,7 +3324,7 @@ function drawNavPlan(){
     npCtx.beginPath();npCtx.arc(wx,wy,wp.current?6:sel?5:3.5,0,6.283);npCtx.fill();
     if(wp.current){npCtx.strokeStyle='rgba(94,196,212,.25)';npCtx.lineWidth=1;npCtx.beginPath();npCtx.arc(wx,wy,14,0,6.283);npCtx.stroke()}
     npCtx.fillStyle=wp.current?'#5ec4d4':sel?'#d4a03c':'rgba(94,196,212,.4)';
-    npCtx.font=`${Math.max(10,w*.013)}px 'Courier New'`;npCtx.fillText(wp.name,wx+10,wy+4);
+    npCtx.font=`${Math.max(14,w*.018)}px 'Courier New'`;npCtx.fillText(wp.name,wx+12,wy+5);
   });
   // Info
   if(navRoute.length>1){
@@ -3514,6 +3851,448 @@ function openRepairModal(sys){
 
   modal.classList.add('show');
   renderStep();
+}
+
+// === WEAPONS SYSTEM ===
+const wpnCanvas=document.getElementById('wpn-canvas');
+const wpnCtx=wpnCanvas.getContext('2d');
+let wpnAnimFrame=0,wpnLockedTarget=null,wpnHeat=0,wpnCooldown=false;
+let wpnIntensity=50,wpnFreq=50,wpnMode='pulse';
+let wpnTorpedoes=8,wpnTorpMax=8;
+const wpnLog=[];
+const wpnLaserBeams=[];// active beam/pulse effects
+const wpnTorpTrails=[];// active torpedo visuals
+const wpnTargets=[];// generated targets
+const shieldDist={fl:100,f:100,fr:100,l:100,r:100,al:100,a:100,ar:100};
+let wpnReticleX=0,wpnReticleY=0,wpnReticleTarget=null;
+const freqNames=['IR','Red','UV','X-Ray','Gamma'];
+
+function initWeapons(){
+  wpnCanvas.width=wpnCanvas.parentElement.offsetWidth;
+  wpnCanvas.height=wpnCanvas.parentElement.offsetHeight;
+  // Generate targets from space objects
+  wpnTargets.length=0;
+  spaceObjects.forEach(o=>{
+    const seed=Math.abs(Math.round((o.x||0)*10000+(o.y||0)*10000));
+    wpnTargets.push({obj:o,name:generateVesselName?generateVesselName(seed):(o.kind+' '+seed),
+      kind:o.kind,dist:(Math.sqrt(o.x*o.x+o.y*o.y)*15).toFixed(1),
+      locked:false,health:100,shieldStr:o.kind==='ship'?60+Math.random()*40:0});
+  });
+  // Add some procedural contacts
+  if(wpnTargets.length<4){
+    for(let i=wpnTargets.length;i<6;i++){
+      const angle=Math.random()*6.28,dist=.1+Math.random()*.3;
+      wpnTargets.push({obj:{x:Math.cos(angle)*dist,y:Math.sin(angle)*dist,z:.5+Math.random()*.4,kind:'asteroid'},
+        name:'Contact-'+String.fromCharCode(65+i),kind:'asteroid',dist:(dist*15).toFixed(1),
+        locked:false,health:100,shieldStr:0});
+    }
+  }
+  renderTargetList();
+  renderTorpRack();
+  renderShieldGrid();
+}
+
+function wpnLogEntry(text,type){
+  const elapsed=Date.now()-missionStart;const ms=elapsed*100;const ts=Math.floor(ms/1000);
+  const h=Math.floor(ts/3600)%24,m=Math.floor(ts/60)%60;
+  const time=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+  wpnLog.unshift({time,text,type});
+  if(wpnLog.length>30)wpnLog.pop();
+  const el=document.getElementById('wpn-log-body');
+  el.innerHTML=wpnLog.map(e=>`<div class="wpn-log-entry ${e.type||''}"><span class="wle-time">[${e.time}]</span>${e.text}</div>`).join('');
+}
+
+function renderTargetList(){
+  const el=document.getElementById('wpn-targets');
+  el.innerHTML=wpnTargets.map((t,i)=>{
+    const color=lrsColors[t.kind]||'#888';
+    return`<div class="wpn-tgt${t.locked?' locked':''}" data-idx="${i}">
+      <div class="wt-dot" style="background:${color}"></div>
+      <div class="wt-name">${t.name}</div>
+      <div class="wt-dist">${t.dist}ly</div>
+      ${t.locked?'<div class="wt-lock">◉ LOCK</div>':''}
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.wpn-tgt').forEach(tgt=>{
+    tgt.addEventListener('click',()=>{
+      const idx=parseInt(tgt.dataset.idx);
+      wpnTargets.forEach(t=>t.locked=false);
+      wpnTargets[idx].locked=true;
+      wpnLockedTarget=wpnTargets[idx];
+      renderTargetList();
+      wpnLogEntry('Target locked: '+wpnLockedTarget.name,'');
+      logComms('Tactical','Weapons lock acquired on '+wpnLockedTarget.name+'.');
+      if(audioCtx){
+        const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+        o.type='square';o.frequency.value=1200;
+        g.gain.setValueAtTime(.03,audioCtx.currentTime);
+        g.gain.linearRampToValueAtTime(.05,audioCtx.currentTime+.05);
+        g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.2);
+        o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.25);
+        // Second tone
+        setTimeout(()=>{
+          const o2=audioCtx.createOscillator(),g2=audioCtx.createGain();
+          o2.type='square';o2.frequency.value=1500;
+          g2.gain.setValueAtTime(.04,audioCtx.currentTime);g2.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.15);
+          o2.connect(g2);g2.connect(masterGain);o2.start();o2.stop(audioCtx.currentTime+.2);
+        },150);
+      }
+      if(engaged)clickSound();
+    });
+  });
+}
+
+function renderTorpRack(){
+  const el=document.getElementById('wpn-torp-rack');
+  el.innerHTML='';
+  for(let i=0;i<wpnTorpMax;i++){
+    const div=document.createElement('div');
+    div.className='wpn-torp'+(i<wpnTorpedoes?' loaded':' fired');
+    el.appendChild(div);
+  }
+  document.getElementById('wpn-torp-status').textContent=wpnTorpedoes+' / '+wpnTorpMax+' loaded';
+  document.getElementById('wpn-fire-torp').disabled=wpnTorpedoes<=0||!wpnLockedTarget;
+}
+
+function renderShieldGrid(){
+  document.querySelectorAll('.shield-cell[data-dir]').forEach(cell=>{
+    const dir=cell.dataset.dir;
+    const pct=shieldDist[dir];
+    cell.querySelector('.shield-pct').textContent=Math.round(pct)+'%';
+    cell.className='shield-cell'+(pct>100?' reinforced':pct>0?' active':'');
+  });
+}
+
+// Laser controls
+document.getElementById('wpn-intensity').addEventListener('input',e=>{
+  wpnIntensity=parseInt(e.target.value);
+  document.getElementById('wpn-int-val').textContent=wpnIntensity+'%';
+});
+document.getElementById('wpn-freq').addEventListener('input',e=>{
+  wpnFreq=parseInt(e.target.value);
+  const fn=freqNames[Math.floor(wpnFreq/20)];
+  document.getElementById('wpn-freq-val').textContent=fn||'Gamma';
+});
+document.getElementById('wpn-mode-pulse').addEventListener('click',()=>{
+  wpnMode='pulse';
+  document.getElementById('wpn-mode-pulse').style.borderColor='rgba(231,76,60,.3)';
+  document.getElementById('wpn-mode-pulse').style.color='#e74c3c';
+  document.getElementById('wpn-mode-beam').style.borderColor='';document.getElementById('wpn-mode-beam').style.color='';
+  if(engaged)clickSound();
+});
+document.getElementById('wpn-mode-beam').addEventListener('click',()=>{
+  wpnMode='beam';
+  document.getElementById('wpn-mode-beam').style.borderColor='rgba(231,76,60,.3)';
+  document.getElementById('wpn-mode-beam').style.color='#e74c3c';
+  document.getElementById('wpn-mode-pulse').style.borderColor='';document.getElementById('wpn-mode-pulse').style.color='';
+  if(engaged)clickSound();
+});
+
+// Fire laser
+document.getElementById('wpn-fire-laser').addEventListener('click',()=>{
+  if(wpnCooldown||!wpnLockedTarget)return;
+  const target=wpnLockedTarget;
+  // Heat
+  wpnHeat=Math.min(100,wpnHeat+wpnIntensity*(wpnMode==='beam'?.6:.3));
+  document.getElementById('wpn-heat').textContent='Heat: '+Math.round(wpnHeat)+'%';
+  document.getElementById('wpn-heat').style.color=wpnHeat>70?'#e74c3c':wpnHeat>40?'#d4a03c':'#2a4a5a';
+  // Overheat check
+  if(wpnHeat>=95){
+    wpnCooldown=true;
+    document.getElementById('wpn-fire-laser').classList.add('cooldown');
+    document.getElementById('wpn-fire-laser').textContent='⚠ OVERHEATED';
+    wpnLogEntry('Laser array overheated — cooling down','miss');
+    let coolPct=100;
+    const coolInt=setInterval(()=>{
+      coolPct-=2;wpnHeat=Math.max(0,wpnHeat-2);
+      document.getElementById('wpn-cool-fill').style.width=coolPct+'%';
+      document.getElementById('wpn-heat').textContent='Heat: '+Math.round(wpnHeat)+'%';
+      if(coolPct<=0){
+        clearInterval(coolInt);wpnCooldown=false;wpnHeat=0;
+        document.getElementById('wpn-fire-laser').classList.remove('cooldown');
+        document.getElementById('wpn-fire-laser').textContent='◈ Fire Laser';
+        document.getElementById('wpn-cool-fill').style.width='0%';
+        document.getElementById('wpn-heat').style.color='#2a4a5a';
+      }
+    },100);
+    return;
+  }
+  // Visual beam effect
+  const cx=wpnCanvas.width/2,cy=wpnCanvas.height/2;
+  const tObj=target.obj;
+  const invZ=1/(tObj.z||.5);
+  const tx=cx+(tObj.x||0)*invZ*(wpnCanvas.width/4);
+  const ty=cy+(tObj.y||0)*invZ*(wpnCanvas.height/4);
+  if(wpnMode==='beam'){
+    wpnLaserBeams.push({sx:cx,sy:cy+30,tx,ty,life:30,intensity:wpnIntensity,mode:'beam'});
+  } else {
+    wpnLaserBeams.push({sx:cx,sy:cy+30,tx,ty,life:8,intensity:wpnIntensity,mode:'pulse'});
+  }
+  // Hit calculation
+  const hitChance=.6+wpnIntensity*.003;
+  const hit=Math.random()<hitChance;
+  if(hit){
+    const dmg=wpnIntensity*(wpnMode==='beam'?.8:.5)*(wpnFreq/50);
+    if(target.shieldStr>0){
+      target.shieldStr=Math.max(0,target.shieldStr-dmg);
+      wpnLogEntry('Laser hit '+target.name+' — shields absorbing ('+Math.round(target.shieldStr)+'% remaining)','hit');
+    } else {
+      target.health=Math.max(0,target.health-dmg*.5);
+      wpnLogEntry('Laser hit '+target.name+' — hull damage ('+Math.round(target.health)+'% integrity)','hit');
+    }
+    if(target.health<=0)wpnLogEntry('*** '+target.name+' DESTROYED ***','hit');
+  } else {
+    wpnLogEntry('Laser missed '+target.name,'miss');
+  }
+  // Sound
+  if(audioCtx){
+    const dur=wpnMode==='beam'?.6:.15;
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sawtooth';o.frequency.value=200+wpnFreq*8;
+    if(wpnMode==='beam')o.frequency.linearRampToValueAtTime(300+wpnFreq*6,audioCtx.currentTime+dur);
+    g.gain.setValueAtTime(.06,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+dur);
+    const f=audioCtx.createBiquadFilter();f.type='highpass';f.frequency.value=400;
+    o.connect(f);f.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+dur+.05);
+    // Impact
+    if(hit){
+      const o2=audioCtx.createOscillator(),g2=audioCtx.createGain();
+      o2.type='sine';o2.frequency.value=150;
+      g2.gain.setValueAtTime(0,audioCtx.currentTime+dur*.5);
+      g2.gain.linearRampToValueAtTime(.04,audioCtx.currentTime+dur*.5+.03);
+      g2.gain.linearRampToValueAtTime(0,audioCtx.currentTime+dur*.5+.2);
+      o2.connect(g2);g2.connect(masterGain);o2.start(audioCtx.currentTime+dur*.5);o2.stop(audioCtx.currentTime+dur+.3);
+    }
+  }
+  if(engaged)clickSound();
+});
+
+// Fire torpedo
+document.getElementById('wpn-fire-torp').addEventListener('click',()=>{
+  if(wpnTorpedoes<=0||!wpnLockedTarget)return;
+  wpnTorpedoes--;
+  const target=wpnLockedTarget;
+  renderTorpRack();
+  // Visual trail
+  const cx=wpnCanvas.width/2,cy=wpnCanvas.height/2;
+  const tObj=target.obj;
+  const invZ=1/(tObj.z||.5);
+  const tx=cx+(tObj.x||0)*invZ*(wpnCanvas.width/4);
+  const ty=cy+(tObj.y||0)*invZ*(wpnCanvas.height/4);
+  wpnTorpTrails.push({sx:cx,sy:cy+30,tx,ty,progress:0,target,hit:Math.random()<.85});
+  wpnLogEntry('Torpedo launched at '+target.name,'');
+  logComms('Tactical','Torpedo away — tracking '+target.name+'.');
+  // Sound — whoosh
+  if(audioCtx){
+    const bs=audioCtx.sampleRate*.8,bf=audioCtx.createBuffer(1,bs,audioCtx.sampleRate);
+    const d=bf.getChannelData(0);for(let i=0;i<bs;i++)d[i]=(Math.random()*2-1)*(.5-i/bs*.5);
+    const src=audioCtx.createBufferSource();src.buffer=bf;
+    const f=audioCtx.createBiquadFilter();f.type='bandpass';f.frequency.value=600;f.Q.value=1;
+    const g=audioCtx.createGain();g.gain.value=.05;
+    src.connect(f);f.connect(g);g.connect(masterGain);src.start();
+  }
+  if(engaged)clickSound();
+});
+
+// Shield distribution
+document.querySelectorAll('.shield-cell[data-dir]').forEach(cell=>{
+  cell.addEventListener('click',()=>{
+    const dir=cell.dataset.dir;
+    // Reinforce this sector by 20, take from others
+    const boost=20;
+    const others=Object.keys(shieldDist).filter(d=>d!==dir);
+    const take=boost/others.length;
+    shieldDist[dir]=Math.min(200,shieldDist[dir]+boost);
+    others.forEach(d=>shieldDist[d]=Math.max(0,shieldDist[d]-take));
+    renderShieldGrid();
+    wpnLogEntry('Shields reinforced: '+dir.toUpperCase()+' sector','');
+    if(engaged)clickSound();
+  });
+});
+
+// Close
+document.getElementById('wpn-close').addEventListener('click',()=>{
+  document.getElementById('weapons-panel').classList.remove('show');
+  document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='weapons')b.classList.remove('active')});
+  cancelAnimationFrame(wpnAnimFrame);
+  if(engaged)clickSound();
+});
+
+// Mouse tracking for reticle
+wpnCanvas.addEventListener('mousemove',e=>{
+  const rect=wpnCanvas.getBoundingClientRect();
+  wpnReticleX=e.clientX-rect.left;
+  wpnReticleY=e.clientY-rect.top;
+});
+
+// Weapons viewport rendering
+function drawWeaponsView(){
+  if(!document.getElementById('weapons-panel').classList.contains('show')){return}
+  const w=wpnCanvas.width=wpnCanvas.parentElement.offsetWidth;
+  const h=wpnCanvas.height=wpnCanvas.parentElement.offsetHeight;
+  const cx=w/2,cy=h/2;
+  wpnCtx.fillStyle='rgba(0,0,0,.15)';wpnCtx.fillRect(0,0,w,h);
+
+  // Stars
+  for(let i=0;i<80;i++){
+    const sx=(Math.sin(i*127.1+performance.now()*.00001)*.5+.5)*w;
+    const sy=(Math.cos(i*311.7+performance.now()*.000008)*.5+.5)*h;
+    wpnCtx.fillStyle=`rgba(220,235,255,${.1+Math.sin(i+performance.now()*.001)*.1})`;
+    wpnCtx.beginPath();wpnCtx.arc(sx,sy,.5+Math.random(),0,6.283);wpnCtx.fill();
+  }
+
+  // Targeting grid overlay
+  wpnCtx.strokeStyle='rgba(231,76,60,.04)';wpnCtx.lineWidth=.5;
+  for(let x=0;x<w;x+=w/20){wpnCtx.beginPath();wpnCtx.moveTo(x,0);wpnCtx.lineTo(x,h);wpnCtx.stroke()}
+  for(let y=0;y<h;y+=h/14){wpnCtx.beginPath();wpnCtx.moveTo(0,y);wpnCtx.lineTo(w,y);wpnCtx.stroke()}
+
+  // Center crosshair
+  wpnCtx.strokeStyle='rgba(231,76,60,.15)';wpnCtx.lineWidth=1;
+  wpnCtx.beginPath();wpnCtx.moveTo(cx-30,cy);wpnCtx.lineTo(cx-8,cy);wpnCtx.moveTo(cx+8,cy);wpnCtx.lineTo(cx+30,cy);
+  wpnCtx.moveTo(cx,cy-30);wpnCtx.lineTo(cx,cy-8);wpnCtx.moveTo(cx,cy+8);wpnCtx.lineTo(cx,cy+30);wpnCtx.stroke();
+
+  // Render targets
+  wpnTargets.forEach(t=>{
+    if(t.health<=0)return;
+    const tObj=t.obj;
+    const invZ=1/(tObj.z||.5);
+    const tx=cx+(tObj.x||0)*invZ*(w/4);
+    const ty=cy+(tObj.y||0)*invZ*(h/4);
+    const color=t.locked?'#e74c3c':(lrsColors[t.kind]||'#888');
+    // Target marker
+    const sz=t.locked?14:8;
+    wpnCtx.strokeStyle=color;wpnCtx.lineWidth=t.locked?2:1;
+    // Corner brackets
+    wpnCtx.beginPath();
+    wpnCtx.moveTo(tx-sz,ty-sz+4);wpnCtx.lineTo(tx-sz,ty-sz);wpnCtx.lineTo(tx-sz+4,ty-sz);
+    wpnCtx.moveTo(tx+sz-4,ty-sz);wpnCtx.lineTo(tx+sz,ty-sz);wpnCtx.lineTo(tx+sz,ty-sz+4);
+    wpnCtx.moveTo(tx+sz,ty+sz-4);wpnCtx.lineTo(tx+sz,ty+sz);wpnCtx.lineTo(tx+sz-4,ty+sz);
+    wpnCtx.moveTo(tx-sz+4,ty+sz);wpnCtx.lineTo(tx-sz,ty+sz);wpnCtx.lineTo(tx-sz,ty+sz-4);
+    wpnCtx.stroke();
+    // Lock animation
+    if(t.locked){
+      const pulse=Math.sin(performance.now()*.005)*.3+.7;
+      wpnCtx.strokeStyle=`rgba(231,76,60,${pulse*.5})`;wpnCtx.lineWidth=1;
+      wpnCtx.beginPath();wpnCtx.arc(tx,ty,sz+4+Math.sin(performance.now()*.003)*2,0,6.283);wpnCtx.stroke();
+      // Range/bearing readout
+      wpnCtx.fillStyle='rgba(231,76,60,.6)';wpnCtx.font="11px 'Courier New'";
+      wpnCtx.fillText(t.name,tx+sz+8,ty-4);
+      wpnCtx.fillText(t.dist+'ly | H:'+Math.round(t.health)+'%'+(t.shieldStr>0?' S:'+Math.round(t.shieldStr)+'%':''),tx+sz+8,ty+8);
+    }
+    // Health bar
+    if(t.locked&&(t.health<100||t.shieldStr<100)){
+      // Shield bar
+      if(t.shieldStr>0){
+        wpnCtx.fillStyle='rgba(94,196,212,.15)';wpnCtx.fillRect(tx-sz,ty+sz+4,sz*2,3);
+        wpnCtx.fillStyle='rgba(94,196,212,.5)';wpnCtx.fillRect(tx-sz,ty+sz+4,sz*2*(t.shieldStr/100),3);
+      }
+      // Hull bar
+      wpnCtx.fillStyle='rgba(231,76,60,.15)';wpnCtx.fillRect(tx-sz,ty+sz+8,sz*2,3);
+      wpnCtx.fillStyle='rgba(231,76,60,.5)';wpnCtx.fillRect(tx-sz,ty+sz+8,sz*2*(t.health/100),3);
+    }
+    // Dot
+    wpnCtx.fillStyle=color;wpnCtx.beginPath();wpnCtx.arc(tx,ty,2,0,6.283);wpnCtx.fill();
+  });
+
+  // Mouse reticle
+  if(wpnReticleX>0&&wpnReticleY>0){
+    wpnCtx.strokeStyle='rgba(231,76,60,.25)';wpnCtx.lineWidth=1;
+    wpnCtx.beginPath();wpnCtx.moveTo(wpnReticleX-12,wpnReticleY);wpnCtx.lineTo(wpnReticleX-4,wpnReticleY);
+    wpnCtx.moveTo(wpnReticleX+4,wpnReticleY);wpnCtx.lineTo(wpnReticleX+12,wpnReticleY);
+    wpnCtx.moveTo(wpnReticleX,wpnReticleY-12);wpnCtx.lineTo(wpnReticleX,wpnReticleY-4);
+    wpnCtx.moveTo(wpnReticleX,wpnReticleY+4);wpnCtx.lineTo(wpnReticleX,wpnReticleY+12);wpnCtx.stroke();
+    wpnCtx.beginPath();wpnCtx.arc(wpnReticleX,wpnReticleY,6,0,6.283);wpnCtx.stroke();
+  }
+
+  // Laser beams
+  for(let i=wpnLaserBeams.length-1;i>=0;i--){
+    const b=wpnLaserBeams[i];b.life--;
+    if(b.life<=0){wpnLaserBeams.splice(i,1);continue}
+    const alpha=b.life/(b.mode==='beam'?30:8);
+    const hue=b.intensity>70?0:b.intensity>40?30:50;
+    wpnCtx.strokeStyle=`hsla(${hue},80%,50%,${alpha*.7})`;wpnCtx.lineWidth=b.mode==='beam'?3:2;
+    wpnCtx.beginPath();wpnCtx.moveTo(b.sx,b.sy);wpnCtx.lineTo(b.tx,b.ty);wpnCtx.stroke();
+    // Glow
+    wpnCtx.strokeStyle=`hsla(${hue},80%,50%,${alpha*.15})`;wpnCtx.lineWidth=b.mode==='beam'?10:6;
+    wpnCtx.beginPath();wpnCtx.moveTo(b.sx,b.sy);wpnCtx.lineTo(b.tx,b.ty);wpnCtx.stroke();
+    // Impact flash
+    if(b.life>((b.mode==='beam'?30:8)-3)){
+      wpnCtx.fillStyle=`hsla(${hue},80%,70%,${alpha*.4})`;
+      wpnCtx.beginPath();wpnCtx.arc(b.tx,b.ty,8+Math.random()*4,0,6.283);wpnCtx.fill();
+    }
+  }
+
+  // Torpedo trails
+  for(let i=wpnTorpTrails.length-1;i>=0;i--){
+    const t=wpnTorpTrails[i];
+    t.progress+=.02;
+    const px=t.sx+(t.tx-t.sx)*t.progress;
+    const py=t.sy+(t.ty-t.sy)*t.progress;
+    // Trail
+    wpnCtx.strokeStyle='rgba(46,204,113,.3)';wpnCtx.lineWidth=2;
+    wpnCtx.beginPath();wpnCtx.moveTo(t.sx,t.sy);wpnCtx.lineTo(px,py);wpnCtx.stroke();
+    // Warhead
+    wpnCtx.fillStyle='rgba(46,204,113,.8)';wpnCtx.beginPath();wpnCtx.arc(px,py,3,0,6.283);wpnCtx.fill();
+    wpnCtx.fillStyle='rgba(46,204,113,.2)';wpnCtx.beginPath();wpnCtx.arc(px,py,8,0,6.283);wpnCtx.fill();
+    // Impact
+    if(t.progress>=1){
+      if(t.hit){
+        const dmg=80;
+        if(t.target.shieldStr>0){t.target.shieldStr=Math.max(0,t.target.shieldStr-dmg);
+          wpnLogEntry('Torpedo IMPACT on '+t.target.name+' — shields hit ('+Math.round(t.target.shieldStr)+'%)','hit');
+        } else {t.target.health=Math.max(0,t.target.health-dmg*.6);
+          wpnLogEntry('Torpedo IMPACT on '+t.target.name+' — hull breach ('+Math.round(t.target.health)+'%)','hit');
+        }
+        if(t.target.health<=0)wpnLogEntry('*** '+t.target.name+' DESTROYED ***','hit');
+        // Explosion effect
+        wpnCtx.fillStyle='rgba(255,200,50,.4)';wpnCtx.beginPath();wpnCtx.arc(t.tx,t.ty,25,0,6.283);wpnCtx.fill();
+        wpnCtx.fillStyle='rgba(255,100,30,.3)';wpnCtx.beginPath();wpnCtx.arc(t.tx,t.ty,40,0,6.283);wpnCtx.fill();
+        // Impact sound
+        if(audioCtx){
+          const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+          o.type='sawtooth';o.frequency.value=80;g.gain.setValueAtTime(.08,audioCtx.currentTime);
+          g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.5);
+          const f=audioCtx.createBiquadFilter();f.type='lowpass';f.frequency.value=300;
+          o.connect(f);f.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.6);
+        }
+      } else {
+        wpnLogEntry('Torpedo missed '+t.target.name+' — target evaded','miss');
+      }
+      wpnTorpTrails.splice(i,1);continue;
+    }
+  }
+
+  // Heat passive cooling
+  if(!wpnCooldown&&wpnHeat>0){
+    wpnHeat=Math.max(0,wpnHeat-.08);
+    document.getElementById('wpn-heat').textContent='Heat: '+Math.round(wpnHeat)+'%';
+  }
+
+  // Target info overlay
+  const ti=document.getElementById('wpn-target-info');
+  if(wpnLockedTarget&&wpnLockedTarget.health>0){
+    const t=wpnLockedTarget;
+    ti.innerHTML=`<div class="wpn-ti-row locked">◉ TARGET LOCKED</div>
+      <div class="wpn-ti-row"><span class="wti-label">TGT</span>${t.name}</div>
+      <div class="wpn-ti-row"><span class="wti-label">RNG</span>${t.dist} ly</div>
+      <div class="wpn-ti-row"><span class="wti-label">HUL</span>${Math.round(t.health)}%</div>
+      ${t.shieldStr>0?`<div class="wpn-ti-row"><span class="wti-label">SHD</span>${Math.round(t.shieldStr)}%</div>`:''}`;
+  } else {
+    ti.innerHTML='<div class="wpn-ti-row" style="color:#3a4a5a">No target locked</div>';
+  }
+
+  // Status bar
+  document.getElementById('wpn-status-bar').innerHTML=`
+    <div class="wpn-stat"><div class="ws-label">Laser</div><div class="ws-val ${wpnHeat>70?'hot':'armed'}">${wpnMode.toUpperCase()} ${wpnIntensity}%</div></div>
+    <div class="wpn-stat"><div class="ws-label">Torpedoes</div><div class="ws-val">${wpnTorpedoes}/${wpnTorpMax}</div></div>
+    <div class="wpn-stat"><div class="ws-label">Heat</div><div class="ws-val ${wpnHeat>70?'hot':''}">${Math.round(wpnHeat)}%</div></div>
+    <div class="wpn-stat"><div class="ws-label">Shields</div><div class="ws-val">${Math.round(shieldsVal)}%</div></div>`;
+
+  // Update fire buttons
+  document.getElementById('wpn-fire-laser').disabled=!wpnLockedTarget||wpnCooldown||wpnLockedTarget.health<=0;
+  document.getElementById('wpn-fire-torp').disabled=wpnTorpedoes<=0||!wpnLockedTarget||wpnLockedTarget.health<=0;
+
+  wpnAnimFrame=requestAnimationFrame(drawWeaponsView);
 }
 
 // === POWER ALLOCATION ===
