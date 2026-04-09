@@ -84,7 +84,7 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .nc-heading{font-size:clamp(8px,.8vw,11px);color:#5ec4d4;text-align:center;margin-top:4px;letter-spacing:2px}
 
 /* === RADIO CHATTER === */
-#radio{position:fixed;bottom:clamp(135px,23vh,250px);left:50%;transform:translateX(-50%);z-index:6;pointer-events:none;text-align:center;opacity:0;transition:opacity 1s;max-width:clamp(280px,40vw,500px)}
+#radio{position:fixed;bottom:clamp(240px,36vh,380px);left:50%;transform:translateX(-50%);z-index:6;pointer-events:none;text-align:center;opacity:0;transition:opacity 1s;max-width:clamp(280px,40vw,500px)}
 #radio.show{opacity:1}
 #radio .r-src{font-size:clamp(7px,.65vw,9px);color:#d4a03c;letter-spacing:3px;text-transform:uppercase;margin-bottom:3px}
 #radio .r-msg{font-size:clamp(9px,.85vw,12px);color:rgba(212,180,100,.6);letter-spacing:1px;line-height:1.5;font-style:italic}
@@ -143,9 +143,9 @@ canvas#c{position:fixed;inset:0;z-index:0}
 
 /* === CREW ACTIVITY LOG === */
 .crew-log{position:fixed;bottom:clamp(132px,22vh,242px);left:clamp(42px,5.6vw,92px);z-index:5;pointer-events:none;overflow:hidden;
-  width:clamp(180px,20vw,280px);height:clamp(50px,6vh,80px)}
+  width:clamp(220px,25vw,360px);height:clamp(70px,9vh,110px)}
 .crew-log-inner{display:flex;flex-direction:column;gap:3px}
-.crew-log-entry{font-size:clamp(6px,.55vw,8px);color:#2a4a5a;letter-spacing:1px;white-space:nowrap;transition:opacity 1s,transform 1s;opacity:0;transform:translateY(6px)}
+.crew-log-entry{font-size:clamp(9px,.85vw,12px);color:#2a4a5a;letter-spacing:1px;white-space:nowrap;transition:opacity 1s,transform 1s;opacity:0;transform:translateY(6px)}
 .crew-log-entry.visible{opacity:1;transform:translateY(0)}
 .crew-log-entry .cle-time{color:#1a3a4a;margin-right:6px}
 .crew-log-entry .cle-text{color:#3a5a6a}
@@ -341,6 +341,132 @@ canvas#c{position:fixed;inset:0;z-index:0}
 #fuel-graph{position:fixed;z-index:11;width:clamp(140px,14vw,200px);height:clamp(50px,6vh,70px);border:1px solid rgba(94,196,212,.1);border-radius:2px;background:rgba(4,8,12,.6);bottom:clamp(40px,7vh,80px);left:clamp(10px,1.5vw,20px);display:none}
 #fuel-graph.show{display:block}
 .fg-label{position:absolute;top:2px;left:4px;font-size:clamp(5px,.45vw,6px);color:#2a4a5a;letter-spacing:1px;text-transform:uppercase}
+
+/* === RADIO REPLY === */
+#radio-reply{position:fixed;bottom:clamp(228px,34vh,360px);left:50%;transform:translateX(-50%);z-index:7;display:none;gap:6px;justify-content:center;margin-top:6px}
+#radio-reply.show{display:flex}
+.reply-btn{background:rgba(10,18,24,.85);border:1px solid rgba(212,160,60,.25);color:#d4a03c;font-family:inherit;font-size:clamp(7px,.65vw,9px);padding:4px 10px;cursor:pointer;border-radius:3px;letter-spacing:1px;transition:all .2s}
+.reply-btn:hover{border-color:#d4a03c;background:rgba(212,160,60,.08);color:#e8c060}
+
+/* === DISTRESS SIGNAL === */
+.distress-panel{position:fixed;bottom:clamp(42px,7vh,80px);left:50%;transform:translateX(-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:4px}
+.distress-cover{width:clamp(50px,5vw,70px);height:clamp(24px,2.5vh,34px);border:1px solid rgba(231,76,60,.2);background:rgba(20,12,12,.8);border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:clamp(6px,.55vw,8px);color:#5a3030;letter-spacing:2px;text-transform:uppercase;transition:all .3s;position:relative;overflow:hidden}
+.distress-cover.open{border-color:rgba(231,76,60,.5);background:rgba(231,76,60,.08);color:#e74c3c}
+.distress-cover.open .cover-flap{transform:rotateX(90deg)}
+.cover-flap{position:absolute;inset:0;background:rgba(30,15,15,.9);border:1px solid rgba(231,76,60,.15);display:flex;align-items:center;justify-content:center;transition:transform .4s;transform-origin:top;font-size:clamp(5px,.5vw,7px);color:#4a2020;letter-spacing:2px}
+.distress-active .edge-glow{background:linear-gradient(90deg,transparent,rgba(231,76,60,.4),transparent)!important;animation:glow-pulse 1s ease-in-out infinite!important}
+.distress-active .bezel-top{border-bottom-color:rgba(231,76,60,.2)!important}
+.distress-active .bezel-bottom{border-top-color:rgba(231,76,60,.2)!important}
+.distress-label{font-size:clamp(5px,.45vw,6px);color:#3a2020;letter-spacing:2px;text-transform:uppercase}
+
+/* === SCAN SYSTEM === */
+#scan-prompt{position:fixed;z-index:10;pointer-events:auto;display:none;background:rgba(10,18,24,.85);border:1px solid rgba(94,196,212,.25);border-radius:3px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:clamp(8px,.7vw,10px);color:#5ec4d4;letter-spacing:2px;transition:all .2s}
+#scan-prompt:hover{border-color:#5ec4d4;background:rgba(94,196,212,.1)}
+#scan-progress{position:fixed;z-index:10;display:none;width:clamp(120px,12vw,180px);pointer-events:none}
+#scan-progress .sp-bar{width:100%;height:4px;background:#111a20;border-radius:2px;overflow:hidden;margin-bottom:4px}
+#scan-progress .sp-fill{height:100%;width:0%;background:linear-gradient(90deg,#1a5a6a,#5ec4d4);border-radius:2px;transition:width .1s linear}
+#scan-progress .sp-text{font-size:clamp(6px,.55vw,8px);color:#3a6a7a;letter-spacing:2px;text-align:center}
+#scan-card{position:fixed;z-index:10;display:none;background:rgba(8,12,16,.92);border:1px solid rgba(94,196,212,.2);border-radius:4px;padding:12px 16px;width:clamp(200px,20vw,280px);pointer-events:auto}
+#scan-card .sc-title{font-size:clamp(9px,.85vw,12px);color:#5ec4d4;letter-spacing:2px;margin-bottom:8px;border-bottom:1px solid rgba(94,196,212,.1);padding-bottom:6px}
+#scan-card .sc-row{font-size:clamp(7px,.65vw,9px);color:#4a7a8a;margin-bottom:3px;display:flex;justify-content:space-between}
+#scan-card .sc-row .sc-label{color:#2a4a5a}
+#scan-card .sc-row .sc-val{color:#5ec4d4}
+#scan-card .sc-row .sc-val.warn{color:#d4a03c}
+#scan-card .sc-row .sc-val.safe{color:#2ecc71}
+#scan-card .sc-close{background:none;border:1px solid rgba(94,196,212,.15);color:#3a6a7a;font-family:inherit;font-size:clamp(6px,.55vw,8px);padding:3px 8px;cursor:pointer;border-radius:2px;letter-spacing:1px;margin-top:8px;width:100%;transition:all .2s}
+#scan-card .sc-close:hover{border-color:#5ec4d4;color:#5ec4d4}
+
+/* === DISCOVERY LOG === */
+.disc-entry{padding:8px 0;border-bottom:1px solid rgba(94,196,212,.04);font-size:clamp(8px,.7vw,10px)}
+.disc-entry .de-time{color:#2a4a5a;margin-right:8px}
+.disc-entry .de-type{color:#d4a03c;margin-right:6px;text-transform:uppercase;letter-spacing:1px;font-size:.9em}
+.disc-entry .de-info{color:#4a7a8a}
+.disc-empty{color:#2a4a5a;font-size:clamp(8px,.7vw,10px);font-style:italic;padding:20px 0}
+
+/* === EMERGENCY OVERRIDE === */
+.emer-panel{position:fixed;left:clamp(50px,6.5vw,100px);top:50%;transform:translateY(-50%);margin-left:clamp(28px,3vw,42px);z-index:11;display:none;flex-direction:column;gap:6px;background:rgba(8,10,14,.92);border:1px solid rgba(231,76,60,.15);border-radius:3px;padding:8px}
+.emer-panel.show{display:flex}
+.emer-title{font-size:clamp(6px,.55vw,8px);color:#5a2020;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:4px;border-bottom:1px solid rgba(231,76,60,.1);padding-bottom:4px}
+.emer-btn{border:1px solid rgba(231,76,60,.25);background:rgba(20,10,10,.8);color:#a04040;font-family:inherit;font-size:clamp(7px,.6vw,9px);padding:5px 8px;cursor:pointer;border-radius:2px;letter-spacing:1px;text-transform:uppercase;transition:all .3s;text-align:center}
+.emer-btn:hover{border-color:rgba(231,76,60,.6);background:rgba(231,76,60,.08);color:#e74c3c}
+.emer-btn.active{border-color:#e74c3c;background:rgba(231,76,60,.15);color:#ff6b6b;animation:blink-crit 2s infinite}
+
+/* === FLIGHT CONTROLS (HELM) === */
+.flight-panel{position:fixed;inset:0;z-index:14;display:none;pointer-events:auto;background:rgba(4,8,12,.1);justify-content:center;align-items:center;flex-direction:column}
+.flight-panel.show{display:flex}
+.helm-wrap{width:clamp(500px,55vw,800px);position:relative}
+.helm-title{font-size:clamp(12px,1.2vw,18px);color:#5ec4d4;letter-spacing:6px;text-transform:uppercase;text-align:center;margin-bottom:clamp(16px,2.5vh,30px)}
+.helm-close{position:absolute;top:0;right:0;background:none;border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:11px;padding:4px 12px;cursor:pointer;border-radius:3px;letter-spacing:2px}
+.helm-close:hover{border-color:#5ec4d4;background:rgba(94,196,212,.08)}
+.helm-main{display:flex;gap:clamp(20px,3vw,50px);justify-content:center;align-items:flex-start}
+/* Course input */
+.helm-course{border:1px solid rgba(94,196,212,.1);border-radius:4px;padding:clamp(12px,1.5vh,20px);background:rgba(8,14,20,.3);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);min-width:clamp(180px,18vw,260px)}
+.helm-course .hc-title{font-size:clamp(8px,.75vw,10px);color:#2a4a5a;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;text-align:center}
+.helm-course .hc-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.helm-course .hc-label{font-size:clamp(8px,.7vw,10px);color:#3a6a7a;width:70px;letter-spacing:1px}
+.helm-course input[type=number]{background:rgba(10,18,24,.8);border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:clamp(12px,1.1vw,16px);letter-spacing:2px;padding:6px 10px;width:clamp(80px,8vw,110px);outline:none;border-radius:3px;text-align:center;-moz-appearance:textfield}
+.helm-course input[type=number]::-webkit-outer-spin-button,.helm-course input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+.helm-course input:focus{border-color:rgba(94,196,212,.5)}
+.helm-engage{width:100%;margin-top:14px;background:rgba(94,196,212,.06);border:1px solid rgba(94,196,212,.25);color:#5ec4d4;font-family:inherit;font-size:clamp(10px,.95vw,14px);padding:8px;cursor:pointer;border-radius:3px;letter-spacing:4px;text-transform:uppercase;transition:all .3s}
+.helm-engage:hover{border-color:#5ec4d4;background:rgba(94,196,212,.12);color:#fff}
+.helm-engage.engaged-anim{border-color:#2ecc71;color:#2ecc71;background:rgba(46,204,113,.08)}
+.helm-status{margin-top:8px;font-size:clamp(7px,.6vw,9px);color:#3a6a7a;text-align:center;min-height:16px}
+/* Attitude joystick area */
+.helm-attitude{border:1px solid rgba(94,196,212,.1);border-radius:4px;padding:clamp(12px,1.5vh,20px);background:rgba(8,14,20,.3);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;flex-direction:column;align-items:center;min-width:clamp(200px,20vw,300px)}
+.helm-attitude .ha-title{font-size:clamp(8px,.75vw,10px);color:#2a4a5a;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px}
+.helm-axes-row{display:flex;gap:clamp(16px,2vw,30px);margin-bottom:10px}
+.helm-ax{display:flex;flex-direction:column;align-items:center;gap:4px}
+.helm-ax .ax-label{font-size:clamp(7px,.6vw,9px);color:#3a5a6a;letter-spacing:2px;text-transform:uppercase}
+.helm-ax .ax-val{font-size:clamp(11px,1vw,15px);color:#5ec4d4;letter-spacing:2px;font-variant-numeric:tabular-nums}
+.helm-ax input[type=range]{-webkit-appearance:none;appearance:none;width:clamp(80px,10vw,140px);height:4px;background:#111a20;outline:none;border-radius:2px;cursor:pointer}
+.helm-ax input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:#5ec4d4;border-radius:50%;cursor:pointer;box-shadow:0 0 6px rgba(94,196,212,.3)}
+/* Current heading display */
+.helm-heading{display:flex;gap:clamp(20px,3vw,40px);justify-content:center;margin-top:clamp(14px,2vh,24px);padding-top:clamp(10px,1.5vh,18px);border-top:1px solid rgba(94,196,212,.06)}
+.helm-heading .hh-item{text-align:center}
+.helm-heading .hh-label{font-size:clamp(6px,.55vw,8px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.helm-heading .hh-val{font-size:clamp(14px,1.4vw,22px);color:#5ec4d4;letter-spacing:3px;font-variant-numeric:tabular-nums}
+
+/* === HAIL SYSTEM === */
+#hail-prompt{position:fixed;z-index:10;pointer-events:auto;display:none;background:rgba(10,18,24,.85);border:1px solid rgba(46,204,113,.25);border-radius:3px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:clamp(8px,.7vw,10px);color:#2ecc71;letter-spacing:2px;transition:all .2s}
+#hail-prompt:hover{border-color:#2ecc71;background:rgba(46,204,113,.1)}
+#hail-modal{position:fixed;z-index:16;display:none;top:50%;left:50%;transform:translate(-50%,-50%);width:clamp(320px,36vw,500px);background:rgba(6,10,14,.95);border:1px solid rgba(94,196,212,.15);border-radius:5px;pointer-events:auto}
+#hail-modal.show{display:block}
+.hail-header{padding:10px 14px;border-bottom:1px solid rgba(94,196,212,.08);display:flex;justify-content:space-between;align-items:center}
+.hail-header .hh-title{font-size:clamp(9px,.85vw,12px);color:#5ec4d4;letter-spacing:3px;text-transform:uppercase}
+.hail-header .hh-close{background:none;border:none;color:#3a6a7a;cursor:pointer;font-size:14px}
+.hail-status{padding:8px 14px;font-size:clamp(7px,.6vw,9px);color:#d4a03c;letter-spacing:2px;text-align:center;border-bottom:1px solid rgba(94,196,212,.05)}
+.hail-body{padding:10px 14px;max-height:clamp(180px,24vh,300px);overflow-y:auto}
+.hail-msg{margin-bottom:8px;font-size:clamp(8px,.7vw,10px);line-height:1.6}
+.hail-msg .hm-speaker{letter-spacing:1px;margin-bottom:2px;font-size:.9em}
+.hail-msg .hm-speaker.them{color:#2ecc71}
+.hail-msg .hm-speaker.you{color:#5ec4d4}
+.hail-msg .hm-text{color:#4a7a8a;font-style:italic}
+.hail-msg .hm-text.you-text{color:#6aacbc;font-style:normal}
+.hail-replies{padding:8px 14px;border-top:1px solid rgba(94,196,212,.06);display:flex;flex-wrap:wrap;gap:6px}
+.hail-reply-btn{background:rgba(10,18,24,.8);border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:clamp(7px,.6vw,9px);padding:4px 10px;cursor:pointer;border-radius:3px;letter-spacing:1px;transition:all .2s;flex:1;min-width:80px;text-align:center}
+.hail-reply-btn:hover{border-color:#5ec4d4;background:rgba(94,196,212,.08)}
+.hail-connecting{text-align:center;padding:20px;color:#3a6a7a;font-size:clamp(8px,.7vw,10px);letter-spacing:3px}
+.hail-connecting .hc-dots{animation:dots-pulse 1.5s infinite}
+@keyframes dots-pulse{0%{content:''}33%{content:'.'}66%{content:'..'}100%{content:'...'}}
+
+/* === COMMS INITIATE === */
+.comms-init{position:fixed;inset:0;z-index:16;display:none;background:rgba(4,8,12,.9);justify-content:center;align-items:center}
+.comms-init.show{display:flex}
+.ci-wrap{width:clamp(360px,40vw,520px);background:rgba(8,14,20,.95);border:1px solid rgba(94,196,212,.12);border-radius:5px;padding:clamp(16px,2vh,24px)}
+.ci-title{font-size:clamp(11px,1.1vw,16px);color:#5ec4d4;letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;border-bottom:1px solid rgba(94,196,212,.08);padding-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.ci-title button{background:none;border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:10px;padding:3px 10px;cursor:pointer;border-radius:3px;letter-spacing:1px}
+.ci-subtitle{font-size:clamp(7px,.65vw,9px);color:#3a5a6a;letter-spacing:2px;margin-bottom:10px}
+.ci-contact{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid rgba(94,196,212,.06);border-radius:3px;margin-bottom:6px;cursor:pointer;transition:all .2s}
+.ci-contact:hover{border-color:rgba(94,196,212,.3);background:rgba(94,196,212,.04)}
+.ci-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.ci-dot.online{background:#2ecc71;box-shadow:0 0 4px rgba(46,204,113,.4)}
+.ci-dot.weak{background:#d4a03c;box-shadow:0 0 4px rgba(212,160,60,.4)}
+.ci-dot.offline{background:#333}
+.ci-info{flex:1}
+.ci-name{font-size:clamp(8px,.75vw,11px);color:#5ec4d4;letter-spacing:1px}
+.ci-detail{font-size:clamp(6px,.55vw,8px);color:#3a5a6a;margin-top:2px}
+.ci-hail-btn{background:none;border:1px solid rgba(46,204,113,.25);color:#2ecc71;font-family:inherit;font-size:clamp(7px,.6vw,9px);padding:4px 10px;cursor:pointer;border-radius:3px;letter-spacing:1px;transition:all .2s}
+.ci-hail-btn:hover{border-color:#2ecc71;background:rgba(46,204,113,.08)}
 </style>
 </head>
 <body>
@@ -404,6 +530,7 @@ canvas#c{position:fixed;inset:0;z-index:0}
   <div class="side-btn"><div class="btn-icon">WPN</div><div class="tooltip">Weapons Array</div></div>
   <div class="side-btn on"><div class="btn-icon">SEN</div><div class="tooltip">Sensor Suite</div></div>
   <div class="side-btn"><div class="btn-icon">AUX</div><div class="tooltip">Auxiliary Power</div></div>
+  <div class="side-btn" id="emer-trigger" style="border-color:rgba(231,76,60,.2);background:rgba(15,8,8,.6)"><div class="btn-icon" style="color:#6a3030">EMR</div><div class="tooltip" style="color:#e74c3c">Emergency Override</div></div>
 </div>
 
 <!-- RIGHT PANEL -->
@@ -463,7 +590,7 @@ canvas#c{position:fixed;inset:0;z-index:0}
 <div class="scope-panel"><div class="scope-label">Sys Waveform</div><canvas id="scope" width="160" height="40"></canvas></div>
 
 <!-- Radar -->
-<div class="radar-panel" style="bottom:clamp(140px,23vh,252px);right:clamp(42px,5.6vw,92px)"><div class="radar-label">Lidar</div><canvas id="radar" width="70" height="70"></canvas></div>
+<div class="radar-panel" style="bottom:clamp(300px,40vh,460px);right:clamp(42px,5.6vw,92px)"><div class="radar-label">Lidar</div><canvas id="radar" width="210" height="210"></canvas></div>
 
 <!-- Condensation drips -->
 <div class="drip" id="drip1"></div>
@@ -484,6 +611,18 @@ canvas#c{position:fixed;inset:0;z-index:0}
   <button class="scr-btn" data-screen="pip">PIP</button>
   <button class="scr-btn" data-screen="ai">AI</button>
   <button class="scr-btn" data-screen="fuelg">Fuel</button>
+  <button class="scr-btn" data-screen="discovery">Disc</button>
+  <button class="scr-btn" data-screen="flight">Fly</button>
+  <button class="scr-btn" data-screen="comms-init" style="border-color:rgba(46,204,113,.2);color:#2ecc71">Hail</button>
+</div>
+
+<!-- COMMS INITIATE -->
+<div class="comms-init" id="comms-init">
+<div class="ci-wrap">
+  <div class="ci-title"><span>⟐ Open Channel</span><button id="ci-close">Close</button></div>
+  <div class="ci-subtitle">Select a contact to hail</div>
+  <div id="ci-contacts"></div>
+</div>
 </div>
 
 <!-- SHIP SCHEMATIC -->
@@ -562,6 +701,78 @@ canvas#c{position:fixed;inset:0;z-index:0}
 
 <!-- Fuel Graph -->
 <div id="fuel-graph"><div class="fg-label">Fuel Cell</div><canvas id="fg-canvas" width="200" height="70"></canvas></div>
+
+<!-- Radio Reply -->
+<div id="radio-reply"></div>
+
+<!-- Distress Signal -->
+<div class="distress-panel">
+  <div class="distress-cover" id="distress-btn"><div class="cover-flap">▼ SOS ▼</div><span>DISTRESS</span></div>
+  <div class="distress-label">Emergency Only</div>
+</div>
+
+<!-- Scan System -->
+<button id="scan-prompt">◎ Scan</button>
+<div id="scan-progress"><div class="sp-bar"><div class="sp-fill" id="sp-fill"></div></div><div class="sp-text">Scanning…</div></div>
+<div id="scan-card"></div>
+
+<!-- DISCOVERY LOG -->
+<div class="screen-overlay" id="scr-discovery"><button class="s-close" data-close>Close</button>
+<div class="s-title">Discovery Log — Scan Archive</div>
+<div id="disc-body"><div class="disc-empty">No discoveries yet. Scan objects in the viewport to build your log.</div></div>
+</div>
+
+<!-- EMERGENCY OVERRIDE -->
+<div class="emer-panel" id="emer-panel">
+  <div class="emer-title">⚠ Emergency Override</div>
+  <button class="emer-btn" id="emer-scram">Reactor Scram</button>
+  <button class="emer-btn" id="emer-vent">Emergency Vent</button>
+  <button class="emer-btn" id="emer-thrust">Thruster Override</button>
+</div>
+
+<!-- FLIGHT CONTROLS -->
+<!-- HAIL SYSTEM -->
+<button id="hail-prompt">⟐ Hail</button>
+<div id="hail-modal">
+  <div class="hail-header"><div class="hh-title" id="hail-title">Hailing…</div><button class="hh-close" id="hail-close">×</button></div>
+  <div class="hail-status" id="hail-status">Opening channel…</div>
+  <div class="hail-body" id="hail-body"></div>
+  <div class="hail-replies" id="hail-replies"></div>
+</div>
+
+<!-- FLIGHT CONTROLS (HELM) -->
+<div class="flight-panel" id="flight-panel">
+<div class="helm-wrap">
+  <div class="helm-title">⊞ Helm Control</div>
+  <button class="helm-close" id="helm-close">Close</button>
+  <div class="helm-main">
+    <div class="helm-course">
+      <div class="hc-title">Set Course</div>
+      <div class="hc-row"><span class="hc-label">Bearing</span><input type="number" id="course-bearing" min="0" max="360" step="0.1" value="274.8"></div>
+      <div class="hc-row"><span class="hc-label">Mark</span><input type="number" id="course-mark" min="-90" max="90" step="0.1" value="0"></div>
+      <div class="hc-row"><span class="hc-label">Velocity</span><input type="number" id="course-vel" min="0" max="0.009" step="0.001" value="0.004"></div>
+      <button class="helm-engage" id="helm-engage">► Engage</button>
+      <div class="helm-status" id="helm-engage-status"></div>
+    </div>
+    <div class="helm-attitude">
+      <div class="ha-title">Attitude Control</div>
+      <div class="helm-axes-row">
+        <div class="helm-ax"><div class="ax-label">Yaw</div><input type="range" id="fc-yaw" min="-100" max="100" value="0"><div class="ax-val" id="fc-yaw-val">0.0°</div></div>
+        <div class="helm-ax"><div class="ax-label">Pitch</div><input type="range" id="fc-pitch" min="-100" max="100" value="0"><div class="ax-val" id="fc-pitch-val">0.0°</div></div>
+      </div>
+      <div class="helm-axes-row">
+        <div class="helm-ax"><div class="ax-label">Roll</div><input type="range" id="fc-roll" min="-100" max="100" value="0"><div class="ax-val" id="fc-roll-val">0.0°</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="helm-heading">
+    <div class="hh-item"><div class="hh-label">Current Bearing</div><div class="hh-val" id="helm-cur-bearing">274.8°</div></div>
+    <div class="hh-item"><div class="hh-label">Mark</div><div class="hh-val" id="helm-cur-mark">0.0°</div></div>
+    <div class="hh-item"><div class="hh-label">Velocity</div><div class="hh-val" id="helm-cur-vel">0.0042c</div></div>
+    <div class="hh-item"><div class="hh-label">Roll</div><div class="hh-val" id="helm-cur-roll">0.0°</div></div>
+  </div>
+</div>
+</div>
 
 <!-- BOTTOM CONSOLE -->
 <div class="bottom-console">
@@ -664,6 +875,7 @@ function tickHUD(){
   document.getElementById('r-eta').textContent=Math.round(distVal/.0042*365).toLocaleString()+'d';
   document.getElementById('r-rad').textContent=radVal.toFixed(3)+' Sv';
   document.getElementById('r-drift').textContent=(driftVal>=0?'+':'')+driftVal.toFixed(3)+'°';
+  if(typeof updateHelmReadouts==='function')updateHelmReadouts();
 }
 setInterval(tickHUD,2000);
 setInterval(()=>{hudSys=(hudSys+1)%systems.length;document.getElementById('h-system').textContent=systems[hudSys]},45000);
@@ -795,6 +1007,7 @@ function scheduleRadio(){
     document.getElementById('radio-static').textContent='▮▯▮▯▮ SUBSPACE CH-7 ▮▯▮▯▮';
     el.classList.add('show');
     logComms(m.src,m.msg);
+    showRadioReply(m.src);
     // Screen flicker for Unknown Signal
     if(m.src==='Unknown Signal'){
       document.body.classList.add('screen-flicker');
@@ -1280,6 +1493,21 @@ canvas.addEventListener('mousemove',e=>{
     }
   }
   if(!hoveredStar)starTip.classList.remove('show');
+  // Scan & hail hover detection for space objects
+  let foundScanTarget=false;
+  if(!scanning&&!hailing){
+    for(const ro of renderedObjects){
+      const dx=mx-ro.sx,dy=my-ro.sy;
+      if(dx*dx+dy*dy<ro.size*ro.size*4){
+        showScanPrompt(ro.obj,ro.sx,ro.sy);
+        if(ro.obj.kind==='ship'||ro.obj.kind==='planet')showHailPrompt(ro.obj,ro.sx,ro.sy);
+        else hideHailPrompt();
+        foundScanTarget=true;
+        break;
+      }
+    }
+  }
+  if(!foundScanTarget){hideScanPrompt();hideHailPrompt()}
 });
 canvas.addEventListener('mouseleave',()=>starTip.classList.remove('show'));
 
@@ -1307,6 +1535,14 @@ document.querySelectorAll('.scr-btn').forEach(btn=>{
     if(id==='pip'){document.getElementById('pip').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
     if(id==='ai'){document.getElementById('ai-terminal').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
     if(id==='fuelg'){document.getElementById('fuel-graph').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
+    if(id==='comms-init'){
+      const ci=document.getElementById('comms-init');
+      if(ci.classList.contains('show')){ci.classList.remove('show');btn.classList.remove('active')}
+      else{ci.classList.add('show');btn.classList.add('active');populateContacts()}
+      if(engaged)clickSound();return;
+    }
+    if(id==='flight'){document.getElementById('flight-panel').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
+    if(id==='discovery'){/* handled as overlay below */}
     const el=document.getElementById('scr-'+id);
     if(!el)return;
     if(activeScreen===id){el.classList.remove('show');activeScreen=null;btn.classList.remove('active')}
@@ -1323,6 +1559,7 @@ document.querySelectorAll('.scr-btn').forEach(btn=>{
       if(id==='lrs')drawLRS();
       if(id==='navplan')drawNavPlan();
       if(id==='cameras'){initCameras();drawCameras()}
+      if(id==='discovery')renderDiscoveryLog();
     }
     if(engaged)clickSound();
   });
@@ -1668,14 +1905,737 @@ function drawFuelGraph(){
 }
 drawFuelGraph();
 
+// === HAIL SYSTEM ===
+const hailPrompt=document.getElementById('hail-prompt');
+const hailModal=document.getElementById('hail-modal');
+let hailTarget=null,hailing=false,hailConversation=[];
+
+// Ship/station name generator
+const vesselPrefixes=['ISS','CSV','RSV','SSV','FRG','MBV','PSV'];
+const vesselNames=['Horizon','Meridian','Polaris','Vanguard','Cassini','Kepler','Endeavour','Resolute','Pathfinder','Nomad','Tempest','Aurora','Zenith','Osprey','Daedalus','Hermes','Orion','Argonaut','Pioneer','Reliant'];
+const stationNames=['Waypoint Echo','Relay Station Kappa','Outpost Seven','Beacon Alpha-3','Fuel Depot Sigma','Trading Post Zeta','Research Platform Iota','Drydock Tau'];
+const crewRanks=['Captain','Commander','Lieutenant','Ensign','Chief','Officer'];
+const crewNames=['Chen','Nakamura','Petrov','Silva','O\'Brien','Johansson','Mbeki','Torres','Kowalski','Adeyemi','Larsen','Gupta','Moreau','Okonkwo','Fischer'];
+
+function generateVesselName(seed){
+  if(seed%5===0)return stationNames[seed%stationNames.length];
+  return vesselPrefixes[seed%vesselPrefixes.length]+' '+vesselNames[seed%vesselNames.length];
+}
+function generateCrewName(seed){
+  return crewRanks[seed%crewRanks.length]+' '+crewNames[(seed*7)%crewNames.length];
+}
+
+// Response templates organized by conversation stage
+const hailGreetings=[
+  (name,crew)=>`This is ${crew} of the ${name}. Go ahead, Artemis.`,
+  (name,crew)=>`${name} here, reading you. What can we do for you?`,
+  (name,crew)=>`Artemis, this is ${crew} aboard ${name}. Channel open.`,
+  (name,crew)=>`You've reached the ${name}. ${crew} speaking. How can we assist?`,
+  (name,crew)=>`${name} responding to your hail. ${crew} on comms. Over.`,
+];
+const hailTopics={
+  status:[
+    (n)=>`All systems green on the ${n}. Running a routine patrol through Sector 7.`,
+    (n)=>`We're running on backup power while we swap out a coolant manifold. Should be back to full capacity in about six hours.`,
+    (n)=>`Nominal here. We've been on station for about 340 days now. Starting to feel it, honestly.`,
+    (n)=>`${n} is operational. We picked up some unusual interference on long-range, but nothing actionable yet.`,
+  ],
+  heading:[
+    (n)=>`We're bound for the Kepler relay network. Should be there in about 200 days, give or take.`,
+    (n)=>`Holding station at current coordinates. We're on survey duty until further notice.`,
+    (n)=>`Heading rimward, toward the Trappist cluster. Long haul, but the cargo pays well.`,
+    (n)=>`We're on a return vector to Proxima station. Should arrive within the quarter.`,
+  ],
+  trade:[
+    (n)=>`We could spare some deuterium if you're running low. What do you have to trade?`,
+    (n)=>`Not carrying much surplus at the moment, sorry. Try hailing the fuel depot if you pass one.`,
+    (n)=>`We've got medical supplies and some spare sensor components. Interested?`,
+    (n)=>`Trading's not really our line, but I can pass your request to the next cargo vessel we encounter.`,
+  ],
+  news:[
+    (n)=>`Word is UESA is planning another deep survey mission past the Kepler corridor. Big funding push.`,
+    (n)=>`There's been some pirate activity reported near the outer rim. Nothing confirmed, but keep your sensors sharp.`,
+    (n)=>`Not much news out here. A science team found some interesting microbial signatures on Kepler-442b's moon. Big deal in the journals.`,
+    (n)=>`Relay stations have been dropping packets more than usual. Could be solar activity, could be equipment aging. Nobody's sure.`,
+  ],
+  anomaly:[
+    (n)=>`Actually, yes — we detected some odd baryonic fluctuations about two days ago. Similar to what your science officer might be tracking.`,
+    (n)=>`Nothing unusual on our end. But we're not carrying the same sensor suite you are.`,
+    (n)=>`Funny you mention it. Our nav computer flagged a gravitational ripple that doesn't match any known source. Coordinates logged if you want them.`,
+    (n)=>`We picked up a faint repeating signal on a deprecated frequency. Probably just an old beacon, but… it didn't match any registered ID.`,
+  ],
+  farewell:[
+    (n)=>`Safe travels, Artemis. ${n} out.`,
+    (n)=>`Good luck out there, Captain. We'll keep a channel open if you need us.`,
+    (n)=>`Copy that. Fair winds and following stars. ${n} closing channel.`,
+    (n)=>`Acknowledged, Artemis. Stay sharp out there. ${n} signing off.`,
+  ],
+};
+
+function showHailPrompt(obj,sx,sy){
+  if(hailing||scanning)return;
+  hailTarget=obj;
+  hailPrompt.style.display='block';
+  hailPrompt.style.left=(sx+15)+'px';
+  hailPrompt.style.top=(sy+10)+'px';
+}
+function hideHailPrompt(){
+  if(!hailing)hailPrompt.style.display='none';
+  hailTarget=null;
+}
+
+hailPrompt.addEventListener('click',()=>{
+  if(!hailTarget)return;
+  hailing=true;
+  hailPrompt.style.display='none';
+
+  const obj=hailTarget;
+  const seed=Math.abs(Math.round((obj.x||0)*10000+(obj.y||0)*10000));
+  const vesselName=generateVesselName(seed);
+  const crewName=generateCrewName(seed);
+
+  hailConversation=[];
+  document.getElementById('hail-title').textContent='⟐ '+vesselName;
+  document.getElementById('hail-status').textContent='Opening channel…';
+  document.getElementById('hail-body').innerHTML='<div class="hail-connecting">Establishing subspace link<span class="hc-dots">...</span></div>';
+  document.getElementById('hail-replies').innerHTML='';
+  hailModal.classList.add('show');
+
+  logComms('Artemis','Hailing '+vesselName+'…',true);
+
+  // Channel open sound
+  if(audioCtx){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';o.frequency.value=500;
+    o.frequency.linearRampToValueAtTime(800,audioCtx.currentTime+.3);
+    g.gain.setValueAtTime(.04,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.5);
+    o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.6);
+  }
+
+  // After connecting delay, show greeting
+  setTimeout(()=>{
+    if(!hailing)return;
+    radioStaticSound();
+    const greeting=hailGreetings[seed%hailGreetings.length](vesselName,crewName);
+    document.getElementById('hail-status').textContent='◉ Channel Open — Subspace Link Active';
+    addHailMessage(crewName,greeting,false);
+    logComms(vesselName,greeting);
+    showHailReplies(vesselName,crewName,seed,'initial');
+  },2000+Math.random()*1500);
+
+  if(engaged)clickSound();
+});
+
+function addHailMessage(speaker,text,isYou){
+  hailConversation.push({speaker,text,isYou});
+  const body=document.getElementById('hail-body');
+  body.innerHTML=hailConversation.map(m=>`<div class="hail-msg"><div class="hm-speaker ${m.isYou?'you':'them'}">${m.speaker}:</div><div class="hm-text${m.isYou?' you-text':''}">${m.text}</div></div>`).join('');
+  body.scrollTop=body.scrollHeight;
+}
+
+function showHailReplies(vesselName,crewName,seed,stage){
+  const replies=document.getElementById('hail-replies');
+  let options=[];
+  if(stage==='initial'){
+    options=[
+      {label:'Request status',topic:'status',next:'mid'},
+      {label:'Ask heading',topic:'heading',next:'mid'},
+      {label:'Any news?',topic:'news',next:'mid'},
+      {label:'End transmission',topic:'farewell',next:'end'},
+    ];
+  } else if(stage==='mid'){
+    options=[
+      {label:'Open to trade?',topic:'trade',next:'late'},
+      {label:'Detected anomalies?',topic:'anomaly',next:'late'},
+      {label:'Safe travels',topic:'farewell',next:'end'},
+    ];
+  } else if(stage==='late'){
+    options=[
+      {label:'Any other news?',topic:'news',next:'final'},
+      {label:'Thanks, signing off',topic:'farewell',next:'end'},
+    ];
+  } else if(stage==='final'){
+    options=[
+      {label:'End transmission',topic:'farewell',next:'end'},
+    ];
+  }
+
+  replies.innerHTML=options.map((o,i)=>`<button class="hail-reply-btn" data-idx="${i}">${o.label}</button>`).join('');
+  replies.querySelectorAll('.hail-reply-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const idx=parseInt(btn.dataset.idx);
+      const opt=options[idx];
+      addHailMessage('Captain',opt.label,true);
+      logComms('Captain',opt.label,true);
+      replies.innerHTML='';
+
+      if(opt.next==='end'){
+        // Farewell
+        setTimeout(()=>{
+          const resp=hailTopics.farewell[seed%hailTopics.farewell.length](vesselName);
+          radioStaticSound();
+          addHailMessage(crewName,resp,false);
+          logComms(vesselName,resp);
+          document.getElementById('hail-status').textContent='◯ Channel Closed';
+          replies.innerHTML='<button class="hail-reply-btn" id="hail-dismiss-btn">Close</button>';
+          document.getElementById('hail-dismiss-btn').addEventListener('click',closeHail);
+        },1000+Math.random()*1000);
+      } else {
+        // Response then more options
+        setTimeout(()=>{
+          const resps=hailTopics[opt.topic]||hailTopics.status;
+          const resp=resps[(seed+hailConversation.length)%resps.length](vesselName);
+          radioStaticSound();
+          addHailMessage(crewName,resp,false);
+          logComms(vesselName,resp);
+          setTimeout(()=>showHailReplies(vesselName,crewName,seed,opt.next),500);
+        },1500+Math.random()*1500);
+      }
+      if(engaged)clickSound();
+    });
+  });
+}
+
+function closeHail(){
+  hailModal.classList.remove('show');
+  // Log to discovery
+  if(hailConversation.length>0){
+    const firstThem=hailConversation.find(m=>!m.isYou);
+    addDiscovery('hail','Contacted '+document.getElementById('hail-title').textContent.replace('⟐ ','')+' — '+hailConversation.length+' messages exchanged');
+  }
+  hailing=false;
+  hailTarget=null;
+  // Channel close sound
+  if(audioCtx){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';o.frequency.value=800;
+    o.frequency.linearRampToValueAtTime(400,audioCtx.currentTime+.2);
+    g.gain.setValueAtTime(.03,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.3);
+    o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.4);
+  }
+  if(engaged)clickSound();
+}
+document.getElementById('hail-close').addEventListener('click',closeHail);
+
+// === COMMS INITIATION ===
+document.getElementById('ci-close').addEventListener('click',()=>{
+  document.getElementById('comms-init').classList.remove('show');
+  document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='comms-init')b.classList.remove('active')});
+  if(engaged)clickSound();
+});
+const knownContacts=[
+  {name:'Artemis Control',detail:'UESA Deep Space Command — Relay link',status:'online',seed:1001},
+  {name:'Waypoint Station Echo',detail:'Transit hub — 2.1 ly',status:'online',seed:2002},
+  {name:'Relay Beacon 14',detail:'Automated signal relay',status:'online',seed:3003},
+  {name:'Cargo Vessel Hypatia',detail:'Freighter — Last contact 4h ago',status:'online',seed:4004},
+  {name:'Science Vessel Curie',detail:'Research — Sector 7 survey',status:'online',seed:5005},
+  {name:'Mining Barge Titan',detail:'Extraction ops — Grid 4-4',status:'weak',seed:6006},
+  {name:'Patrol Craft Sentinel',detail:'Sector patrol — Intermittent signal',status:'weak',seed:7007},
+  {name:'Freighter Nostromo',detail:'Cargo run to Kepler station',status:'weak',seed:8008},
+  {name:'Nav Buoy K-7',detail:'Automated beacon',status:'online',seed:9009},
+  {name:'Unknown Signal Source',detail:'Origin unknown — Deprecated frequency',status:'weak',seed:1010},
+];
+function populateContacts(){
+  const el=document.getElementById('ci-contacts');
+  // Merge live ships from viewport
+  const allContacts=[...knownContacts];
+  spaceObjects.filter(o=>o.kind==='ship').forEach(o=>{
+    const seed=Math.abs(Math.round((o.x||0)*10000+(o.y||0)*10000));
+    const name=generateVesselName(seed);
+    if(!allContacts.find(c=>c.name===name)){
+      allContacts.push({name,detail:'Detected on sensors — Visual range',status:'online',seed,live:o});
+    }
+  });
+  el.innerHTML=allContacts.map((c,i)=>`<div class="ci-contact" data-idx="${i}"><div class="ci-dot ${c.status}"></div><div class="ci-info"><div class="ci-name">${c.name}</div><div class="ci-detail">${c.detail}</div></div><button class="ci-hail-btn">Hail</button></div>`).join('');
+  el.querySelectorAll('.ci-hail-btn').forEach((btn,i)=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const contact=allContacts[i];
+      // Close contact list
+      document.getElementById('comms-init').classList.remove('show');
+      document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='comms-init')b.classList.remove('active')});
+      // Initiate hail using existing system
+      initiateHail(contact);
+      if(engaged)clickSound();
+    });
+  });
+}
+function initiateHail(contact){
+  hailing=true;
+  const seed=contact.seed||Math.floor(Math.random()*10000);
+  const vesselName=contact.name;
+  const crewName=generateCrewName(seed);
+  hailConversation=[];
+  document.getElementById('hail-title').textContent='⟐ '+vesselName;
+  document.getElementById('hail-status').textContent='Opening channel…';
+  document.getElementById('hail-body').innerHTML='<div class="hail-connecting">Establishing subspace link<span class="hc-dots">...</span></div>';
+  document.getElementById('hail-replies').innerHTML='';
+  hailModal.classList.add('show');
+  logComms('Artemis','Hailing '+vesselName+'…',true);
+  // Channel open sound
+  if(audioCtx){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';o.frequency.value=500;
+    o.frequency.linearRampToValueAtTime(800,audioCtx.currentTime+.3);
+    g.gain.setValueAtTime(.04,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.5);
+    o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.6);
+  }
+  // Weak signal = longer connect, chance of failure
+  const connectTime=contact.status==='weak'?3500+Math.random()*2000:1500+Math.random()*1500;
+  const failChance=contact.status==='weak'?.15:0;
+  setTimeout(()=>{
+    if(!hailing)return;
+    if(Math.random()<failChance){
+      document.getElementById('hail-status').textContent='✕ No Response — Signal Lost';
+      document.getElementById('hail-body').innerHTML='<div class="hail-connecting" style="color:#d4a03c">Unable to establish link. Target may be out of range.</div>';
+      document.getElementById('hail-replies').innerHTML='<button class="hail-reply-btn" id="hail-dismiss-btn">Close</button>';
+      document.getElementById('hail-dismiss-btn').addEventListener('click',closeHail);
+      logComms('Comms','Hail to '+vesselName+' failed — no response.');
+      return;
+    }
+    radioStaticSound();
+    const greeting=hailGreetings[seed%hailGreetings.length](vesselName,crewName);
+    document.getElementById('hail-status').textContent='◉ Channel Open — Subspace Link Active';
+    addHailMessage(crewName,greeting,false);
+    logComms(vesselName,greeting);
+    showHailReplies(vesselName,crewName,seed,'initial');
+  },connectTime);
+}
+
+// === DISCOVERY LOG ===
+const discoveries=[];
+function addDiscovery(type,info){
+  const elapsed=Date.now()-missionStart;const ms=elapsed*100;const ts=Math.floor(ms/1000);
+  const h=Math.floor(ts/3600)%24,m=Math.floor(ts/60)%60;
+  const time=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+  discoveries.push({time,type,info});
+  if(activeScreen==='discovery')renderDiscoveryLog();
+}
+function renderDiscoveryLog(){
+  const el=document.getElementById('disc-body');
+  if(discoveries.length===0){el.innerHTML='<div class="disc-empty">No discoveries yet. Scan objects in the viewport to build your log.</div>';return}
+  el.innerHTML=discoveries.map(d=>`<div class="disc-entry"><span class="de-time">[${d.time}]</span><span class="de-type">${d.type}</span><span class="de-info">${d.info}</span></div>`).join('');
+}
+
+// === EMERGENCY OVERRIDE PANEL ===
+let emerOpen=false,scramActive=false,ventActive=false,thrustActive=false;
+function closeEmerPanel(){emerOpen=false;document.getElementById('emer-panel').classList.remove('show')}
+document.getElementById('emer-trigger').addEventListener('click',()=>{
+  emerOpen=!emerOpen;
+  document.getElementById('emer-panel').classList.toggle('show',emerOpen);
+  if(engaged)clickSound();
+});
+
+// Reactor Scram
+document.getElementById('emer-scram').addEventListener('click',()=>{
+  scramActive=!scramActive;
+  document.getElementById('emer-scram').classList.toggle('active',scramActive);
+  if(scramActive){
+    logComms('EMERGENCY','⚠ REACTOR SCRAM — All power systems entering safe mode',true);
+    // Dim everything, deep hum drop
+    document.body.style.filter='brightness(0.3)';
+    if(audioCtx){
+      engineOscs.forEach(eh=>eh.osc.frequency.setTargetAtTime(eh.baseFreq*.3,audioCtx.currentTime,.5));
+    }
+    // Auto-recover after 8s
+    setTimeout(()=>{
+      if(!scramActive)return;
+      scramActive=false;document.getElementById('emer-scram').classList.remove('active');
+      document.body.style.filter='';
+      if(audioCtx)engineOscs.forEach(eh=>eh.osc.frequency.setTargetAtTime(eh.baseFreq*(.7+throttle*.6),audioCtx.currentTime,.5));
+      logComms('Engineering','Reactor restart complete. All systems nominal.',false);
+      closeEmerPanel();
+    },8000);
+  } else {
+    document.body.style.filter='';
+    if(audioCtx)engineOscs.forEach(eh=>eh.osc.frequency.setTargetAtTime(eh.baseFreq*(.7+throttle*.6),audioCtx.currentTime,.5));
+    logComms('Engineering','Reactor scram cancelled. Resuming normal operations.',false);
+  }
+  if(engaged)clickSound();
+  // Alarm sound
+  if(audioCtx&&scramActive){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='square';o.frequency.value=200;
+    g.gain.setValueAtTime(.06,audioCtx.currentTime);g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+1.5);
+    o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+1.5);
+  }
+});
+
+// Emergency Vent
+document.getElementById('emer-vent').addEventListener('click',()=>{
+  ventActive=!ventActive;
+  document.getElementById('emer-vent').classList.toggle('active',ventActive);
+  if(ventActive){
+    logComms('EMERGENCY','⚠ EMERGENCY VENT — Atmosphere venting from Deck 2',true);
+    // Rushing air sound
+    if(audioCtx){
+      const bs=audioCtx.sampleRate*4,bf=audioCtx.createBuffer(1,bs,audioCtx.sampleRate);
+      const d=bf.getChannelData(0);for(let i=0;i<bs;i++)d[i]=(Math.random()*2-1)*(1-i/bs);
+      const src=audioCtx.createBufferSource();src.buffer=bf;
+      const f=audioCtx.createBiquadFilter();f.type='highpass';f.frequency.value=800;
+      const g=audioCtx.createGain();g.gain.value=.08;
+      src.connect(f);f.connect(g);g.connect(masterGain);src.start();
+    }
+    // Pressure readout drops
+    hudPress=0.4;
+    setTimeout(()=>{
+      if(!ventActive)return;
+      ventActive=false;document.getElementById('emer-vent').classList.remove('active');
+      hudPress=1.013;
+      logComms('Life Support','Emergency vent sealed. Pressure normalizing.',false);
+      closeEmerPanel();
+    },6000);
+  } else {
+    hudPress=1.013;
+    logComms('Life Support','Emergency vent cancelled.',false);
+  }
+  if(engaged)clickSound();
+});
+
+// Thruster Override
+document.getElementById('emer-thrust').addEventListener('click',()=>{
+  thrustActive=!thrustActive;
+  document.getElementById('emer-thrust').classList.toggle('active',thrustActive);
+  if(thrustActive){
+    logComms('EMERGENCY','⚠ MANUAL THRUSTER OVERRIDE — Attitude control disengaged',true);
+    // Ship shakes — oscillate pan
+    let shakeTime=0;
+    const shakeInt=setInterval(()=>{
+      if(!thrustActive||shakeTime>5000){clearInterval(shakeInt);panTargetX=0;panTargetY=0;return}
+      panTargetX=(Math.random()-.5)*40;panTargetY=(Math.random()-.5)*30;
+      shakeTime+=100;
+    },100);
+    // Thruster burst sounds
+    if(audioCtx){
+      for(let i=0;i<4;i++){
+        const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+        o.type='sawtooth';o.frequency.value=60+Math.random()*40;
+        g.gain.setValueAtTime(0,audioCtx.currentTime+i*1.2);
+        g.gain.linearRampToValueAtTime(.05,audioCtx.currentTime+i*1.2+.1);
+        g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+i*1.2+.8);
+        const f=audioCtx.createBiquadFilter();f.type='lowpass';f.frequency.value=300;
+        o.connect(f);f.connect(g);g.connect(masterGain);o.start(audioCtx.currentTime+i*1.2);o.stop(audioCtx.currentTime+i*1.2+1);
+      }
+    }
+    setTimeout(()=>{
+      if(!thrustActive)return;
+      thrustActive=false;document.getElementById('emer-thrust').classList.remove('active');
+      panTargetX=0;panTargetY=0;
+      logComms('Navigation','Attitude control re-engaged. Heading stabilized.',false);
+      closeEmerPanel();
+    },5000);
+  } else {
+    panTargetX=0;panTargetY=0;
+    logComms('Navigation','Thruster override cancelled.',false);
+  }
+  if(engaged)clickSound();
+});
+
+// === HELM CONTROLS ===
+let flightYaw=0,flightPitch=0,flightRoll=0,courseMark=0;
+document.getElementById('fc-yaw').addEventListener('input',e=>{
+  flightYaw=e.target.value/100*30;
+  document.getElementById('fc-yaw-val').textContent=flightYaw.toFixed(1)+'°';
+  panTargetX=flightYaw*5;
+});
+document.getElementById('fc-pitch').addEventListener('input',e=>{
+  flightPitch=e.target.value/100*20;
+  document.getElementById('fc-pitch-val').textContent=flightPitch.toFixed(1)+'°';
+  panTargetY=flightPitch*5;
+});
+document.getElementById('fc-roll').addEventListener('input',e=>{
+  flightRoll=e.target.value/100*45;
+  document.getElementById('fc-roll-val').textContent=flightRoll.toFixed(1)+'°';
+});
+['fc-yaw','fc-pitch','fc-roll'].forEach(sid=>{
+  const el=document.getElementById(sid);
+  let dragging=false,returnInt=null;
+  el.addEventListener('mousedown',()=>{dragging=true;if(returnInt){clearInterval(returnInt);returnInt=null}});
+  el.addEventListener('touchstart',()=>{dragging=true;if(returnInt){clearInterval(returnInt);returnInt=null}});
+  function release(){
+    if(!dragging)return;dragging=false;
+    returnInt=setInterval(()=>{
+      const v=parseFloat(el.value);
+      if(Math.abs(v)<2){el.value=0;el.dispatchEvent(new Event('input'));clearInterval(returnInt);returnInt=null;return}
+      el.value=v*.82;el.dispatchEvent(new Event('input'));
+    },40);
+  }
+  addEventListener('mouseup',release);
+  addEventListener('touchend',release);
+});
+// Prevent keyboard events from bubbling when typing in number inputs
+document.querySelectorAll('.helm-course input[type=number]').forEach(inp=>{
+  inp.addEventListener('keydown',e=>e.stopPropagation());
+});
+// Helm close
+document.getElementById('helm-close').addEventListener('click',()=>{
+  document.getElementById('flight-panel').classList.remove('show');
+  document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='flight')b.classList.remove('active')});
+  if(engaged)clickSound();
+});
+// Engage course
+document.getElementById('helm-engage').addEventListener('click',()=>{
+  const bearing=parseFloat(document.getElementById('course-bearing').value)||0;
+  const mark=parseFloat(document.getElementById('course-mark').value)||0;
+  const vel=parseFloat(document.getElementById('course-vel').value)||.004;
+  const btn=document.getElementById('helm-engage');
+  const status=document.getElementById('helm-engage-status');
+  // Engage animation
+  btn.classList.add('engaged-anim');btn.textContent='✓ Course Laid In';
+  status.textContent='Coming to heading '+bearing.toFixed(1)+'° mark '+mark.toFixed(1)+'…';
+  status.style.color='#2ecc71';
+  // Sound
+  if(audioCtx){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';o.frequency.value=600;
+    o.frequency.linearRampToValueAtTime(900,audioCtx.currentTime+.2);
+    g.gain.setValueAtTime(.05,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.4);
+    o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.5);
+    // Second confirmation tone
+    const o2=audioCtx.createOscillator(),g2=audioCtx.createGain();
+    o2.type='sine';o2.frequency.value=900;
+    g2.gain.setValueAtTime(0,audioCtx.currentTime+.3);
+    g2.gain.linearRampToValueAtTime(.04,audioCtx.currentTime+.35);
+    g2.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.6);
+    o2.connect(g2);g2.connect(masterGain);o2.start(audioCtx.currentTime+.3);o2.stop(audioCtx.currentTime+.7);
+  }
+  // Apply course
+  hudHeading=bearing;courseMark=mark;
+  throttle=Math.max(.05,Math.min(1,vel/.009));
+  document.getElementById('throttle').value=throttle*100;
+  // Engine pitch
+  for(const eh of engineOscs){
+    eh.osc.frequency.setTargetAtTime(eh.baseFreq*(.7+throttle*.6),audioCtx?audioCtx.currentTime:0,.3);
+  }
+  logComms('Helm','Course set: bearing '+bearing.toFixed(1)+'° mark '+mark.toFixed(1)+', velocity '+vel.toFixed(4)+'c. Engaging.',true);
+  // Reset button after 3s
+  setTimeout(()=>{
+    btn.classList.remove('engaged-anim');btn.textContent='► Engage';
+    status.textContent='Course confirmed. Autopilot engaged.';status.style.color='#3a6a7a';
+  },3000);
+  if(engaged)clickSound();
+});
+// Update helm readouts in HUD tick
+function updateHelmReadouts(){
+  document.getElementById('helm-cur-bearing').textContent=hudHeading.toFixed(1)+'°';
+  document.getElementById('helm-cur-mark').textContent=courseMark.toFixed(1)+'°';
+  document.getElementById('helm-cur-vel').textContent=hudSpeed.toFixed(4)+'c';
+  document.getElementById('helm-cur-roll').textContent=flightRoll.toFixed(1)+'°';
+}
+
 // Hook comms logging into existing radio
 const origScheduleRadio=scheduleRadio;
+
+// === RADIO REPLY SYSTEM ===
+const replyOptions={
+  'Artemis Control':[
+    {text:'Copy that, Control.',followup:{src:'Artemis Control',msg:'Roger, Artemis. Maintain current heading. Control out.'}},
+    {text:'Acknowledged, adjusting heading.',followup:{src:'Artemis Control',msg:'Understood, Artemis. New heading logged. Safe travels.'}},
+    {text:'Request clarification.',followup:{src:'Artemis Control',msg:'Clarification: previous advisory is precautionary. No immediate action required.'}},
+  ],
+  'Cargo Vessel Hypatia':[
+    {text:'Copy, Hypatia. Safe travels.',followup:{src:'Cargo Vessel Hypatia',msg:'Appreciate it, Artemis. See you on the return leg.'}},
+    {text:'What\'s your heading?',followup:{src:'Cargo Vessel Hypatia',msg:'Bearing 118.4, bound for Kepler station. Should arrive in 340 days.'}},
+  ],
+  'Science Vessel Curie':[
+    {text:'Confirmed, picking up similar readings.',followup:{src:'Science Vessel Curie',msg:'Interesting. Shall we share spectral data? Transmitting on sideband.'}},
+    {text:'Negative, our sensors show nominal.',followup:{src:'Science Vessel Curie',msg:'Copy that. Could be localized. We\'ll continue monitoring.'}},
+  ],
+  'Unknown Signal':[
+    {text:'Attempting to triangulate.',followup:null},
+    {text:'Ignore and log.',followup:null},
+  ],
+  '_default':[
+    {text:'Copy that.',followup:null},
+    {text:'Acknowledged.',followup:null},
+    {text:'Request clarification.',followup:null},
+  ],
+};
+let currentRadioSrc=null;
+function showRadioReply(src){
+  currentRadioSrc=src;
+  const opts=replyOptions[src]||replyOptions['_default'];
+  const el=document.getElementById('radio-reply');
+  el.innerHTML=opts.map((o,i)=>`<button class="reply-btn" data-idx="${i}">${o.text}</button>`).join('');
+  el.classList.add('show');
+  el.querySelectorAll('.reply-btn').forEach(btn=>btn.addEventListener('click',()=>{
+    const idx=parseInt(btn.dataset.idx);
+    const opt=(replyOptions[currentRadioSrc]||replyOptions['_default'])[idx];
+    // Log player reply
+    logComms('Captain',opt.text,true);
+    addCaptainEntry(opt.text);
+    el.classList.remove('show');
+    // Schedule follow-up
+    if(opt.followup){
+      setTimeout(()=>{
+        radioStaticSound();
+        const rel=document.getElementById('radio');
+        document.getElementById('radio-src').textContent='◄ '+opt.followup.src+' ►';
+        document.getElementById('radio-msg').textContent='"'+opt.followup.msg+'"';
+        document.getElementById('radio-static').textContent='▮▯▮▯▮ SUBSPACE CH-7 ▮▯▮▯▮';
+        rel.classList.add('show');
+        logComms(opt.followup.src,opt.followup.msg);
+        setTimeout(()=>rel.classList.remove('show'),5000);
+      },3000+Math.random()*2000);
+    }
+    if(engaged)clickSound();
+  }));
+  // Auto-hide after 12s
+  setTimeout(()=>el.classList.remove('show'),12000);
+}
+
+// === DISTRESS SIGNAL ===
+let distressCoverOpen=false,distressActive=false,distressInterval=null;
+document.getElementById('distress-btn').addEventListener('click',()=>{
+  if(!distressCoverOpen){
+    distressCoverOpen=true;
+    document.getElementById('distress-btn').classList.add('open');
+    if(engaged)clickSound();
+    return;
+  }
+  if(!distressActive){
+    distressActive=true;
+    document.body.classList.add('distress-active');
+    logComms('ARTEMIS','⚠ DISTRESS SIGNAL ACTIVATED — All frequencies',true);
+    // SOS tone
+    if(audioCtx){
+      distressInterval=setInterval(()=>{
+        if(!distressActive)return;
+        const t0=audioCtx.currentTime;
+        // Three short, three long, three short (simplified)
+        for(let i=0;i<3;i++){
+          const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+          o.type='sine';o.frequency.value=880;
+          g.gain.setValueAtTime(.06,t0+i*.2);g.gain.linearRampToValueAtTime(0,t0+i*.2+.1);
+          o.connect(g);g.connect(masterGain);o.start(t0+i*.2);o.stop(t0+i*.2+.15);
+        }
+        for(let i=0;i<3;i++){
+          const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+          o.type='sine';o.frequency.value=880;
+          g.gain.setValueAtTime(.06,t0+.7+i*.35);g.gain.linearRampToValueAtTime(0,t0+.7+i*.35+.25);
+          o.connect(g);g.connect(masterGain);o.start(t0+.7+i*.35);o.stop(t0+.7+i*.35+.3);
+        }
+      },3000);
+    }
+    // Distress radio broadcast
+    setTimeout(()=>{
+      if(!distressActive)return;
+      radioStaticSound();
+      const rel=document.getElementById('radio');
+      document.getElementById('radio-src').textContent='◄ EMERGENCY BROADCAST ►';
+      document.getElementById('radio-msg').textContent='"Mayday, Mayday. ISS Artemis transmitting distress on all frequencies. Position: Sector 7, bearing 274. Request immediate assistance."';
+      document.getElementById('radio-static').textContent='▮▯▮▯▮ ALL FREQUENCIES ▮▯▮▯▮';
+      rel.classList.add('show');
+      setTimeout(()=>rel.classList.remove('show'),8000);
+    },1500);
+  } else {
+    distressActive=false;
+    document.body.classList.remove('distress-active');
+    if(distressInterval){clearInterval(distressInterval);distressInterval=null}
+    logComms('ARTEMIS','Distress signal cancelled.',true);
+    document.getElementById('distress-btn').classList.remove('open');
+    distressCoverOpen=false;
+  }
+  if(engaged)clickSound();
+});
+
+// === SCAN SYSTEM ===
+const scanPrompt=document.getElementById('scan-prompt');
+const scanProgress=document.getElementById('scan-progress');
+const scanCard=document.getElementById('scan-card');
+const scanFill=document.getElementById('sp-fill');
+let scanTarget=null,scanning=false;
+let renderedObjects=[]; // track screen positions for scan hover
+const compositions={asteroid:['Iron-Nickel','Carbonaceous','Silicate','Ice-Rock','Metallic Ore'],ship:['Titanium Alloy','Composite Hull','Unknown Polymer'],planet:['Rocky Silicate','Gas Giant','Ice World','Iron Core']};
+const origins={asteroid:['Belt Fragment','Oort Cloud','Extrasolar Capture','Unknown'],ship:['UESA Registry','Independent','Unregistered','Colonial'],planet:['Native Formation','Captured Body','Rogue Planet']};
+
+function showScanPrompt(obj,screenX,screenY){
+  if(scanning)return;
+  scanTarget=obj;
+  scanPrompt.style.display='block';
+  scanPrompt.style.left=(screenX+15)+'px';
+  scanPrompt.style.top=(screenY-15)+'px';
+}
+function hideScanPrompt(){
+  if(!scanning)scanPrompt.style.display='none';
+  scanTarget=null;
+}
+
+scanPrompt.addEventListener('click',()=>{
+  if(!scanTarget||scanning)return;
+  scanning=true;
+  const obj=scanTarget;
+  scanPrompt.style.display='none';
+  // Position progress near the object
+  scanProgress.style.left=scanPrompt.style.left;
+  scanProgress.style.top=scanPrompt.style.top;
+  scanProgress.style.display='block';
+  scanFill.style.width='0%';
+  // Scan sound
+  if(audioCtx){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';o.frequency.setValueAtTime(400,audioCtx.currentTime);
+    o.frequency.linearRampToValueAtTime(1200,audioCtx.currentTime+3);
+    g.gain.setValueAtTime(.03,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(.01,audioCtx.currentTime+3);
+    o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+3.1);
+  }
+  // Animate progress
+  let prog=0;
+  const scanInt=setInterval(()=>{
+    prog+=2;scanFill.style.width=Math.min(100,prog)+'%';
+    if(prog>=100){
+      clearInterval(scanInt);
+      scanProgress.style.display='none';
+      showScanCard(obj);
+      scanning=false;
+    }
+  },60);
+});
+
+function showScanCard(obj){
+  const kind=obj.kind||'asteroid';
+  const seed=Math.abs(Math.round((obj.x||0)*10000+(obj.y||0)*10000));
+  const comp=(compositions[kind]||compositions.asteroid)[seed%(compositions[kind]||compositions.asteroid).length];
+  const orig=(origins[kind]||origins.asteroid)[seed%(origins[kind]||origins.asteroid).length];
+  const mass=kind==='planet'?(1e22+seed*1e18).toExponential(1)+' kg':kind==='ship'?(2000+seed%8000)+' t':(50+seed%500)+' t';
+  const temp=kind==='planet'?(-200+seed%500)+'°C':kind==='ship'?(18+seed%8)+'°C':(-270+seed%30)+'°C';
+  const threat=kind==='asteroid'?(seed%10>7?'Moderate':'Low'):kind==='unknown'?'Unknown':'None';
+  const threatClass=threat==='Moderate'||threat==='Unknown'?'warn':'safe';
+
+  scanCard.innerHTML=`
+    <div class="sc-title">◎ Scan Complete — ${kind.charAt(0).toUpperCase()+kind.slice(1)}</div>
+    <div class="sc-row"><span class="sc-label">Composition</span><span class="sc-val">${comp}</span></div>
+    <div class="sc-row"><span class="sc-label">Mass</span><span class="sc-val">${mass}</span></div>
+    <div class="sc-row"><span class="sc-label">Surface Temp</span><span class="sc-val">${temp}</span></div>
+    <div class="sc-row"><span class="sc-label">Origin</span><span class="sc-val">${orig}</span></div>
+    <div class="sc-row"><span class="sc-label">Threat Level</span><span class="sc-val ${threatClass}">${threat}</span></div>
+    <button class="sc-close" id="sc-close-btn">Dismiss</button>`;
+  scanCard.style.left=scanProgress.style.left;
+  scanCard.style.top=scanProgress.style.top;
+  scanCard.style.display='block';
+  if(engaged)clickSound();
+  logComms('Sensors','Scan complete: '+kind+' — '+comp+', '+mass+', threat: '+threat);
+  addDiscovery(kind,comp+' — '+mass+' — Temp: '+temp+' — Origin: '+orig+' — Threat: '+threat);
+  document.getElementById('sc-close-btn').addEventListener('click',()=>{scanCard.style.display='none';if(engaged)clickSound()});
+}
 
 // RENDER
 let t=0;
 function draw(now){
   t=now*.001;
   ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  // Apply flight roll
+  if(Math.abs(flightRoll)>.1){
+    ctx.save();
+    ctx.translate(W/2,H/2);
+    ctx.rotate(flightRoll*Math.PI/180);
+    ctx.translate(-W/2,-H/2);
+  }
 
   // Pan rubber-band interpolation
   panX+=(panTargetX-panX)*.05;
@@ -1701,6 +2661,7 @@ function draw(now){
 
   // Space objects
   const cx=W/2+panX,cy=H/2+panY;
+  renderedObjects=[];
   for(let i=spaceObjects.length-1;i>=0;i--){
     const o=spaceObjects[i];
     o.z-=.0004;
@@ -1711,6 +2672,7 @@ function draw(now){
     const oy=cy+o.y*invZ*(H/2);
     if(ox<-100||ox>W+100||oy<-100||oy>H+100){spaceObjects.splice(i,1);continue}
     const sc=(1-o.z)*invZ;
+    renderedObjects.push({obj:o,sx:ox,sy:oy,size:Math.max(8,sc*10)});
 
     // Feed radar blips
     if(o.z<.8&&Math.random()<.01){
@@ -1819,6 +2781,8 @@ function draw(now){
       }
     }
   }
+  // Restore roll rotation
+  if(Math.abs(flightRoll)>.1)ctx.restore();
   flareOpacity+=(flareTarget-flareOpacity)*.08;
   flareEl.style.opacity=flareOpacity;
   requestAnimationFrame(draw);
