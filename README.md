@@ -14,6 +14,8 @@ Starship ASMR Simulator is a single HTML file that transforms your browser into 
 
 **Recommended audio pairing:** [Space Traffic Control ASMR](https://www.youtube.com/watch?v=-q4XwtdSxDE)
 
+**Try it here: https://mbparks.com/starship
+
 ### Use Cases
 
 - **ASMR / Ambient Relaxation** — Run it full screen with headphones. The engine hum, soft console blips, and occasional radio chatter create a deeply calming soundscape. Interact as much or as little as you want.
