@@ -467,6 +467,38 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .ci-detail{font-size:clamp(6px,.55vw,8px);color:#3a5a6a;margin-top:2px}
 .ci-hail-btn{background:none;border:1px solid rgba(46,204,113,.25);color:#2ecc71;font-family:inherit;font-size:clamp(7px,.6vw,9px);padding:4px 10px;cursor:pointer;border-radius:3px;letter-spacing:1px;transition:all .2s}
 .ci-hail-btn:hover{border-color:#2ecc71;background:rgba(46,204,113,.08)}
+
+/* === MAINTENANCE SYSTEM === */
+.maint-notif{position:fixed;top:clamp(75px,12vh,140px);left:50%;transform:translateX(-50%);z-index:13;background:rgba(8,12,16,.92);border:1px solid rgba(212,160,60,.3);border-left:3px solid #d4a03c;padding:8px 16px;border-radius:3px;display:none;align-items:center;gap:12px;max-width:clamp(340px,38vw,480px);pointer-events:auto}
+.maint-notif.show{display:flex}
+.maint-notif.critical{border-color:rgba(231,76,60,.4);border-left-color:#e74c3c}
+.maint-notif .mn-icon{font-size:16px;flex-shrink:0}
+.maint-notif .mn-text{font-size:clamp(8px,.7vw,10px);color:#d4a03c;letter-spacing:1px;line-height:1.5;flex:1}
+.maint-notif.critical .mn-text{color:#e74c3c}
+.maint-notif .mn-btn{background:none;border:1px solid rgba(212,160,60,.3);color:#d4a03c;font-family:inherit;font-size:clamp(7px,.6vw,9px);padding:4px 10px;cursor:pointer;border-radius:3px;letter-spacing:1px;transition:all .2s;white-space:nowrap}
+.maint-notif .mn-btn:hover{border-color:#d4a03c;background:rgba(212,160,60,.08)}
+.maint-notif .mn-dismiss{background:none;border:none;color:#3a5a6a;cursor:pointer;font-size:12px;padding:0 4px}
+
+/* Repair modal */
+.repair-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:16;width:clamp(320px,35vw,460px);background:rgba(6,10,14,.95);border:1px solid rgba(212,160,60,.2);border-radius:5px;display:none;pointer-events:auto}
+.repair-modal.show{display:block}
+.repair-header{padding:10px 14px;border-bottom:1px solid rgba(212,160,60,.08);display:flex;justify-content:space-between;align-items:center}
+.repair-header .rh-title{font-size:clamp(10px,.95vw,14px);color:#d4a03c;letter-spacing:3px;text-transform:uppercase}
+.repair-body{padding:14px}
+.repair-step{display:none;flex-direction:column;gap:10px}
+.repair-step.active{display:flex}
+.repair-step .rs-desc{font-size:clamp(8px,.7vw,10px);color:#4a7a8a;line-height:1.6}
+.repair-step .rs-action{display:flex;align-items:center;gap:8px}
+.repair-step .rs-indicator{width:100%;height:6px;background:#111a20;border-radius:3px;overflow:hidden}
+.repair-step .rs-fill{height:100%;width:0%;border-radius:3px;transition:width .3s}
+.rs-fill.scanning{background:linear-gradient(90deg,#1a5a6a,#5ec4d4);animation:scan-sweep 1.5s ease-in-out}
+.rs-fill.calibrating{background:linear-gradient(90deg,#6a5a1a,#d4a03c);animation:scan-sweep 2s ease-in-out}
+.rs-fill.complete{background:linear-gradient(90deg,#1a6b3a,#2ecc71);width:100%!important}
+@keyframes scan-sweep{0%{width:0%}50%{width:70%}100%{width:100%}}
+.repair-action-btn{background:none;border:1px solid rgba(94,196,212,.25);color:#5ec4d4;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:6px 14px;cursor:pointer;border-radius:3px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;width:100%}
+.repair-action-btn:hover{border-color:#5ec4d4;background:rgba(94,196,212,.08)}
+.repair-action-btn.success{border-color:#2ecc71;color:#2ecc71;background:rgba(46,204,113,.06)}
+.repair-status{font-size:clamp(7px,.6vw,9px);color:#3a6a7a;text-align:center;margin-top:6px;min-height:14px}
 </style>
 </head>
 <body>
@@ -546,13 +578,13 @@ canvas#c{position:fixed;inset:0;z-index:0}
 
 <!-- STATUS GRID -->
 <div class="status-grid">
-  <div class="sg-name">Life Support</div><div class="sg-status"><div class="sg-dot ok"></div><span style="color:#2ecc71">Nominal</span></div>
+  <div class="sg-name">Life Support</div><div class="sg-status"><div class="sg-dot ok" id="sg-life-dot"></div><span style="color:#2ecc71" id="sg-life">Nominal</span></div>
   <div class="sg-name">FTL Drive</div><div class="sg-status"><div class="sg-dot ok" id="sg-ftl-dot"></div><span id="sg-ftl" style="color:#2ecc71">Standby</span></div>
   <div class="sg-name">Port Thruster</div><div class="sg-status"><div class="sg-dot ok"></div><span style="color:#2ecc71">Online</span></div>
   <div class="sg-name">Stbd Thruster</div><div class="sg-status"><div class="sg-dot warn" id="sg-stbd-dot"></div><span id="sg-stbd" style="color:#d4a03c">Degraded</span></div>
-  <div class="sg-name">Sensors</div><div class="sg-status"><div class="sg-dot ok"></div><span style="color:#2ecc71">Active</span></div>
-  <div class="sg-name">Comms Array</div><div class="sg-status"><div class="sg-dot ok"></div><span style="color:#2ecc71">Linked</span></div>
-  <div class="sg-name">Deflectors</div><div class="sg-status"><div class="sg-dot ok"></div><span style="color:#2ecc71">Online</span></div>
+  <div class="sg-name">Sensors</div><div class="sg-status"><div class="sg-dot ok" id="sg-sens-dot"></div><span style="color:#2ecc71" id="sg-sens">Active</span></div>
+  <div class="sg-name">Comms Array</div><div class="sg-status"><div class="sg-dot ok" id="sg-comms-dot"></div><span style="color:#2ecc71" id="sg-comms">Linked</span></div>
+  <div class="sg-name">Deflectors</div><div class="sg-status"><div class="sg-dot ok" id="sg-defl-dot"></div><span style="color:#2ecc71" id="sg-defl">Online</span></div>
   <div class="sg-name">Coolant</div><div class="sg-status"><div class="sg-dot warn" id="sg-cool-dot"></div><span id="sg-cool" style="color:#d4a03c">Low Press</span></div>
 </div>
 
@@ -617,6 +649,19 @@ canvas#c{position:fixed;inset:0;z-index:0}
 </div>
 
 <!-- COMMS INITIATE -->
+
+<!-- MAINTENANCE SYSTEM -->
+<div class="maint-notif" id="maint-notif">
+  <div class="mn-icon">⚠</div>
+  <div class="mn-text" id="maint-text"></div>
+  <button class="mn-btn" id="maint-repair-btn">Run Diagnostics</button>
+  <button class="mn-dismiss" id="maint-dismiss">×</button>
+</div>
+<div class="repair-modal" id="repair-modal">
+  <div class="repair-header"><div class="rh-title" id="repair-title">Diagnostics</div></div>
+  <div class="repair-body" id="repair-body"></div>
+</div>
+
 <div class="comms-init" id="comms-init">
 <div class="ci-wrap">
   <div class="ci-title"><span>⟐ Open Channel</span><button id="ci-close">Close</button></div>
@@ -2118,6 +2163,177 @@ function closeHail(){
   if(engaged)clickSound();
 }
 document.getElementById('hail-close').addEventListener('click',closeHail);
+
+// === MAINTENANCE SYSTEM ===
+const maintSystems=[
+  {id:'coolant',name:'Coolant Loop',sgDot:'sg-cool-dot',sgText:'sg-cool',
+   steps:['Isolate coolant manifold','Flush pressure regulator','Recalibrate flow sensors','Verify loop integrity'],
+   effect:()=>{hudPress=0.8},recover:()=>{hudPress=1.013}},
+  {id:'thruster',name:'Starboard Thruster',sgDot:'sg-stbd-dot',sgText:'sg-stbd',
+   steps:['Disengage thruster gimbal','Run ignition diagnostics','Realign thrust vector','Test fire at 10%'],
+   effect:()=>{driftVal=.02},recover:()=>{driftVal=.003}},
+  {id:'sensors',name:'Sensor Array',sgDot:'sg-sens-dot',sgText:'sg-sens',
+   steps:['Power cycle sensor bus','Recalibrate spectral filters','Run pattern recognition test','Verify detection range'],
+   effect:()=>{},recover:()=>{}},
+  {id:'deflectors',name:'Deflector Grid',sgDot:'sg-defl-dot',sgText:'sg-defl',
+   steps:['Inspect emitter alignment','Cycle deflector frequency','Run particle dispersion test','Confirm coverage map'],
+   effect:()=>{shieldsVal=Math.max(60,shieldsVal-20)},recover:()=>{shieldsVal=Math.min(100,shieldsVal+20)}},
+  {id:'comms',name:'Comms Relay',sgDot:'sg-comms-dot',sgText:'sg-comms',
+   steps:['Restart subspace transceiver','Tune carrier frequency','Run signal integrity check','Verify encryption handshake'],
+   effect:()=>{},recover:()=>{}},
+  {id:'lifesupport',name:'Air Recycler',sgDot:'sg-life-dot',sgText:'sg-life',
+   steps:['Replace carbon filter','Purge intake manifold','Calibrate O₂ mix ratio','Verify atmospheric output'],
+   effect:()=>{o2Val=Math.max(65,o2Val-15)},recover:()=>{o2Val=Math.min(99,o2Val+15)}},
+];
+let activeMaint=null,maintEscalateTimer=null,maintIgnoreCount=0;
+
+function scheduleMaintenance(){
+  const delay=activeMaint?90000+Math.random()*90000:30000+Math.random()*30000; // first in 30-60s, then 90-180s
+  setTimeout(()=>{
+    if(!engaged){scheduleMaintenance();return} // wait for engage
+    if(activeMaint){scheduleMaintenance();return} // don't stack
+    const sys=maintSystems[Math.floor(Math.random()*maintSystems.length)];
+    activeMaint={sys,level:'amber',time:Date.now()};
+    // Set status to amber
+    if(sys.sgDot){
+      document.getElementById(sys.sgDot).className='sg-dot warn';
+      document.getElementById(sys.sgText).style.color='#d4a03c';
+      document.getElementById(sys.sgText).textContent='Degraded';
+    }
+    sys.effect();
+    // Show notification
+    const notif=document.getElementById('maint-notif');
+    document.getElementById('maint-text').textContent=sys.name+' showing anomalous readings. Diagnostics recommended.';
+    notif.classList.remove('critical');
+    notif.classList.add('show');
+    logComms('Engineering','⚠ '+sys.name+' — Performance degradation detected. Recommend running diagnostics.');
+    if(engaged)clickSound();
+    // Escalation timer — goes critical after 60s if ignored
+    maintEscalateTimer=setTimeout(()=>{
+      if(!activeMaint||activeMaint.level==='red')return;
+      activeMaint.level='red';
+      if(sys.sgDot){
+        document.getElementById(sys.sgDot).className='sg-dot crit';
+        document.getElementById(sys.sgText).style.color='#e74c3c';
+        document.getElementById(sys.sgText).textContent='Critical';
+      }
+      notif.classList.add('critical');
+      document.getElementById('maint-text').textContent='⚠ '+sys.name+' CRITICAL — Immediate maintenance required. Cascading failures possible.';
+      logComms('Engineering','⚠ CRITICAL: '+sys.name+' failure imminent. Cascading effects on adjacent systems.');
+      // Cascading: degrade another system slightly
+      const otherSys=maintSystems.find(s=>s.id!==sys.id);
+      if(otherSys)otherSys.effect();
+      // Alarm
+      if(audioCtx){
+        const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+        o.type='square';o.frequency.value=300;
+        g.gain.setValueAtTime(.04,audioCtx.currentTime);
+        g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.8);
+        o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+1);
+      }
+    },60000);
+    scheduleMaintenance();
+  },delay);
+}
+scheduleMaintenance();
+
+// Dismiss notification (but problem persists)
+document.getElementById('maint-dismiss').addEventListener('click',()=>{
+  document.getElementById('maint-notif').classList.remove('show');
+  if(engaged)clickSound();
+});
+
+// Open repair modal
+document.getElementById('maint-repair-btn').addEventListener('click',()=>{
+  if(!activeMaint)return;
+  document.getElementById('maint-notif').classList.remove('show');
+  openRepairModal(activeMaint.sys);
+  if(engaged)clickSound();
+});
+
+function openRepairModal(sys){
+  const modal=document.getElementById('repair-modal');
+  document.getElementById('repair-title').textContent='⚙ '+sys.name+' — Diagnostics';
+  const body=document.getElementById('repair-body');
+  let currentStep=0;
+
+  function renderStep(){
+    if(currentStep>=sys.steps.length){
+      // Complete
+      body.innerHTML=`
+        <div class="repair-step active">
+          <div class="rs-desc" style="color:#2ecc71;text-align:center">✓ All diagnostics passed. ${sys.name} restored to nominal operation.</div>
+          <div class="rs-indicator"><div class="rs-fill complete"></div></div>
+          <button class="repair-action-btn success" id="repair-done">Complete</button>
+        </div>`;
+      document.getElementById('repair-done').addEventListener('click',()=>{
+        modal.classList.remove('show');
+        // Restore system
+        if(sys.sgDot){
+          document.getElementById(sys.sgDot).className='sg-dot ok';
+          document.getElementById(sys.sgText).style.color='#2ecc71';
+          document.getElementById(sys.sgText).textContent='Nominal';
+        }
+        sys.recover();
+        if(maintEscalateTimer){clearTimeout(maintEscalateTimer);maintEscalateTimer=null}
+        activeMaint=null;
+        logComms('Engineering',sys.name+' diagnostics complete. All systems nominal.');
+        if(engaged)clickSound();
+      });
+      // Success sound
+      if(audioCtx){
+        const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+        o.type='sine';o.frequency.value=600;
+        o.frequency.linearRampToValueAtTime(900,audioCtx.currentTime+.15);
+        g.gain.setValueAtTime(.04,audioCtx.currentTime);
+        g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.4);
+        o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.5);
+      }
+      return;
+    }
+    const step=sys.steps[currentStep];
+    const stepNum=currentStep+1;
+    const animClass=stepNum%2===0?'calibrating':'scanning';
+    body.innerHTML=`
+      <div class="repair-step active">
+        <div class="rs-desc">Step ${stepNum}/${sys.steps.length}: ${step}</div>
+        <div class="rs-indicator"><div class="rs-fill" id="rs-bar"></div></div>
+        <button class="repair-action-btn" id="repair-next">${stepNum<sys.steps.length?'Execute':'Run Final Check'}</button>
+        <div class="repair-status" id="repair-status">Ready</div>
+      </div>`;
+    document.getElementById('repair-next').addEventListener('click',()=>{
+      const btn=document.getElementById('repair-next');
+      const bar=document.getElementById('rs-bar');
+      const status=document.getElementById('repair-status');
+      btn.disabled=true;btn.style.opacity='.5';btn.textContent='Running…';
+      status.textContent='Processing…';
+      bar.className='rs-fill '+animClass;
+      // Scan sound
+      if(audioCtx){
+        const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+        o.type='sine';o.frequency.value=300+stepNum*100;
+        o.frequency.linearRampToValueAtTime(500+stepNum*100,audioCtx.currentTime+1.5);
+        g.gain.setValueAtTime(.025,audioCtx.currentTime);
+        g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+1.8);
+        o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+2);
+      }
+      const duration=1500+Math.random()*1500;
+      setTimeout(()=>{
+        bar.className='rs-fill complete';
+        status.textContent='✓ Step '+stepNum+' complete';
+        status.style.color='#2ecc71';
+        if(engaged)clickSound();
+        setTimeout(()=>{
+          currentStep++;
+          renderStep();
+        },600);
+      },duration);
+    });
+  }
+
+  modal.classList.add('show');
+  renderStep();
+}
 
 // === COMMS INITIATION ===
 document.getElementById('ci-close').addEventListener('click',()=>{
