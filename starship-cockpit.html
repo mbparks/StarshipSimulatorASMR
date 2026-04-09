@@ -85,6 +85,163 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .sgp-row .sgp-val.crit{color:#e74c3c}
 .sgp-graph{width:100%;height:36px;border:1px solid rgba(94,196,212,.06);border-radius:2px;margin-top:8px;background:rgba(4,8,12,.5)}
 .sgp-graph-label{font-size:clamp(5px,.45vw,7px);color:#2a4a5a;letter-spacing:1px;margin-top:3px;text-align:center}
+
+/* === PROBE LAUNCH === */
+#probe-btn{background:none;border:1px solid rgba(94,196,212,.25);color:#5ec4d4;padding:clamp(3px,.4vh,6px) clamp(8px,1vw,16px);font-family:inherit;font-size:clamp(8px,.8vw,10px);letter-spacing:3px;cursor:pointer;text-transform:uppercase;transition:all .3s;border-radius:3px}
+#probe-btn:hover{border-color:#5ec4d4;background:rgba(94,196,212,.08)}
+#probe-btn.launched{border-color:#d4a03c;color:#d4a03c;pointer-events:none;opacity:.6}
+#probe-status{position:fixed;bottom:clamp(108px,18.5vh,205px);left:50%;transform:translateX(-50%);z-index:10;display:none;font-size:clamp(7px,.65vw,9px);color:#d4a03c;letter-spacing:2px;text-align:center}
+#probe-status.show{display:block}
+.probe-card{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:16;width:clamp(340px,38vw,500px);background:rgba(6,10,14,.95);border:1px solid rgba(94,196,212,.2);border-radius:5px;display:none;pointer-events:auto}
+.probe-card.show{display:block}
+.probe-card .pc-header{padding:10px 14px;border-bottom:1px solid rgba(94,196,212,.08);display:flex;justify-content:space-between;align-items:center}
+.probe-card .pc-title{font-size:clamp(10px,.95vw,14px);color:#5ec4d4;letter-spacing:3px;text-transform:uppercase}
+.probe-card .pc-body{padding:12px 14px}
+.probe-card .pc-row{display:flex;justify-content:space-between;margin-bottom:5px;font-size:clamp(7px,.65vw,9px)}
+.probe-card .pc-label{color:#2a4a5a}
+.probe-card .pc-val{color:#5ec4d4}
+.probe-card .pc-val.rare{color:#d4a03c}
+.probe-card .pc-val.epic{color:#e74c3c}
+.probe-card .pc-finding{margin-top:10px;padding:8px;border:1px solid rgba(94,196,212,.1);border-radius:3px;font-size:clamp(8px,.7vw,10px);color:#4a7a8a;line-height:1.6;font-style:italic}
+.probe-card .pc-finding.alien{border-color:rgba(212,160,60,.3);color:#d4a03c}
+
+/* === SIGNAL DECRYPTION === */
+.decrypt-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:16;width:clamp(360px,40vw,520px);background:rgba(6,10,14,.95);border:1px solid rgba(212,160,60,.2);border-radius:5px;display:none;pointer-events:auto}
+.decrypt-modal.show{display:block}
+.decrypt-header{padding:10px 14px;border-bottom:1px solid rgba(212,160,60,.08);display:flex;justify-content:space-between;align-items:center}
+.decrypt-header .dh-title{font-size:clamp(10px,.95vw,14px);color:#d4a03c;letter-spacing:3px;text-transform:uppercase}
+.decrypt-body{padding:14px;text-align:center}
+.decrypt-waveform{width:100%;height:60px;border:1px solid rgba(212,160,60,.1);border-radius:3px;margin-bottom:12px;background:rgba(4,8,12,.5)}
+.decrypt-dials{display:flex;justify-content:center;gap:clamp(12px,2vw,24px);margin-bottom:12px}
+.dial-group{display:flex;flex-direction:column;align-items:center;gap:4px}
+.dial-group .dial-label{font-size:clamp(6px,.55vw,8px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase}
+.dial-group input[type=range]{-webkit-appearance:none;appearance:none;width:clamp(60px,8vw,100px);height:4px;background:#1a2a20;outline:none;border-radius:2px;cursor:pointer}
+.dial-group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:#d4a03c;border-radius:50%;cursor:pointer;box-shadow:0 0 6px rgba(212,160,60,.3)}
+.dial-val{font-size:clamp(8px,.7vw,10px);color:#d4a03c;font-variant-numeric:tabular-nums}
+.decrypt-match{font-size:clamp(8px,.7vw,10px);color:#3a5a3a;letter-spacing:1px;margin-bottom:8px;min-height:16px}
+.decrypt-match.close{color:#d4a03c}
+.decrypt-match.locked{color:#2ecc71}
+.decrypt-btn{background:none;border:1px solid rgba(212,160,60,.25);color:#d4a03c;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:6px 14px;cursor:pointer;border-radius:3px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;width:100%}
+.decrypt-btn:hover{border-color:#d4a03c;background:rgba(212,160,60,.08)}
+.decrypt-btn:disabled{opacity:.4;pointer-events:none}
+.decrypt-result{margin-top:10px;padding:10px;border:1px solid rgba(212,160,60,.15);border-radius:3px;font-size:clamp(8px,.75vw,11px);color:#d4a03c;line-height:1.7;text-align:left;font-style:italic;display:none}
+.decrypt-result.show{display:block}
+.decrypt-fragments{margin-top:8px;font-size:clamp(7px,.6vw,9px);color:#3a5a6a;text-align:left}
+
+/* === NEBULA COLLECTOR === */
+#nebula-collect{position:fixed;bottom:clamp(240px,36vh,380px);left:50%;transform:translateX(-50%);z-index:10;display:none;pointer-events:auto}
+#nebula-collect.show{display:block}
+#nebula-collect button{background:none;border:1px solid rgba(160,120,200,.3);color:rgba(160,120,200,.8);font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:5px 14px;cursor:pointer;border-radius:3px;letter-spacing:2px;transition:all .2s}
+#nebula-collect button:hover{border-color:rgba(160,120,200,.6);background:rgba(160,120,200,.06)}
+#collect-progress{position:fixed;bottom:clamp(240px,36vh,380px);left:50%;transform:translateX(-50%);z-index:10;display:none;text-align:center;pointer-events:none}
+#collect-progress.show{display:block}
+#collect-progress .cp-bar{width:clamp(150px,16vw,220px);height:5px;background:#1a1a2a;border-radius:3px;overflow:hidden;margin:0 auto 6px}
+#collect-progress .cp-fill{height:100%;width:0%;background:linear-gradient(90deg,rgba(120,80,180,.5),rgba(160,120,200,.8));border-radius:3px;transition:width .5s}
+#collect-progress .cp-text{font-size:clamp(7px,.6vw,9px);color:rgba(160,120,200,.6);letter-spacing:2px}
+.nebula-card{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:16;width:clamp(320px,35vw,460px);background:rgba(6,10,14,.95);border:1px solid rgba(160,120,200,.2);border-radius:5px;display:none;pointer-events:auto}
+.nebula-card.show{display:block}
+.nebula-card .nc-header{padding:10px 14px;border-bottom:1px solid rgba(160,120,200,.08)}
+.nebula-card .nc-title{font-size:clamp(10px,.95vw,14px);color:rgba(160,120,200,.8);letter-spacing:3px;text-transform:uppercase}
+.nebula-card .nc-body{padding:12px 14px}
+.nebula-card .nc-row{display:flex;justify-content:space-between;margin-bottom:5px;font-size:clamp(7px,.65vw,9px)}
+.nebula-card .nc-label{color:#2a4a5a}
+.nebula-card .nc-val{color:rgba(160,120,200,.8)}
+.nebula-card .nc-spectrum{width:100%;height:30px;border:1px solid rgba(160,120,200,.1);border-radius:2px;margin-top:8px;background:rgba(4,8,12,.5)}
+
+/* === POWER ALLOCATION === */
+.power-panel{position:fixed;inset:0;z-index:14;display:none;pointer-events:auto;background:rgba(4,8,12,.15);justify-content:center;align-items:center;flex-direction:column}
+.power-panel.show{display:flex}
+.pwr-wrap{width:clamp(520px,55vw,780px);background:rgba(8,14,20,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(94,196,212,.1);border-radius:5px;padding:clamp(16px,2.5vh,28px)}
+.pwr-title{font-size:clamp(12px,1.2vw,18px);color:#5ec4d4;letter-spacing:5px;text-transform:uppercase;text-align:center;margin-bottom:4px}
+.pwr-subtitle{font-size:clamp(7px,.6vw,9px);color:#3a5a6a;letter-spacing:2px;text-align:center;margin-bottom:clamp(14px,2vh,24px)}
+.pwr-close{position:absolute;top:12px;right:16px;background:none;border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:11px;padding:4px 12px;cursor:pointer;border-radius:3px;letter-spacing:2px}
+.pwr-close:hover{border-color:#5ec4d4;background:rgba(94,196,212,.08)}
+.pwr-total{text-align:center;margin-bottom:clamp(10px,1.5vh,18px);font-size:clamp(9px,.85vw,12px);color:#3a6a7a;letter-spacing:2px}
+.pwr-total .pt-val{color:#5ec4d4;font-size:1.2em}
+.pwr-total .pt-val.over{color:#e74c3c}
+.pwr-rows{display:flex;flex-direction:column;gap:clamp(8px,1.2vh,14px)}
+.pwr-row{display:flex;align-items:center;gap:clamp(8px,1.2vw,16px);padding:6px 10px;border:1px solid rgba(94,196,212,.06);border-radius:3px;transition:all .3s}
+.pwr-row.overload{border-color:rgba(212,160,60,.3);background:rgba(212,160,60,.03);animation:pwr-glow 2s ease-in-out infinite}
+.pwr-row.burnout{border-color:rgba(231,76,60,.3);background:rgba(231,76,60,.04)}
+@keyframes pwr-glow{0%,100%{box-shadow:none}50%{box-shadow:inset 0 0 15px rgba(212,160,60,.06)}}
+.pwr-row .pwr-icon{font-size:clamp(14px,1.4vw,20px);width:28px;text-align:center}
+.pwr-row .pwr-name{font-size:clamp(8px,.75vw,11px);color:#5ec4d4;letter-spacing:2px;text-transform:uppercase;width:clamp(80px,9vw,120px)}
+.pwr-row .pwr-slider{-webkit-appearance:none;appearance:none;flex:1;height:6px;background:#111a20;outline:none;border-radius:3px;cursor:pointer}
+.pwr-row .pwr-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:#5ec4d4;border-radius:50%;cursor:pointer;box-shadow:0 0 6px rgba(94,196,212,.3)}
+.pwr-row.overload .pwr-slider::-webkit-slider-thumb{background:#d4a03c;box-shadow:0 0 8px rgba(212,160,60,.4)}
+.pwr-row.burnout .pwr-slider::-webkit-slider-thumb{background:#e74c3c}
+.pwr-row .pwr-pct{font-size:clamp(11px,1.1vw,16px);color:#5ec4d4;letter-spacing:2px;width:55px;text-align:right;font-variant-numeric:tabular-nums}
+.pwr-row.overload .pwr-pct{color:#d4a03c}
+.pwr-row.burnout .pwr-pct{color:#e74c3c}
+.pwr-row .pwr-bar{width:clamp(40px,4vw,60px);height:6px;background:#111a20;border-radius:3px;overflow:hidden}
+.pwr-row .pwr-bar-fill{height:100%;border-radius:3px;transition:width .3s,background .3s}
+.pwr-status{font-size:clamp(6px,.5vw,8px);letter-spacing:1px;text-transform:uppercase;width:60px;text-align:center}
+.pwr-status.nominal{color:#2ecc71}
+.pwr-status.boosted{color:#d4a03c}
+.pwr-status.critical{color:#e74c3c}
+.pwr-status.offline{color:#e74c3c;animation:blink-crit 1s infinite}
+.pwr-warn{text-align:center;margin-top:clamp(8px,1vh,14px);font-size:clamp(7px,.6vw,9px);color:#3a5a6a;min-height:16px}
+.pwr-warn.active{color:#d4a03c}
+.pwr-reset{background:none;border:1px solid rgba(94,196,212,.15);color:#3a6a7a;font-family:inherit;font-size:clamp(7px,.6vw,9px);padding:4px 12px;cursor:pointer;border-radius:3px;letter-spacing:2px;margin-top:10px;display:block;margin-left:auto;margin-right:auto;transition:all .2s}
+.pwr-reset:hover{border-color:#5ec4d4;color:#5ec4d4}
+
+/* === SHIP NAMING MODAL === */
+#name-modal{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s}
+#name-modal.hidden{opacity:0;pointer-events:none}
+#name-modal .nm-title{font-size:clamp(10px,1.2vw,16px);color:#3a7a8a;letter-spacing:6px;text-transform:uppercase;margin-bottom:6px}
+#name-modal .nm-sub{font-size:clamp(8px,.85vw,12px);color:#2a4a5a;letter-spacing:3px;margin-bottom:clamp(16px,3vh,30px)}
+#name-modal input{background:rgba(10,18,24,.8);border:1px solid rgba(94,196,212,.3);color:#5ec4d4;font-family:inherit;font-size:clamp(16px,2vw,28px);letter-spacing:5px;padding:10px 20px;text-align:center;outline:none;border-radius:4px;width:clamp(240px,30vw,400px);text-transform:uppercase}
+#name-modal input:focus{border-color:rgba(94,196,212,.6)}
+#name-modal input::placeholder{color:#1a3a4a;text-transform:none;letter-spacing:2px;font-size:.6em}
+#name-modal .nm-btn{margin-top:clamp(12px,2vh,20px);background:none;border:1px solid rgba(94,196,212,.25);color:#5ec4d4;font-family:inherit;font-size:clamp(9px,.9vw,12px);padding:8px 24px;cursor:pointer;border-radius:3px;letter-spacing:4px;text-transform:uppercase;transition:all .3s}
+#name-modal .nm-btn:hover{border-color:#5ec4d4;background:rgba(94,196,212,.08)}
+/* Difficulty selector inside name modal */
+.diff-select{display:flex;gap:8px;margin-top:clamp(16px,2.5vh,28px);margin-bottom:8px}
+.diff-btn{background:rgba(10,18,24,.6);border:1px solid rgba(94,196,212,.15);color:#3a6a7a;font-family:inherit;font-size:clamp(7px,.65vw,9px);padding:8px 12px;cursor:pointer;border-radius:3px;letter-spacing:1px;transition:all .2s;text-align:center;flex:1}
+.diff-btn:hover{border-color:rgba(94,196,212,.4);color:#5ec4d4}
+.diff-btn.selected{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.08)}
+.diff-btn .db-name{font-size:clamp(8px,.75vw,10px);margin-bottom:3px;letter-spacing:2px;text-transform:uppercase}
+.diff-btn .db-desc{font-size:clamp(6px,.5vw,7px);color:#2a4a5a;line-height:1.4}
+.diff-btn.selected .db-desc{color:#3a6a7a}
+.diff-label{font-size:clamp(7px,.6vw,9px);color:#2a4a5a;letter-spacing:3px;text-transform:uppercase;text-align:center;margin-top:clamp(12px,2vh,20px)}
+
+/* === WATCH SUMMARY === */
+.watch-modal{position:fixed;inset:0;z-index:16;background:rgba(2,4,6,.95);display:none;justify-content:center;align-items:center;pointer-events:auto}
+.watch-modal.show{display:flex}
+.watch-wrap{width:clamp(400px,45vw,620px);max-height:85vh;overflow-y:auto;background:rgba(6,10,14,.98);border:1px solid rgba(94,196,212,.1);border-radius:5px;padding:clamp(20px,3vh,36px)}
+.watch-header{text-align:center;margin-bottom:clamp(14px,2vh,24px);border-bottom:1px solid rgba(94,196,212,.08);padding-bottom:12px}
+.watch-header .wh-ship{font-size:clamp(12px,1.3vw,20px);color:#5ec4d4;letter-spacing:6px;text-transform:uppercase}
+.watch-header .wh-sub{font-size:clamp(8px,.75vw,10px);color:#3a5a6a;letter-spacing:3px;margin-top:4px}
+.watch-section{margin-bottom:clamp(12px,1.5vh,18px)}
+.watch-section .ws-title{font-size:clamp(8px,.7vw,10px);color:#3a6a7a;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;border-bottom:1px solid rgba(94,196,212,.04);padding-bottom:4px}
+.watch-row{display:flex;justify-content:space-between;margin-bottom:3px;font-size:clamp(8px,.7vw,10px)}
+.watch-row .wr-label{color:#2a4a5a;letter-spacing:1px}
+.watch-row .wr-val{color:#5ec4d4;font-variant-numeric:tabular-nums}
+.watch-row .wr-val.highlight{color:#2ecc71}
+.watch-row .wr-val.warn{color:#d4a03c}
+.watch-close{background:none;border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:6px 16px;cursor:pointer;border-radius:3px;letter-spacing:3px;text-transform:uppercase;transition:all .2s;width:100%;margin-top:14px}
+.watch-close:hover{border-color:#5ec4d4;background:rgba(94,196,212,.06)}
+
+/* === BIOLUMINESCENT ORGANISMS === */
+.bio-alert{position:fixed;bottom:clamp(240px,36vh,380px);left:50%;transform:translateX(-50%);z-index:10;display:none;text-align:center;pointer-events:none}
+.bio-alert.show{display:block}
+.bio-alert .ba-text{font-size:clamp(8px,.75vw,11px);color:rgba(120,220,180,.7);letter-spacing:3px;animation:pulse-text 2s infinite}
+
+/* === SPACE WEATHER === */
+.weather-panel{position:fixed;z-index:5;pointer-events:none}
+.weather-label{font-size:clamp(5px,.5vw,7px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
+#weather-canvas{border:1px solid rgba(94,196,212,.08);border-radius:3px;background:rgba(4,8,12,.5)}
+
+/* === TRACTOR BEAM === */
+#tractor-btn{background:none;border:1px solid rgba(94,196,212,.25);color:#5ec4d4;padding:clamp(3px,.4vh,6px) clamp(8px,1vw,16px);font-family:inherit;font-size:clamp(8px,.8vw,10px);letter-spacing:3px;cursor:pointer;text-transform:uppercase;transition:all .3s;border-radius:3px}
+#tractor-btn:hover{border-color:#5ec4d4;background:rgba(94,196,212,.08)}
+#tractor-btn.active{border-color:#2ecc71;color:#2ecc71;background:rgba(46,204,113,.06)}
+#tractor-btn.locked{border-color:#d4a03c;color:#d4a03c;background:rgba(212,160,60,.06)}
+#tractor-status{position:fixed;bottom:clamp(108px,18.5vh,205px);left:50%;transform:translateX(-50%);z-index:10;display:none;font-size:clamp(7px,.65vw,9px);color:#2ecc71;letter-spacing:2px;text-align:center}
+#tractor-status.show{display:block}
+.tractor-release{display:flex;gap:8px;justify-content:center;margin-top:6px}
+.tractor-release button{background:none;border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:clamp(7px,.6vw,9px);padding:3px 10px;cursor:pointer;border-radius:3px;letter-spacing:1px;transition:all .2s;pointer-events:auto}
+.tractor-release button:hover{border-color:#5ec4d4;background:rgba(94,196,212,.06)}
 .sg-status{font-size:clamp(7px,.65vw,9px);letter-spacing:1px;padding:2px 0;display:flex;align-items:center;gap:4px}
 .sg-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 .sg-dot.ok{background:#2ecc71;box-shadow:0 0 4px rgba(46,204,113,.4)}
@@ -522,7 +679,20 @@ canvas#c{position:fixed;inset:0;z-index:0}
 </head>
 <body>
 
-<div id="engage"><div class="title">ISS Artemis</div><div class="sub">Click to engage systems</div></div>
+<div id="name-modal">
+  <div class="nm-title">Deep Space Simulator</div>
+  <div class="nm-sub">Name your vessel</div>
+  <input type="text" id="ship-name-input" placeholder="Enter ship name…" maxlength="24">
+  <div class="diff-label">Select Mission Profile</div>
+  <div class="diff-select">
+    <div class="diff-btn" data-diff="peaceful"><div class="db-name">Peaceful Cruise</div><div class="db-desc">No malfunctions. No threats. Pure ambient ASMR.</div></div>
+    <div class="diff-btn selected" data-diff="standard"><div class="db-name">Standard Patrol</div><div class="db-desc">Balanced events. Occasional repairs. Moderate encounters.</div></div>
+    <div class="diff-btn" data-diff="frontier"><div class="db-name">Deep Frontier</div><div class="db-desc">Frequent events. Resource pressure. Higher burnout risk.</div></div>
+  </div>
+  <button class="nm-btn" id="nm-engage">Engage Systems</button>
+</div>
+
+<div id="engage" class="hidden"><div class="title">ISS Artemis</div><div class="sub">Click to engage systems</div></div>
 <canvas id="c"></canvas>
 <div class="crt-overlay"></div>
 <div class="vignette"></div>
@@ -668,7 +838,12 @@ canvas#c{position:fixed;inset:0;z-index:0}
   <button class="scr-btn" data-screen="discovery">Disc</button>
   <button class="scr-btn" data-screen="flight">Fly</button>
   <button class="scr-btn" data-screen="comms-init" style="border-color:rgba(46,204,113,.2);color:#2ecc71">Hail</button>
+  <button class="scr-btn" data-screen="power">Power</button>
+  <button class="scr-btn" data-screen="watch" style="border-color:rgba(212,160,60,.2);color:#d4a03c">Watch</button>
 </div>
+
+<!-- WATCH SUMMARY -->
+<div class="watch-modal" id="watch-modal"></div>
 
 <!-- COMMS INITIATE -->
 
@@ -682,6 +857,19 @@ canvas#c{position:fixed;inset:0;z-index:0}
 <div class="repair-modal" id="repair-modal">
   <div class="repair-header"><div class="rh-title" id="repair-title">Diagnostics</div></div>
   <div class="repair-body" id="repair-body"></div>
+</div>
+
+<!-- POWER ALLOCATION -->
+<div class="power-panel" id="power-panel">
+<div class="pwr-wrap" style="position:relative">
+  <div class="pwr-title">⚡ Power Allocation</div>
+  <div class="pwr-subtitle">Total reactor output: 500 units — Redistribute as needed</div>
+  <button class="pwr-close" id="pwr-close">Close</button>
+  <div class="pwr-total">Allocated: <span class="pt-val" id="pwr-total-val">500</span> / 500</div>
+  <div class="pwr-rows" id="pwr-rows"></div>
+  <div class="pwr-warn" id="pwr-warn"></div>
+  <button class="pwr-reset" id="pwr-reset">Reset to Default</button>
+</div>
 </div>
 
 <div class="comms-init" id="comms-init">
@@ -783,6 +971,41 @@ canvas#c{position:fixed;inset:0;z-index:0}
 <div id="scan-progress"><div class="sp-bar"><div class="sp-fill" id="sp-fill"></div></div><div class="sp-text">Scanning…</div></div>
 <div id="scan-card"></div>
 
+<!-- Probe Launch -->
+<div id="probe-status">Probe in transit… <span id="probe-timer"></span></div>
+<div class="probe-card" id="probe-card"><div class="pc-header"><div class="pc-title" id="pc-title">Probe Data</div><button class="sgp-close" id="pc-close">×</button></div><div class="pc-body" id="pc-body"></div></div>
+
+<!-- Signal Decryption -->
+<div class="decrypt-modal" id="decrypt-modal">
+  <div class="decrypt-header"><div class="dh-title">⟐ Signal Decryption</div><button class="sgp-close" id="decrypt-close">×</button></div>
+  <div class="decrypt-body">
+    <canvas class="decrypt-waveform" id="decrypt-wave" width="400" height="60"></canvas>
+    <div class="decrypt-dials">
+      <div class="dial-group"><div class="dial-label">Freq α</div><input type="range" id="dial-a" min="0" max="100" value="50"><div class="dial-val" id="dial-a-val">50</div></div>
+      <div class="dial-group"><div class="dial-label">Freq β</div><input type="range" id="dial-b" min="0" max="100" value="50"><div class="dial-val" id="dial-b-val">50</div></div>
+      <div class="dial-group"><div class="dial-label">Phase</div><input type="range" id="dial-c" min="0" max="100" value="50"><div class="dial-val" id="dial-c-val">50</div></div>
+    </div>
+    <div class="decrypt-match" id="decrypt-match">Adjust dials to match the target waveform</div>
+    <button class="decrypt-btn" id="decrypt-lock" disabled>Lock Signal</button>
+    <div class="decrypt-result" id="decrypt-result"></div>
+    <div class="decrypt-fragments" id="decrypt-fragments"></div>
+  </div>
+</div>
+
+<!-- Nebula Collector -->
+<div id="nebula-collect"><button id="nebula-collect-btn">◈ Deploy Collector</button></div>
+<div id="collect-progress"><div class="cp-bar"><div class="cp-fill" id="cp-fill"></div></div><div class="cp-text">Collecting nebula sample…</div></div>
+<div class="nebula-card" id="nebula-card"><div class="nc-header"><div class="nc-title">Spectrographic Analysis</div></div><div class="nc-body" id="nc-body"></div></div>
+
+<!-- Bioluminescent Alert -->
+<div class="bio-alert" id="bio-alert"><div class="ba-text">◈ Unknown Biological Signatures Detected ◈</div></div>
+
+<!-- Space Weather Radar -->
+<div class="weather-panel" style="top:clamp(130px,18vh,220px);left:clamp(50px,7vw,110px)"><div class="weather-label">Space Weather</div><canvas id="weather-canvas" width="120" height="60"></canvas></div>
+
+<!-- Tractor Beam Status -->
+<div id="tractor-status"></div>
+
 <!-- DISCOVERY LOG -->
 <div class="screen-overlay" id="scr-discovery"><button class="s-close" data-close>Close</button>
 <div class="s-title">Discovery Log — Scan Archive</div>
@@ -871,6 +1094,8 @@ canvas#c{position:fixed;inset:0;z-index:0}
     <input type="range" id="throttle" min="5" max="100" value="30">
     <button id="eng-mute" style="background:none;border:1px solid rgba(94,196,212,.25);color:#5ec4d4;padding:clamp(3px,.4vh,6px) clamp(8px,1vw,16px);font-family:inherit;font-size:clamp(8px,.8vw,10px);letter-spacing:3px;cursor:pointer;text-transform:uppercase;transition:all .3s;border-radius:3px">Engine</button>
     <button id="starmap-btn">Map</button>
+    <button id="probe-btn">Probe</button>
+    <button id="tractor-btn">Tractor</button>
     <button id="warp-btn">Warp</button>
   </div>
 </div>
@@ -1195,6 +1420,15 @@ function scheduleRadio(){
       document.body.classList.add('screen-flicker');
       document.getElementById('interference').classList.add('active');
       setTimeout(()=>{document.body.classList.remove('screen-flicker');document.getElementById('interference').classList.remove('active')},3000);
+      // Show decrypt option in reply area
+      const replyEl=document.getElementById('radio-reply');
+      const existingHTML=replyEl.innerHTML;
+      replyEl.innerHTML=existingHTML+'<button class="reply-btn" id="decrypt-trigger" style="border-color:rgba(212,160,60,.4);color:#d4a03c">◈ Attempt Decrypt</button>';
+      document.getElementById('decrypt-trigger').addEventListener('click',()=>{
+        replyEl.classList.remove('show');
+        openDecryptModal();
+        if(engaged)clickSound();
+      });
     }
     setTimeout(()=>el.classList.remove('show'),6000+m.msg.length*30);
     scheduleRadio();
@@ -1217,6 +1451,159 @@ function radioStaticSound(){
   },300);
 }
 
+// === SHIP NAMING & DIFFICULTY ===
+let shipName=localStorage.getItem('shipName')||'ISS Artemis';
+let difficulty=localStorage.getItem('difficulty')||'standard';
+const sessionStats={scans:0,repairs:0,commsExchanged:0,courseChanges:0,probesLaunched:0,signalsDecrypted:0,nebulaSamples:0,hails:0,powerEvents:0,startTime:Date.now()};
+
+// Pre-fill name input
+document.getElementById('ship-name-input').value=shipName==='ISS Artemis'?'':shipName;
+
+// Difficulty selection
+document.querySelectorAll('.diff-btn').forEach(btn=>{
+  if(btn.dataset.diff===difficulty)btn.classList.add('selected');
+  else btn.classList.remove('selected');
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    difficulty=btn.dataset.diff;
+  });
+});
+
+function applyShipName(name){
+  shipName=name||'ISS Artemis';
+  localStorage.setItem('shipName',shipName);
+  document.title=shipName+' — Deep Space Cruise';
+  // Update all visible text references
+  document.querySelectorAll('.s-title,.nm-title,.ai-header span,.wh-ship').forEach(el=>{
+    el.textContent=el.textContent.replace(/ISS Artemis|Artemis/g,shipName);
+  });
+  // Update radio messages to use ship name
+  radioMessages.forEach(m=>{
+    m.msg=m.msg.replace(/Artemis/g,shipName);
+    m.src=m.src.replace(/Artemis/g,shipName);
+  });
+  // Update database
+  if(dbEntries.ship)dbEntries.ship.content=dbEntries.ship.content.replace(/ISS Artemis/g,shipName);
+  // Update starmap waypoint
+  navWaypoints.forEach(wp=>{if(wp.name==='Artemis')wp.name=shipName});
+  waypoints.forEach(wp=>{if(wp.name==='Artemis')wp.name=shipName});
+  // Update known contacts
+  knownContacts.forEach(c=>{c.name=c.name.replace(/Artemis/g,shipName);c.detail=c.detail.replace(/Artemis/g,shipName)});
+  // Update crew data
+  crewEvents.forEach((e,i)=>{crewEvents[i]=e.replace(/Artemis/g,shipName)});
+  // AI terminal header
+  const aiHeader=document.querySelector('.ai-header span');
+  if(aiHeader)aiHeader.textContent=shipName+' AI — v4.2.1';
+  const aiLog=document.querySelector('.ai-log .ai-resp');
+  if(aiLog)aiLog.textContent=shipName.toUpperCase()+' AI online. Type a command.';
+}
+
+function getDifficultyMultiplier(type){
+  if(type==='maintDelay'){
+    if(difficulty==='peaceful')return 999999999;// effectively never
+    if(difficulty==='frontier')return .4;
+    return 1;
+  }
+  if(type==='maintEscalate'){
+    if(difficulty==='frontier')return .5;
+    return 1;
+  }
+  if(type==='burnoutRisk'){
+    if(difficulty==='peaceful')return 0;
+    if(difficulty==='frontier')return 1.5;
+    return 1;
+  }
+  if(type==='eventFreq'){
+    if(difficulty==='peaceful')return .3;
+    if(difficulty==='frontier')return 2;
+    return 1;
+  }
+  return 1;
+}
+
+// Naming modal engage
+document.getElementById('nm-engage').addEventListener('click',()=>{
+  const input=document.getElementById('ship-name-input').value.trim();
+  if(input)applyShipName(input);
+  else applyShipName('ISS Artemis');
+  localStorage.setItem('difficulty',difficulty);
+  document.getElementById('name-modal').classList.add('hidden');
+  // Now trigger original engage
+  if(!engaged){
+    engaged=true;
+    document.getElementById('engage').classList.add('hidden');
+    initAudio();
+  }
+});
+document.getElementById('ship-name-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter')document.getElementById('nm-engage').click();
+  e.stopPropagation();
+});
+
+// === WATCH SUMMARY ===
+function showWatchSummary(){
+  const elapsed=Date.now()-sessionStats.startTime;
+  const mins=Math.floor(elapsed/60000);
+  const hrs=Math.floor(mins/60);
+  const missionElapsed=elapsed*100;
+  const mDays=Math.floor(missionElapsed/1000/86400);
+  const distTraveled=(elapsed/1000*hudSpeed*.001).toFixed(3);
+
+  const modal=document.getElementById('watch-modal');
+  modal.innerHTML=`<div class="watch-wrap">
+    <div class="watch-header">
+      <div class="wh-ship">${shipName}</div>
+      <div class="wh-sub">End of Watch Report — ${hrs}h ${mins%60}m real time</div>
+    </div>
+    <div class="watch-section">
+      <div class="ws-title">Navigation</div>
+      <div class="watch-row"><span class="wr-label">Mission Days Elapsed</span><span class="wr-val">${mDays}</span></div>
+      <div class="watch-row"><span class="wr-label">Distance Traveled</span><span class="wr-val">${distTraveled} ly</span></div>
+      <div class="watch-row"><span class="wr-label">Current Heading</span><span class="wr-val">${hudHeading.toFixed(1)}°</span></div>
+      <div class="watch-row"><span class="wr-label">Current Velocity</span><span class="wr-val">${hudSpeed.toFixed(4)}c</span></div>
+      <div class="watch-row"><span class="wr-label">Course Changes</span><span class="wr-val">${sessionStats.courseChanges}</span></div>
+    </div>
+    <div class="watch-section">
+      <div class="ws-title">Operations</div>
+      <div class="watch-row"><span class="wr-label">Objects Scanned</span><span class="wr-val ${sessionStats.scans>0?'highlight':''}">${sessionStats.scans}</span></div>
+      <div class="watch-row"><span class="wr-label">Probes Launched</span><span class="wr-val">${sessionStats.probesLaunched}</span></div>
+      <div class="watch-row"><span class="wr-label">Signals Decrypted</span><span class="wr-val ${sessionStats.signalsDecrypted>0?'highlight':''}">${sessionStats.signalsDecrypted}</span></div>
+      <div class="watch-row"><span class="wr-label">Nebula Samples</span><span class="wr-val">${sessionStats.nebulaSamples}</span></div>
+      <div class="watch-row"><span class="wr-label">Discoveries Logged</span><span class="wr-val highlight">${discoveries.length}</span></div>
+    </div>
+    <div class="watch-section">
+      <div class="ws-title">Communications</div>
+      <div class="watch-row"><span class="wr-label">Radio Messages Received</span><span class="wr-val">${commsLog.filter(c=>!c.isCaptain).length}</span></div>
+      <div class="watch-row"><span class="wr-label">Hails Initiated</span><span class="wr-val">${sessionStats.hails}</span></div>
+      <div class="watch-row"><span class="wr-label">Captain's Log Entries</span><span class="wr-val">${commsLog.filter(c=>c.isCaptain).length}</span></div>
+    </div>
+    <div class="watch-section">
+      <div class="ws-title">Engineering</div>
+      <div class="watch-row"><span class="wr-label">Systems Repaired</span><span class="wr-val ${sessionStats.repairs>0?'highlight':''}">${sessionStats.repairs}</span></div>
+      <div class="watch-row"><span class="wr-label">Power Events</span><span class="wr-val ${sessionStats.powerEvents>0?'warn':''}">${sessionStats.powerEvents}</span></div>
+      <div class="watch-row"><span class="wr-label">Fuel Remaining</span><span class="wr-val">${hudFuel.toFixed(1)}%</span></div>
+      <div class="watch-row"><span class="wr-label">Shield Integrity</span><span class="wr-val">${Math.round(shieldsVal)}%</span></div>
+      <div class="watch-row"><span class="wr-label">O₂ Level</span><span class="wr-val">${Math.round(o2Val)}%</span></div>
+    </div>
+    <div class="watch-section">
+      <div class="ws-title">Mission Profile</div>
+      <div class="watch-row"><span class="wr-label">Difficulty</span><span class="wr-val">${difficulty==='peaceful'?'Peaceful Cruise':difficulty==='frontier'?'Deep Frontier':'Standard Patrol'}</span></div>
+      <div class="watch-row"><span class="wr-label">Crew Status</span><span class="wr-val highlight">5 Active / 1 Cryo</span></div>
+    </div>
+    <button class="watch-close" id="watch-close-btn">Dismiss Report</button>
+  </div>`;
+  modal.classList.add('show');
+  document.getElementById('watch-close-btn').addEventListener('click',()=>{
+    modal.classList.remove('show');
+    if(engaged)clickSound();
+  });
+  if(engaged)clickSound();
+}
+
+// Hook stats tracking
+const origLogComms=logComms;
+
 // EVENTS
 document.getElementById('engage').addEventListener('click',()=>{
   if(engaged)return;engaged=true;
@@ -1237,7 +1624,32 @@ document.getElementById('warp-btn').addEventListener('click',()=>{
   document.getElementById('warp-btn').classList.toggle('active',warping);warpSound(warping);
 });
 canvas.addEventListener('click',e=>{
-  if(!engaged)return;scanPing();
+  if(!engaged)return;
+  // Check for tractor beam lock on asteroids
+  if(tractorMode&&!tractorLocked){
+    const mx=e.clientX,my=e.clientY;
+    for(const ro of renderedObjects){
+      if(ro.obj.kind!=='asteroid')continue;
+      const dx=mx-ro.sx,dy=my-ro.sy;
+      if(dx*dx+dy*dy<ro.size*ro.size*4){
+        lockTractor(ro.obj,ro.sx,ro.sy);
+        return;
+      }
+    }
+    // Also check bio creatures
+    for(const bc of bioCreatures){
+      if(bc.fading)continue;
+      const cx2=W/2+panX,cy2=H/2+panY;
+      const invZ=1/bc.z;
+      const bsx=cx2+bc.x*invZ*(W/2),bsy=cy2+bc.y*invZ*(H/2);
+      const dx=mx-bsx,dy=my-bsy;
+      if(dx*dx+dy*dy<400){
+        lockTractor(bc,bsx,bsy);
+        return;
+      }
+    }
+  }
+  scanPing();
   const r=document.createElement('div');r.className='scan-ring';
   r.style.left=(e.clientX-60)+'px';r.style.top=(e.clientY-60)+'px';
   document.body.appendChild(r);setTimeout(()=>r.remove(),1000);
@@ -1688,6 +2100,20 @@ canvas.addEventListener('mousemove',e=>{
         break;
       }
     }
+    // Check bio creatures for scan
+    if(!foundScanTarget){
+      for(const bc of bioCreatures){
+        if(bc.fading)continue;
+        const cx2=W/2+panX,cy2=H/2+panY;
+        const invZ=1/bc.z;
+        const bsx=cx2+bc.x*invZ*(W/2),bsy=cy2+bc.y*invZ*(H/2);
+        const dx=mx-bsx,dy=my-bsy;
+        if(dx*dx+dy*dy<400){
+          showScanPrompt({kind:'organism',x:bc.x,y:bc.y,z:bc.z},bsx,bsy);
+          foundScanTarget=true;break;
+        }
+      }
+    }
   }
   if(!foundScanTarget){hideScanPrompt();hideHailPrompt()}
 });
@@ -1717,6 +2143,17 @@ document.querySelectorAll('.scr-btn').forEach(btn=>{
     if(id==='pip'){document.getElementById('pip').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
     if(id==='ai'){document.getElementById('ai-terminal').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
     if(id==='fuelg'){document.getElementById('fuel-graph').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
+    if(id==='power'){
+      const pp=document.getElementById('power-panel');
+      if(pp.classList.contains('show')){pp.classList.remove('show');btn.classList.remove('active')}
+      else{pp.classList.add('show');btn.classList.add('active');renderPowerGrid()}
+      if(engaged)clickSound();return;
+    }
+    if(id==='watch'){
+      showWatchSummary();btn.classList.add('active');
+      setTimeout(()=>btn.classList.remove('active'),500);
+      return;
+    }
     if(id==='comms-init'){
       const ci=document.getElementById('comms-init');
       if(ci.classList.contains('show')){ci.classList.remove('show');btn.classList.remove('active')}
@@ -2109,9 +2546,9 @@ function generateCrewName(seed){
 
 // Response templates organized by conversation stage
 const hailGreetings=[
-  (name,crew)=>`This is ${crew} of the ${name}. Go ahead, Artemis.`,
+  (name,crew)=>`This is ${crew} of the ${name}. Go ahead, ${shipName}.`,
   (name,crew)=>`${name} here, reading you. What can we do for you?`,
-  (name,crew)=>`Artemis, this is ${crew} aboard ${name}. Channel open.`,
+  (name,crew)=>`${shipName}, this is ${crew} aboard ${name}. Channel open.`,
   (name,crew)=>`You've reached the ${name}. ${crew} speaking. How can we assist?`,
   (name,crew)=>`${name} responding to your hail. ${crew} on comms. Over.`,
 ];
@@ -2147,10 +2584,10 @@ const hailTopics={
     (n)=>`We picked up a faint repeating signal on a deprecated frequency. Probably just an old beacon, but… it didn't match any registered ID.`,
   ],
   farewell:[
-    (n)=>`Safe travels, Artemis. ${n} out.`,
+    (n)=>`Safe travels, ${shipName}. ${n} out.`,
     (n)=>`Good luck out there, Captain. We'll keep a channel open if you need us.`,
     (n)=>`Copy that. Fair winds and following stars. ${n} closing channel.`,
-    (n)=>`Acknowledged, Artemis. Stay sharp out there. ${n} signing off.`,
+    (n)=>`Acknowledged, ${shipName}. Stay sharp out there. ${n} signing off.`,
   ],
 };
 
@@ -2183,7 +2620,7 @@ hailPrompt.addEventListener('click',()=>{
   document.getElementById('hail-replies').innerHTML='';
   hailModal.classList.add('show');
 
-  logComms('Artemis','Hailing '+vesselName+'…',true);
+  logComms(shipName,'Hailing '+vesselName+'…',true);
 
   // Channel open sound
   if(audioCtx){
@@ -2325,7 +2762,8 @@ const maintSystems=[
 let activeMaint=null,maintEscalateTimer=null,maintIgnoreCount=0;
 
 function scheduleMaintenance(){
-  const delay=activeMaint?90000+Math.random()*90000:30000+Math.random()*30000; // first in 30-60s, then 90-180s
+  const baseDelay=activeMaint?90000+Math.random()*90000:30000+Math.random()*30000;
+  const delay=baseDelay*getDifficultyMultiplier('maintDelay');
   setTimeout(()=>{
     if(!engaged){scheduleMaintenance();return} // wait for engage
     if(activeMaint){scheduleMaintenance();return} // don't stack
@@ -2422,6 +2860,7 @@ function openRepairModal(sys){
         if(maintEscalateTimer){clearTimeout(maintEscalateTimer);maintEscalateTimer=null}
         activeMaint=null;
         logComms('Engineering',sys.name+' diagnostics complete. All systems nominal.');
+        sessionStats.repairs++;
         if(engaged)clickSound();
       });
       // Success sound
@@ -2479,6 +2918,154 @@ function openRepairModal(sys){
   renderStep();
 }
 
+// === POWER ALLOCATION ===
+const powerSystems=[
+  {id:'engines',name:'Engines',icon:'◈',power:100,default:100,
+   effect:(p)=>{throttle=Math.max(.05,Math.min(1,(p/100)*.3*10));document.getElementById('throttle').value=throttle*100},
+   desc:'Sublight drive output'},
+  {id:'shields',name:'Shields',icon:'◇',power:100,default:100,
+   effect:(p)=>{shieldsVal=Math.min(100,p*1)},
+   desc:'Deflector grid strength'},
+  {id:'sensors',name:'Sensors',icon:'◎',power:100,default:100,
+   effect:(p)=>{},
+   desc:'Detection range & resolution'},
+  {id:'lifesup',name:'Life Support',icon:'♢',power:100,default:100,
+   effect:(p)=>{o2Val=Math.min(99,Math.max(50,p*.9))},
+   desc:'O₂ generation & atmosphere'},
+  {id:'weapons',name:'Weapons',icon:'△',power:100,default:100,
+   effect:(p)=>{},
+   desc:'Point-defense array'},
+];
+let burnoutTimers={};
+
+function renderPowerGrid(){
+  const rows=document.getElementById('pwr-rows');
+  rows.innerHTML='';
+  powerSystems.forEach((sys,i)=>{
+    const row=document.createElement('div');
+    row.className='pwr-row'+(sys.power>130?' overload':'')+(sys.burnedOut?' burnout':'');
+    row.id='pwr-row-'+sys.id;
+    const statusClass=sys.burnedOut?'offline':sys.power>130?'boosted':sys.power<50?'critical':'nominal';
+    const statusText=sys.burnedOut?'Offline':sys.power>130?'Boosted':sys.power<50?'Low':'Nominal';
+    const barPct=Math.min(100,sys.power/1.6);
+    const barColor=sys.burnedOut?'#e74c3c':sys.power>130?'#d4a03c':sys.power<50?'#e74c3c':'#5ec4d4';
+    row.innerHTML=`
+      <div class="pwr-icon">${sys.icon}</div>
+      <div class="pwr-name">${sys.name}</div>
+      <input type="range" class="pwr-slider" data-idx="${i}" min="0" max="160" value="${sys.power}" ${sys.burnedOut?'disabled':''}>
+      <div class="pwr-pct">${sys.power}%</div>
+      <div class="pwr-bar"><div class="pwr-bar-fill" style="width:${barPct}%;background:${barColor}"></div></div>
+      <div class="pwr-status ${statusClass}">${statusText}</div>`;
+    rows.appendChild(row);
+  });
+  updatePowerTotal();
+  // Attach slider events
+  rows.querySelectorAll('.pwr-slider').forEach(slider=>{
+    slider.addEventListener('input',e=>{
+      const idx=parseInt(e.target.dataset.idx);
+      const newVal=parseInt(e.target.value);
+      const oldVal=powerSystems[idx].power;
+      const diff=newVal-oldVal;
+      powerSystems[idx].power=newVal;
+      // Redistribute deficit/surplus to other systems proportionally
+      const others=powerSystems.filter((_,i)=>i!==idx&&!_.burnedOut);
+      const othersTotal=others.reduce((a,s)=>a+s.power,0);
+      if(othersTotal>0&&diff!==0){
+        let remaining=-diff;
+        others.forEach(s=>{
+          const share=othersTotal>0?(s.power/othersTotal)*remaining:remaining/others.length;
+          s.power=Math.max(0,Math.min(160,Math.round(s.power+share)));
+        });
+      }
+      // Apply effects
+      powerSystems.forEach(s=>s.effect(s.power));
+      // Check overload burnout risk
+      checkBurnout(idx);
+      renderPowerGrid();
+      if(engaged)clickSound();
+    });
+  });
+}
+
+function updatePowerTotal(){
+  const total=powerSystems.reduce((a,s)=>a+s.power,0);
+  const el=document.getElementById('pwr-total-val');
+  el.textContent=total;
+  el.className='pt-val'+(total>500?' over':'');
+  const warn=document.getElementById('pwr-warn');
+  const overloaded=powerSystems.filter(s=>s.power>130&&!s.burnedOut);
+  if(overloaded.length>0){
+    warn.textContent='⚠ '+overloaded.map(s=>s.name).join(', ')+' overloaded — burnout risk';
+    warn.className='pwr-warn active';
+  } else {
+    warn.textContent='';
+    warn.className='pwr-warn';
+  }
+}
+
+function checkBurnout(idx){
+  const sys=powerSystems[idx];
+  if(sys.power>130&&!sys.burnedOut&&!burnoutTimers[sys.id]){
+    // Start burnout risk timer — higher power = faster burnout
+    const risk=((sys.power-130)/30); // 0-1 scale
+    const delay=20000-risk*12000; // 8-20 seconds
+    burnoutTimers[sys.id]=setTimeout(()=>{
+      if(sys.power<=130||sys.burnedOut){delete burnoutTimers[sys.id];return}
+      // Random chance based on overload level
+      if(Math.random()<(.4+risk*.3)*getDifficultyMultiplier('burnoutRisk')){
+        // BURNOUT
+        sys.burnedOut=true;
+        const lost=sys.power;
+        sys.power=0;
+        sys.effect(0);
+        logComms('Engineering','⚠ BURNOUT: '+sys.name+' overloaded and went offline. Rerouting power.');
+        sessionStats.powerEvents++;
+        // Alarm
+        if(audioCtx){
+          const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+          o.type='square';o.frequency.value=250;
+          g.gain.setValueAtTime(.05,audioCtx.currentTime);g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.6);
+          o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.7);
+        }
+        // Redistribute lost power
+        const others=powerSystems.filter(s=>!s.burnedOut&&s.id!==sys.id);
+        others.forEach(s=>{s.power=Math.min(160,s.power+Math.round(lost/others.length));s.effect(s.power)});
+        renderPowerGrid();
+        // Auto-recover after 15s
+        setTimeout(()=>{
+          sys.burnedOut=false;
+          sys.power=sys.default;
+          sys.effect(sys.power);
+          logComms('Engineering',sys.name+' back online. Power restored to default.');
+          if(document.getElementById('power-panel').classList.contains('show'))renderPowerGrid();
+        },15000);
+      }
+      delete burnoutTimers[sys.id];
+      // Re-check if still overloaded
+      if(sys.power>130)checkBurnout(idx);
+    },delay);
+  } else if(sys.power<=130&&burnoutTimers[sys.id]){
+    clearTimeout(burnoutTimers[sys.id]);
+    delete burnoutTimers[sys.id];
+  }
+}
+
+document.getElementById('pwr-close').addEventListener('click',()=>{
+  document.getElementById('power-panel').classList.remove('show');
+  document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='power')b.classList.remove('active')});
+  if(engaged)clickSound();
+});
+
+document.getElementById('pwr-reset').addEventListener('click',()=>{
+  powerSystems.forEach(s=>{
+    s.power=s.default;s.burnedOut=false;s.effect(s.power);
+    if(burnoutTimers[s.id]){clearTimeout(burnoutTimers[s.id]);delete burnoutTimers[s.id]}
+  });
+  renderPowerGrid();
+  logComms('Engineering','Power allocation reset to default distribution.');
+  if(engaged)clickSound();
+});
+
 // === COMMS INITIATION ===
 document.getElementById('ci-close').addEventListener('click',()=>{
   document.getElementById('comms-init').classList.remove('show');
@@ -2524,6 +3111,7 @@ function populateContacts(){
 }
 function initiateHail(contact){
   hailing=true;
+  sessionStats.hails++;
   const seed=contact.seed||Math.floor(Math.random()*10000);
   const vesselName=contact.name;
   const crewName=generateCrewName(seed);
@@ -2533,7 +3121,7 @@ function initiateHail(contact){
   document.getElementById('hail-body').innerHTML='<div class="hail-connecting">Establishing subspace link<span class="hc-dots">...</span></div>';
   document.getElementById('hail-replies').innerHTML='';
   hailModal.classList.add('show');
-  logComms('Artemis','Hailing '+vesselName+'…',true);
+  logComms(shipName,'Hailing '+vesselName+'…',true);
   // Channel open sound
   if(audioCtx){
     const o=audioCtx.createOscillator(),g=audioCtx.createGain();
@@ -2563,6 +3151,305 @@ function initiateHail(contact){
     logComms(vesselName,greeting);
     showHailReplies(vesselName,crewName,seed,'initial');
   },connectTime);
+}
+
+// === PROBE LAUNCH ===
+let probeActive=false;
+const probeTargets=['Kepler-442b','Proxima Centauri','Trappist-1e','Asteroid Field Alpha','Unknown Signal Source','Nebula Core Sample','Deep Space Void','Baryonic Anomaly Site'];
+const probeFindings=[
+  {type:'standard',text:'Standard mineral composition detected. Silicate and iron-nickel deposits consistent with planetary formation models.'},
+  {type:'standard',text:'Electromagnetic emissions consistent with natural stellar phenomena. No anomalous signatures.'},
+  {type:'standard',text:'Trace organic compounds detected in spectral analysis. Likely abiotic in origin — consistent with carbonaceous material.'},
+  {type:'rare',text:'Unusual crystalline lattice structure detected on surface. Molecular arrangement does not match any known natural formation. Further study recommended.'},
+  {type:'rare',text:'Faint repeating thermal signature detected beneath surface layer. Pattern is too regular to be geological. Possibly artificial heat source.'},
+  {type:'rare',text:'Subspace field distortion detected near target. Signature is consistent with theoretical warp field residue. Something passed through here recently.'},
+  {type:'epic',text:'WARNING: Probe detected structured metallic object of non-human manufacture embedded in subsurface ice. Object is approximately 40 meters in length. Composition: unknown alloy. Origin: UNKNOWN. Recommend immediate follow-up mission.'},
+  {type:'epic',text:'ANOMALY: Probe recorded a coherent light pulse originating from within the target. Pulse contained modulated data in a binary-like encoding. Signal does not match any known communication protocol. This may constitute first contact evidence.'},
+];
+document.getElementById('probe-btn').addEventListener('click',()=>{
+  if(probeActive||!engaged)return;
+  probeActive=true;
+  sessionStats.probesLaunched++;
+  const btn=document.getElementById('probe-btn');
+  btn.classList.add('launched');btn.textContent='Probe Active';
+  const target=probeTargets[Math.floor(Math.random()*probeTargets.length)];
+  logComms('Sensors','Probe launched toward '+target+'. ETA: 60 seconds.');
+  // Status display
+  const status=document.getElementById('probe-status');
+  status.classList.add('show');
+  let countdown=60;
+  const cdInt=setInterval(()=>{
+    countdown--;
+    document.getElementById('probe-timer').textContent=countdown+'s';
+    if(countdown<=0)clearInterval(cdInt);
+  },1000);
+  // Launch sound
+  if(audioCtx){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sawtooth';o.frequency.value=80;
+    o.frequency.linearRampToValueAtTime(200,audioCtx.currentTime+.5);
+    g.gain.setValueAtTime(.05,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+1);
+    const f=audioCtx.createBiquadFilter();f.type='lowpass';f.frequency.value=500;
+    o.connect(f);f.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+1.2);
+  }
+  setTimeout(()=>{
+    status.classList.remove('show');
+    // Determine finding rarity
+    const roll=Math.random();
+    let finding;
+    if(roll<.08)finding=probeFindings.filter(f=>f.type==='epic')[Math.floor(Math.random()*2)];
+    else if(roll<.3)finding=probeFindings.filter(f=>f.type==='rare')[Math.floor(Math.random()*3)];
+    else finding=probeFindings.filter(f=>f.type==='standard')[Math.floor(Math.random()*3)];
+    // Build card
+    const card=document.getElementById('probe-card');
+    document.getElementById('pc-title').textContent='◎ Probe Return — '+target;
+    const seed=Math.floor(Math.random()*10000);
+    document.getElementById('pc-body').innerHTML=`
+      <div class="pc-row"><span class="pc-label">Target</span><span class="pc-val">${target}</span></div>
+      <div class="pc-row"><span class="pc-label">Distance</span><span class="pc-val">${(1+Math.random()*12).toFixed(1)} ly</span></div>
+      <div class="pc-row"><span class="pc-label">Scan Duration</span><span class="pc-val">60s (full spectrum)</span></div>
+      <div class="pc-row"><span class="pc-label">Data Quality</span><span class="pc-val ${finding.type==='epic'?'epic':finding.type==='rare'?'rare':''}">${finding.type==='epic'?'EXCEPTIONAL':finding.type==='rare'?'Notable':'Standard'}</span></div>
+      <div class="pc-finding ${finding.type==='epic'?'alien':''}">${finding.text}</div>
+      <button class="repair-action-btn" style="margin-top:10px" id="pc-dismiss">Acknowledge</button>`;
+    card.classList.add('show');
+    document.getElementById('pc-dismiss').addEventListener('click',()=>{card.classList.remove('show');if(engaged)clickSound()});
+    logComms('Sensors','Probe data received from '+target+'. Finding: '+finding.type.toUpperCase());
+    addDiscovery('probe',target+' — '+finding.type+': '+finding.text.substring(0,80)+'…');
+    // Return sound
+    if(audioCtx){
+      const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+      o.type='sine';o.frequency.value=800;g.gain.setValueAtTime(.04,audioCtx.currentTime);
+      g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.3);
+      o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.4);
+    }
+    btn.classList.remove('launched');btn.textContent='Probe';probeActive=false;
+    if(engaged)clickSound();
+  },60000);
+});
+document.getElementById('pc-close').addEventListener('click',()=>{document.getElementById('probe-card').classList.remove('show');if(engaged)clickSound()});
+
+// === SIGNAL DECRYPTION ===
+const decryptFragments=[];
+const messageFragments=[
+  '...we are... not alone in this corridor...',
+  '...coordinates locked... waiting... for response...',
+  '...the builders left... long before we arrived...',
+  '...do not approach... the structure... at bearing 215...',
+  '...signal repeats every... 4,722 years... origin predates...',
+  '...translation matrix incomplete... language unknown... mathematical base-12...',
+  '...they knew we would come... the beacon was meant... to be found...',
+  '...subsurface ocean confirmed... thermal signatures suggest... active biology...',
+];
+let decryptTargetA=0,decryptTargetB=0,decryptTargetC=0,decryptAnimFrame=0;
+
+function openDecryptModal(){
+  // Generate random target values
+  decryptTargetA=15+Math.floor(Math.random()*70);
+  decryptTargetB=15+Math.floor(Math.random()*70);
+  decryptTargetC=15+Math.floor(Math.random()*70);
+  // Reset dials
+  document.getElementById('dial-a').value=50;document.getElementById('dial-a-val').textContent='50';
+  document.getElementById('dial-b').value=50;document.getElementById('dial-b-val').textContent='50';
+  document.getElementById('dial-c').value=50;document.getElementById('dial-c-val').textContent='50';
+  document.getElementById('decrypt-match').textContent='Adjust dials to match the target waveform';
+  document.getElementById('decrypt-match').className='decrypt-match';
+  document.getElementById('decrypt-lock').disabled=true;
+  document.getElementById('decrypt-result').classList.remove('show');
+  document.getElementById('decrypt-modal').classList.add('show');
+  drawDecryptWave();
+}
+document.getElementById('decrypt-close').addEventListener('click',()=>{
+  document.getElementById('decrypt-modal').classList.remove('show');
+  cancelAnimationFrame(decryptAnimFrame);
+  if(engaged)clickSound();
+});
+
+function drawDecryptWave(){
+  const cv=document.getElementById('decrypt-wave');
+  const cx=cv.getContext('2d');
+  const w=cv.width,h=cv.height;
+  cx.fillStyle='rgba(4,8,12,.4)';cx.fillRect(0,0,w,h);
+  const now=performance.now()*.001;
+  const a=parseFloat(document.getElementById('dial-a').value);
+  const b=parseFloat(document.getElementById('dial-b').value);
+  const c=parseFloat(document.getElementById('dial-c').value);
+  // Target waveform (dim)
+  cx.strokeStyle='rgba(212,160,60,.2)';cx.lineWidth=2;cx.beginPath();
+  for(let x=0;x<w;x++){
+    const v=Math.sin(x*.02*decryptTargetA/50+now)+Math.sin(x*.04*decryptTargetB/50+now*1.3)*.5+Math.sin(x*.01*decryptTargetC/50)*.3;
+    const y=h/2+v*h*.2;x===0?cx.moveTo(x,y):cx.lineTo(x,y);
+  }
+  cx.stroke();
+  // Player waveform
+  cx.strokeStyle='rgba(94,196,212,.7)';cx.lineWidth=1.5;cx.beginPath();
+  for(let x=0;x<w;x++){
+    const v=Math.sin(x*.02*a/50+now)+Math.sin(x*.04*b/50+now*1.3)*.5+Math.sin(x*.01*c/50)*.3;
+    const y=h/2+v*h*.2;x===0?cx.moveTo(x,y):cx.lineTo(x,y);
+  }
+  cx.stroke();
+  decryptAnimFrame=requestAnimationFrame(drawDecryptWave);
+}
+
+['dial-a','dial-b','dial-c'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',e=>{
+    document.getElementById(id+'-val').textContent=e.target.value;
+    checkDecryptMatch();
+  });
+});
+
+function checkDecryptMatch(){
+  const a=parseFloat(document.getElementById('dial-a').value);
+  const b=parseFloat(document.getElementById('dial-b').value);
+  const c=parseFloat(document.getElementById('dial-c').value);
+  const diffA=Math.abs(a-decryptTargetA);
+  const diffB=Math.abs(b-decryptTargetB);
+  const diffC=Math.abs(c-decryptTargetC);
+  const totalDiff=diffA+diffB+diffC;
+  const match=document.getElementById('decrypt-match');
+  const lockBtn=document.getElementById('decrypt-lock');
+  if(totalDiff<10){
+    match.textContent='◉ SIGNAL LOCKED — Waveforms aligned';
+    match.className='decrypt-match locked';
+    lockBtn.disabled=false;
+  } else if(totalDiff<30){
+    match.textContent='◎ Close — Fine-tune frequency dials';
+    match.className='decrypt-match close';
+    lockBtn.disabled=true;
+  } else {
+    match.textContent='○ Searching — Adjust dials to match target';
+    match.className='decrypt-match';
+    lockBtn.disabled=true;
+  }
+}
+
+document.getElementById('decrypt-lock').addEventListener('click',()=>{
+  const fragment=messageFragments[decryptFragments.length%messageFragments.length];
+  decryptFragments.push(fragment);
+  sessionStats.signalsDecrypted++;
+  document.getElementById('decrypt-result').textContent='DECRYPTED: "'+fragment+'"';
+  document.getElementById('decrypt-result').classList.add('show');
+  document.getElementById('decrypt-lock').disabled=true;
+  document.getElementById('decrypt-match').textContent='✓ Fragment decoded and archived';
+  // Show all fragments
+  document.getElementById('decrypt-fragments').innerHTML='<strong>Archived Fragments ('+decryptFragments.length+'):</strong><br>'+decryptFragments.map((f,i)=>'['+(i+1)+'] '+f).join('<br>');
+  logComms('Sensors','Signal fragment decoded: "'+fragment+'"');
+  addDiscovery('signal','Decrypted fragment #'+decryptFragments.length+': "'+fragment+'"');
+  if(audioCtx){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';o.frequency.value=1000;
+    o.frequency.linearRampToValueAtTime(1400,audioCtx.currentTime+.2);
+    g.gain.setValueAtTime(.04,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.5);
+    o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.6);
+  }
+  if(engaged)clickSound();
+});
+
+// === NEBULA COLLECTOR ===
+let nebulaCollecting=false,nearNebula=false;
+const nebulaElements=['Hydrogen','Helium','Carbon','Nitrogen','Oxygen','Neon','Silicon','Iron','Lithium','Phosphorus'];
+const nebulaTypes=['Emission Nebula','Reflection Nebula','Planetary Nebula','Dark Nebula','Protostellar Cloud'];
+const nebulaFindings=[
+  'Standard hydrogen-helium composition consistent with stellar nursery.',
+  'Elevated heavy metal content suggests recent supernova enrichment.',
+  'Complex organic molecules detected — possible prebiotic chemistry.',
+  'Unusual isotope ratios do not match any known stellar nucleosynthesis pathway.',
+  'Crystalline silicate particles with anomalous geometric regularity detected.',
+  'Trace biosignature gases detected at sub-PPM levels. Likely abiotic, but flagged for review.',
+];
+
+function checkNebulaProximity(){
+  // Check if any nebula is close to center
+  nearNebula=false;
+  for(const n of nebulae){
+    const dx=n.x-.5,dy=n.y-.5;
+    if(Math.sqrt(dx*dx+dy*dy)<.3){nearNebula=true;break}
+  }
+  const el=document.getElementById('nebula-collect');
+  if(nearNebula&&!nebulaCollecting)el.classList.add('show');
+  else el.classList.remove('show');
+}
+setInterval(checkNebulaProximity,5000);
+
+document.getElementById('nebula-collect-btn').addEventListener('click',()=>{
+  if(nebulaCollecting||!engaged)return;
+  nebulaCollecting=true;
+  sessionStats.nebulaSamples++;
+  document.getElementById('nebula-collect').classList.remove('show');
+  const prog=document.getElementById('collect-progress');
+  prog.classList.add('show');
+  document.getElementById('cp-fill').style.width='0%';
+  logComms('Science','Deploying nebula sample collector. Collection time: 30 seconds.');
+  // Collection sound — gentle whoosh
+  if(audioCtx){
+    const bs=audioCtx.sampleRate*4,bf=audioCtx.createBuffer(1,bs,audioCtx.sampleRate);
+    const d=bf.getChannelData(0);for(let i=0;i<bs;i++)d[i]=(Math.random()*2-1)*.15*(1-Math.abs(i/bs-.5)*2);
+    const src=audioCtx.createBufferSource();src.buffer=bf;src.loop=true;
+    const f=audioCtx.createBiquadFilter();f.type='bandpass';f.frequency.value=400;f.Q.value=.8;
+    const g=audioCtx.createGain();g.gain.value=.03;
+    src.connect(f);f.connect(g);g.connect(masterGain);src.start();
+    setTimeout(()=>{g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+1);setTimeout(()=>src.stop(),1200)},28000);
+  }
+  // Animate progress
+  let pct=0;
+  const colInt=setInterval(()=>{
+    pct+=3.33;
+    document.getElementById('cp-fill').style.width=Math.min(100,pct)+'%';
+    if(pct>=100){
+      clearInterval(colInt);
+      prog.classList.remove('show');
+      showNebulaCard();
+      nebulaCollecting=false;
+    }
+  },1000);
+});
+
+function showNebulaCard(){
+  const card=document.getElementById('nebula-card');
+  const type=nebulaTypes[Math.floor(Math.random()*nebulaTypes.length)];
+  const finding=nebulaFindings[Math.floor(Math.random()*nebulaFindings.length)];
+  // Generate composition
+  const comp=[];
+  const total=[60+Math.random()*15,20+Math.random()*10];
+  total.push(100-total[0]-total[1]);
+  for(let i=0;i<3;i++)comp.push({el:nebulaElements[Math.floor(Math.random()*nebulaElements.length)],pct:total[i]});
+  let html=`<div class="nc-row"><span class="nc-label">Classification</span><span class="nc-val">${type}</span></div>`;
+  html+=`<div class="nc-row"><span class="nc-label">Sample Volume</span><span class="nc-val">${(0.5+Math.random()*2).toFixed(1)} cm³</span></div>`;
+  html+=`<div class="nc-row"><span class="nc-label">Temperature</span><span class="nc-val">${(-270+Math.random()*20).toFixed(0)}°C</span></div>`;
+  html+=`<div class="nc-row"><span class="nc-label">Density</span><span class="nc-val">${(0.1+Math.random()*5).toFixed(2)} particles/cm³</span></div>`;
+  html+='<div style="border-top:1px solid rgba(160,120,200,.06);margin:6px 0"></div>';
+  comp.forEach(c=>{html+=`<div class="nc-row"><span class="nc-label">${c.el}</span><span class="nc-val">${c.pct.toFixed(1)}%</span></div>`});
+  // Spectrum canvas
+  html+=`<canvas class="nc-spectrum" id="nc-spectrum-cv" width="280" height="30"></canvas>`;
+  html+=`<div class="pc-finding" style="border-color:rgba(160,120,200,.2);margin-top:8px">${finding}</div>`;
+  html+=`<button class="repair-action-btn" style="margin-top:10px;border-color:rgba(160,120,200,.25);color:rgba(160,120,200,.8)" id="nc-dismiss">Archive Sample</button>`;
+  document.getElementById('nc-body').innerHTML=html;
+  card.classList.add('show');
+  // Draw spectrum
+  const cv=document.getElementById('nc-spectrum-cv');
+  const cx=cv.getContext('2d');
+  const grad=cx.createLinearGradient(0,0,cv.width,0);
+  grad.addColorStop(0,'rgba(80,40,120,.6)');grad.addColorStop(.3,'rgba(60,100,180,.4)');
+  grad.addColorStop(.5,'rgba(40,160,120,.5)');grad.addColorStop(.7,'rgba(180,180,40,.4)');
+  grad.addColorStop(1,'rgba(180,60,40,.5)');
+  cx.fillStyle=grad;cx.fillRect(0,0,cv.width,cv.height);
+  // Emission lines
+  for(let i=0;i<8;i++){
+    const x=20+Math.random()*(cv.width-40);
+    cx.fillStyle=`rgba(255,255,255,${.3+Math.random()*.5})`;
+    cx.fillRect(x,0,1+Math.random()*2,cv.height);
+  }
+  document.getElementById('nc-dismiss').addEventListener('click',()=>{card.classList.remove('show');if(engaged)clickSound()});
+  logComms('Science','Nebula sample collected. Classification: '+type);
+  addDiscovery('nebula',type+' — '+finding.substring(0,80)+'…');
+  if(audioCtx){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';o.frequency.value=600;g.gain.setValueAtTime(.03,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.3);
+    o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.4);
+  }
+  if(engaged)clickSound();
 }
 
 // === DISCOVERY LOG ===
@@ -2772,6 +3659,7 @@ document.getElementById('helm-engage').addEventListener('click',()=>{
     eh.osc.frequency.setTargetAtTime(eh.baseFreq*(.7+throttle*.6),audioCtx?audioCtx.currentTime:0,.3);
   }
   logComms('Helm','Course set: bearing '+bearing.toFixed(1)+'° mark '+mark.toFixed(1)+', velocity '+vel.toFixed(4)+'c. Engaging.',true);
+  sessionStats.courseChanges++;
   // Reset button after 3s
   setTimeout(()=>{
     btn.classList.remove('engaged-anim');btn.textContent='► Engage';
@@ -2834,11 +3722,13 @@ function showRadioReply(src){
       setTimeout(()=>{
         radioStaticSound();
         const rel=document.getElementById('radio');
-        document.getElementById('radio-src').textContent='◄ '+opt.followup.src+' ►';
-        document.getElementById('radio-msg').textContent='"'+opt.followup.msg+'"';
+        const fuSrc=opt.followup.src.replace(/Artemis/g,shipName);
+        const fuMsg=opt.followup.msg.replace(/Artemis/g,shipName);
+        document.getElementById('radio-src').textContent='◄ '+fuSrc+' ►';
+        document.getElementById('radio-msg').textContent='"'+fuMsg+'"';
         document.getElementById('radio-static').textContent='▮▯▮▯▮ SUBSPACE CH-7 ▮▯▮▯▮';
         rel.classList.add('show');
-        logComms(opt.followup.src,opt.followup.msg);
+        logComms(fuSrc,fuMsg);
         setTimeout(()=>rel.classList.remove('show'),5000);
       },3000+Math.random()*2000);
     }
@@ -2860,7 +3750,7 @@ document.getElementById('distress-btn').addEventListener('click',()=>{
   if(!distressActive){
     distressActive=true;
     document.body.classList.add('distress-active');
-    logComms('ARTEMIS','⚠ DISTRESS SIGNAL ACTIVATED — All frequencies',true);
+    logComms(shipName.toUpperCase(),'⚠ DISTRESS SIGNAL ACTIVATED — All frequencies',true);
     // SOS tone
     if(audioCtx){
       distressInterval=setInterval(()=>{
@@ -2887,7 +3777,7 @@ document.getElementById('distress-btn').addEventListener('click',()=>{
       radioStaticSound();
       const rel=document.getElementById('radio');
       document.getElementById('radio-src').textContent='◄ EMERGENCY BROADCAST ►';
-      document.getElementById('radio-msg').textContent='"Mayday, Mayday. ISS Artemis transmitting distress on all frequencies. Position: Sector 7, bearing 274. Request immediate assistance."';
+      document.getElementById('radio-msg').textContent='"Mayday, Mayday. '+shipName+' transmitting distress on all frequencies. Position: Sector 7, bearing 274. Request immediate assistance."';
       document.getElementById('radio-static').textContent='▮▯▮▯▮ ALL FREQUENCIES ▮▯▮▯▮';
       rel.classList.add('show');
       setTimeout(()=>rel.classList.remove('show'),8000);
@@ -2896,7 +3786,7 @@ document.getElementById('distress-btn').addEventListener('click',()=>{
     distressActive=false;
     document.body.classList.remove('distress-active');
     if(distressInterval){clearInterval(distressInterval);distressInterval=null}
-    logComms('ARTEMIS','Distress signal cancelled.',true);
+    logComms(shipName.toUpperCase(),'Distress signal cancelled.',true);
     document.getElementById('distress-btn').classList.remove('open');
     distressCoverOpen=false;
   }
@@ -2910,8 +3800,8 @@ const scanCard=document.getElementById('scan-card');
 const scanFill=document.getElementById('sp-fill');
 let scanTarget=null,scanning=false;
 let renderedObjects=[]; // track screen positions for scan hover
-const compositions={asteroid:['Iron-Nickel','Carbonaceous','Silicate','Ice-Rock','Metallic Ore'],ship:['Titanium Alloy','Composite Hull','Unknown Polymer'],planet:['Rocky Silicate','Gas Giant','Ice World','Iron Core']};
-const origins={asteroid:['Belt Fragment','Oort Cloud','Extrasolar Capture','Unknown'],ship:['UESA Registry','Independent','Unregistered','Colonial'],planet:['Native Formation','Captured Body','Rogue Planet']};
+const compositions={asteroid:['Iron-Nickel','Carbonaceous','Silicate','Ice-Rock','Metallic Ore'],ship:['Titanium Alloy','Composite Hull','Unknown Polymer'],planet:['Rocky Silicate','Gas Giant','Ice World','Iron Core'],organism:['Silicon-Carbon Hybrid','Bioluminescent Gel Matrix','Unknown Organic Polymer','Crystalline Bio-lattice']};
+const origins={asteroid:['Belt Fragment','Oort Cloud','Extrasolar Capture','Unknown'],ship:['UESA Registry','Independent','Unregistered','Colonial'],planet:['Native Formation','Captured Body','Rogue Planet'],organism:['Unknown — No Matching Species','Possible Nebula Origin','Deep Space Native','Extragalactic']};
 
 function showScanPrompt(obj,screenX,screenY){
   if(scanning)return;
@@ -2962,10 +3852,17 @@ function showScanCard(obj){
   const seed=Math.abs(Math.round((obj.x||0)*10000+(obj.y||0)*10000));
   const comp=(compositions[kind]||compositions.asteroid)[seed%(compositions[kind]||compositions.asteroid).length];
   const orig=(origins[kind]||origins.asteroid)[seed%(origins[kind]||origins.asteroid).length];
-  const mass=kind==='planet'?(1e22+seed*1e18).toExponential(1)+' kg':kind==='ship'?(2000+seed%8000)+' t':(50+seed%500)+' t';
-  const temp=kind==='planet'?(-200+seed%500)+'°C':kind==='ship'?(18+seed%8)+'°C':(-270+seed%30)+'°C';
-  const threat=kind==='asteroid'?(seed%10>7?'Moderate':'Low'):kind==='unknown'?'Unknown':'None';
+  const mass=kind==='planet'?(1e22+seed*1e18).toExponential(1)+' kg':kind==='ship'?(2000+seed%8000)+' t':kind==='organism'?(0.1+seed%10*.1).toFixed(1)+' kg':(50+seed%500)+' t';
+  const temp=kind==='planet'?(-200+seed%500)+'°C':kind==='ship'?(18+seed%8)+'°C':kind==='organism'?(2+seed%6)+'°C':(-270+seed%30)+'°C';
+  const threat=kind==='asteroid'?(seed%10>7?'Moderate':'Low'):kind==='unknown'?'Unknown':kind==='organism'?'None — Passive':'None';
   const threatClass=threat==='Moderate'||threat==='Unknown'?'warn':'safe';
+
+  let extraRows='';
+  if(kind==='organism'){
+    extraRows=`<div class="sc-row"><span class="sc-label">Bioluminescence</span><span class="sc-val" style="color:#2ecc71">${['Cyan-Green','Blue-Violet','Amber-Gold','Emerald'][seed%4]}</span></div>
+    <div class="sc-row"><span class="sc-label">Colony Size</span><span class="sc-val">${5+seed%12} individuals</span></div>
+    <div class="sc-row"><span class="sc-label">Classification</span><span class="sc-val" style="color:#d4a03c">NEW SPECIES</span></div>`;
+  }
 
   scanCard.innerHTML=`
     <div class="sc-title">◎ Scan Complete — ${kind.charAt(0).toUpperCase()+kind.slice(1)}</div>
@@ -2974,15 +3871,210 @@ function showScanCard(obj){
     <div class="sc-row"><span class="sc-label">Surface Temp</span><span class="sc-val">${temp}</span></div>
     <div class="sc-row"><span class="sc-label">Origin</span><span class="sc-val">${orig}</span></div>
     <div class="sc-row"><span class="sc-label">Threat Level</span><span class="sc-val ${threatClass}">${threat}</span></div>
+    ${extraRows}
     <button class="sc-close" id="sc-close-btn">Dismiss</button>`;
   scanCard.style.left=scanProgress.style.left;
   scanCard.style.top=scanProgress.style.top;
   scanCard.style.display='block';
   if(engaged)clickSound();
   logComms('Sensors','Scan complete: '+kind+' — '+comp+', '+mass+', threat: '+threat);
+  sessionStats.scans++;
   addDiscovery(kind,comp+' — '+mass+' — Temp: '+temp+' — Origin: '+orig+' — Threat: '+threat);
   document.getElementById('sc-close-btn').addEventListener('click',()=>{scanCard.style.display='none';if(engaged)clickSound()});
 }
+
+// === BIOLUMINESCENT ORGANISMS ===
+const bioCreatures=[];
+let bioEventActive=false;
+function spawnBioEvent(){
+  const delay=(300000+Math.random()*600000)/getDifficultyMultiplier('eventFreq'); // 5-15 min
+  setTimeout(()=>{
+    if(!engaged){spawnBioEvent();return}
+    bioEventActive=true;
+    // Spawn cluster of 5-12 creatures
+    const count=5+Math.floor(Math.random()*8);
+    const clusterX=.3+Math.random()*.4;
+    const clusterY=.3+Math.random()*.4;
+    for(let i=0;i<count;i++){
+      bioCreatures.push({
+        x:clusterX+(Math.random()-.5)*.15,
+        y:clusterY+(Math.random()-.5)*.15,
+        z:.6+Math.random()*.3,
+        size:3+Math.random()*5,
+        tentacles:3+Math.floor(Math.random()*4),
+        phase:Math.random()*6.28,
+        pulseSpeed:.5+Math.random()*.8,
+        driftX:(Math.random()-.5)*.0002,
+        driftY:(Math.random()-.5)*.0001,
+        hue:140+Math.random()*60, // cyan-green range
+        life:1
+      });
+    }
+    // Alert
+    document.getElementById('bio-alert').classList.add('show');
+    logComms('Science','Unknown biological signatures detected! Bioluminescent organisms on approach vector.');
+    addCrewEntry('Dr. Tanaka: "Everyone — look at the viewport. I\'ve never seen anything like this."');
+    setTimeout(()=>{
+      addCrewEntry('Lt. Park: "They\'re beautiful... are they alive?"');
+    },5000);
+    setTimeout(()=>{
+      addCrewEntry('Dr. Tanaka: "Definitely biological. Logging for analysis."');
+    },10000);
+    // Hide alert after 8s
+    setTimeout(()=>document.getElementById('bio-alert').classList.remove('show'),8000);
+    // Creatures fade after 40-60 seconds
+    setTimeout(()=>{
+      bioEventActive=false;
+      bioCreatures.forEach(c=>c.fading=true);
+    },40000+Math.random()*20000);
+    spawnBioEvent();
+  },delay);
+}
+spawnBioEvent();
+
+// === SPACE WEATHER RADAR ===
+const weatherCanvas=document.getElementById('weather-canvas');
+const wxCtx=weatherCanvas.getContext('2d');
+let solarWind=.3,radBelt=.2,magField=.5;
+// Slowly vary space weather
+setInterval(()=>{
+  solarWind+=(.05-.025)*Math.random()*.3;solarWind=Math.max(.05,Math.min(1,solarWind+(Math.random()-.5)*.08));
+  radBelt=Math.max(0,Math.min(1,radBelt+(Math.random()-.5)*.06));
+  magField=Math.max(.1,Math.min(1,magField+(Math.random()-.5)*.04));
+  // Effects: high solar wind affects shields and adds rad
+  if(solarWind>.7){
+    shieldsVal=Math.max(60,shieldsVal-.3);
+    radVal=Math.min(.09,radVal+.001);
+  }
+},5000);
+
+function drawWeather(){
+  const w=weatherCanvas.width,h=weatherCanvas.height;
+  wxCtx.fillStyle='rgba(4,8,12,.25)';wxCtx.fillRect(0,0,w,h);
+  const now=performance.now()*.001;
+  // Solar wind — flowing horizontal lines
+  for(let i=0;i<6;i++){
+    const y=h*.15+i*(h*.12);
+    const intensity=solarWind;
+    wxCtx.strokeStyle=`rgba(212,160,60,${intensity*.3})`;wxCtx.lineWidth=1+intensity;
+    wxCtx.beginPath();
+    for(let x=0;x<w;x++){
+      const vy=y+Math.sin(x*.1+now*2+i)*(2+intensity*4);
+      x===0?wxCtx.moveTo(x,vy):wxCtx.lineTo(x,vy);
+    }
+    wxCtx.stroke();
+  }
+  // Radiation belt — red glow patches
+  if(radBelt>.3){
+    const rx=w*.5+Math.sin(now*.3)*w*.2,ry=h*.5;
+    const rg=wxCtx.createRadialGradient(rx,ry,0,rx,ry,radBelt*20);
+    rg.addColorStop(0,`rgba(231,76,60,${radBelt*.2})`);rg.addColorStop(1,'transparent');
+    wxCtx.fillStyle=rg;wxCtx.fillRect(0,0,w,h);
+  }
+  // Magnetic field — blue curved lines
+  wxCtx.strokeStyle=`rgba(94,196,212,${magField*.15})`;wxCtx.lineWidth=.8;
+  for(let i=0;i<3;i++){
+    wxCtx.beginPath();
+    for(let x=0;x<w;x++){
+      const y=h/2+Math.sin(x*.05+now*.5+i*2)*h*.3*magField;
+      x===0?wxCtx.moveTo(x,y):wxCtx.lineTo(x,y);
+    }
+    wxCtx.stroke();
+  }
+  // Labels
+  wxCtx.fillStyle='rgba(94,196,212,.25)';wxCtx.font="7px 'Courier New'";
+  wxCtx.fillText('SW:'+Math.round(solarWind*100)+'%',3,9);
+  wxCtx.fillText('RAD:'+radVal.toFixed(2),3,h-3);
+  const swColor=solarWind>.7?'rgba(231,76,60,.5)':solarWind>.4?'rgba(212,160,60,.4)':'rgba(46,204,113,.3)';
+  wxCtx.fillStyle=swColor;wxCtx.fillRect(w-12,2,8,4);
+  requestAnimationFrame(drawWeather);
+}
+drawWeather();
+
+// === TRACTOR BEAM ===
+let tractorMode=false,tractorTarget=null,tractorLocked=false;
+const tractorBtn=document.getElementById('tractor-btn');
+const tractorStatus=document.getElementById('tractor-status');
+
+tractorBtn.addEventListener('click',()=>{
+  if(!engaged)return;
+  if(tractorLocked){
+    // Release tractor beam
+    logComms('Engineering','Tractor beam disengaged.');
+    releaseTractor();
+    return;
+  }
+  tractorMode=!tractorMode;
+  tractorBtn.classList.toggle('active',tractorMode);
+  if(tractorMode){
+    tractorBtn.textContent='Tractor ◎';
+    tractorStatus.innerHTML='Tractor beam armed — click an asteroid to lock on';
+    tractorStatus.classList.add('show');
+    logComms('Engineering','Tractor beam emitter powered up. Ready to lock.');
+  } else {
+    tractorBtn.textContent='Tractor';
+    tractorStatus.classList.remove('show');
+    tractorTarget=null;tractorLocked=false;
+  }
+  if(engaged)clickSound();
+});
+
+function lockTractor(obj,sx,sy){
+  if(!tractorMode||tractorLocked)return;
+  tractorTarget=obj;
+  tractorLocked=true;
+  tractorBtn.classList.remove('active');
+  tractorBtn.classList.add('locked');
+  tractorBtn.textContent='Tractor ◉';
+  tractorStatus.innerHTML='Tractor beam locked on target — steering moves it<div class="tractor-release"><button id="tractor-cargo">Cargo Bay</button><button id="tractor-release">Release</button></div>';
+  tractorStatus.classList.add('show');
+  logComms('Engineering','Tractor beam locked. Target acquired.');
+  // Tractor lock sound
+  if(audioCtx){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';o.frequency.value=300;
+    o.frequency.linearRampToValueAtTime(500,audioCtx.currentTime+.3);
+    g.gain.setValueAtTime(.04,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(.02,audioCtx.currentTime+.5);
+    g.gain.linearRampToValueAtTime(.015,audioCtx.currentTime+2);
+    o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+2.5);
+  }
+  // Release buttons
+  setTimeout(()=>{
+    const cargoBtn=document.getElementById('tractor-cargo');
+    const releaseBtn=document.getElementById('tractor-release');
+    if(cargoBtn)cargoBtn.addEventListener('click',()=>{
+      logComms('Cargo','Object transferred to Cargo Bay. Mass: '+(50+Math.floor(Math.random()*500))+' tonnes.');
+      addDiscovery('tractor','Collected object via tractor beam — transferred to cargo bay');
+      releaseTractor();
+      if(engaged)clickSound();
+    });
+    if(releaseBtn)releaseBtn.addEventListener('click',()=>{
+      logComms('Engineering','Tractor beam released. Object set adrift.');
+      releaseTractor();
+      if(engaged)clickSound();
+    });
+  },100);
+}
+
+function releaseTractor(){
+  tractorTarget=null;tractorLocked=false;tractorMode=false;
+  tractorBtn.classList.remove('active','locked');
+  tractorBtn.textContent='Tractor';
+  tractorStatus.classList.remove('show');
+  // Release sound
+  if(audioCtx){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';o.frequency.value=500;
+    o.frequency.linearRampToValueAtTime(200,audioCtx.currentTime+.3);
+    g.gain.setValueAtTime(.03,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.4);
+    o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.5);
+  }
+}
+
+// Hook tractor into canvas click
+const origCanvasClick=canvas.onclick;
 
 // RENDER
 let t=0;
@@ -3141,6 +4233,74 @@ function draw(now){
       }
     }
   }
+
+  // Bioluminescent organisms
+  for(let bi=bioCreatures.length-1;bi>=0;bi--){
+    const bc=bioCreatures[bi];
+    bc.x+=bc.driftX;bc.y+=bc.driftY;
+    if(bc.fading){bc.life-=.008;if(bc.life<=0){bioCreatures.splice(bi,1);continue}}
+    const invZ=1/bc.z;
+    const bx=cx+bc.x*invZ*(W/2);
+    const by=cy+bc.y*invZ*(H/2);
+    if(bx<-50||bx>W+50||by<-50||by>H+50)continue;
+    const pulse=.5+.5*Math.sin(t*bc.pulseSpeed+bc.phase);
+    const alpha=bc.life*(.3+pulse*.5);
+    const sz=bc.size*(1-bc.z)*1.5;
+    // Glow
+    const glow=ctx.createRadialGradient(bx,by,0,bx,by,sz*3);
+    glow.addColorStop(0,`hsla(${bc.hue},80%,60%,${alpha*.2})`);
+    glow.addColorStop(.5,`hsla(${bc.hue},60%,40%,${alpha*.05})`);
+    glow.addColorStop(1,'transparent');
+    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(bx,by,sz*3,0,6.283);ctx.fill();
+    // Body
+    ctx.fillStyle=`hsla(${bc.hue},70%,65%,${alpha*.6})`;
+    ctx.beginPath();ctx.ellipse(bx,by,sz*.7,sz,0,0,6.283);ctx.fill();
+    // Tentacles
+    ctx.strokeStyle=`hsla(${bc.hue},60%,55%,${alpha*.35})`;ctx.lineWidth=.8;
+    for(let ti=0;ti<bc.tentacles;ti++){
+      const ta=ti/bc.tentacles*3.14+1.57;// fan below
+      ctx.beginPath();ctx.moveTo(bx,by+sz*.5);
+      const tx=bx+Math.cos(ta+Math.sin(t*bc.pulseSpeed*.7+ti)*.3)*sz*1.5;
+      const ty=by+sz+Math.sin(ta)*sz*2+Math.sin(t*bc.pulseSpeed+ti*2)*sz*.3;
+      ctx.quadraticCurveTo(bx+Math.cos(ta)*sz*.5,by+sz*1.2,tx,ty);
+      ctx.stroke();
+    }
+    // Inner light pulse
+    ctx.fillStyle=`hsla(${bc.hue},90%,80%,${alpha*pulse*.4})`;
+    ctx.beginPath();ctx.arc(bx,by-sz*.15,sz*.25,0,6.283);ctx.fill();
+  }
+
+  // Tractor beam visual
+  if(tractorLocked&&tractorTarget){
+    const tObj=tractorTarget;
+    let tsx,tsy;
+    // Find target screen position
+    if(tObj.z!==undefined){// space object or bio creature
+      const invZ=1/(tObj.z||.5);
+      tsx=cx+(tObj.x||0)*invZ*(W/2);
+      tsy=cy+(tObj.y||0)*invZ*(H/2);
+      // Move target toward ship center slowly
+      tObj.x+=(0-tObj.x)*.002;tObj.y+=(0-tObj.y)*.002;
+      // Also respond to yaw/pitch
+      tObj.x+=flightYaw*.0001;tObj.y+=flightPitch*.0001;
+    } else {
+      tsx=W/2;tsy=H/2;
+    }
+    // Draw beam
+    const beamGrad=ctx.createLinearGradient(W/2,H/2,tsx,tsy);
+    beamGrad.addColorStop(0,'rgba(46,204,113,.15)');
+    beamGrad.addColorStop(.5,'rgba(94,196,212,.1)');
+    beamGrad.addColorStop(1,'rgba(46,204,113,.2)');
+    ctx.strokeStyle=beamGrad;ctx.lineWidth=3+Math.sin(t*4);
+    ctx.beginPath();ctx.moveTo(W/2,H/2);ctx.lineTo(tsx,tsy);ctx.stroke();
+    // Beam glow
+    ctx.strokeStyle='rgba(46,204,113,.04)';ctx.lineWidth=12+Math.sin(t*3)*4;
+    ctx.beginPath();ctx.moveTo(W/2,H/2);ctx.lineTo(tsx,tsy);ctx.stroke();
+    // Target highlight
+    ctx.strokeStyle=`rgba(46,204,113,${.3+Math.sin(t*5)*.15})`;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(tsx,tsy,12+Math.sin(t*3)*3,0,6.283);ctx.stroke();
+  }
+
   // Restore roll rotation
   if(Math.abs(flightRoll)>.1)ctx.restore();
   flareOpacity+=(flareTarget-flareOpacity)*.08;
