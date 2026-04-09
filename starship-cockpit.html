@@ -14,7 +14,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Co
 #engage .sub{font-size:clamp(11px,1.4vw,16px);letter-spacing:6px;color:#3a7a8a;animation:pulse-text 3s ease-in-out infinite .5s}
 @keyframes pulse-text{0%,100%{opacity:.4}50%{opacity:1}}
 
-canvas{position:fixed;inset:0;z-index:0}
+canvas#c{position:fixed;inset:0;z-index:0}
 
 /* === COCKPIT BEZEL === */
 .bezel{position:fixed;inset:0;z-index:2;pointer-events:none}
@@ -322,6 +322,7 @@ canvas{position:fixed;inset:0;z-index:0}
 /* PIP */
 #pip{position:fixed;z-index:11;width:clamp(140px,16vw,220px);aspect-ratio:16/10;border:1px solid rgba(94,196,212,.15);border-radius:3px;background:#000;cursor:move;bottom:clamp(140px,23vh,255px);left:clamp(42px,5.6vw,92px);overflow:hidden;display:none}
 #pip.show{display:block}
+#pip canvas{width:100%;height:100%;display:block}
 #pip .pip-label{position:absolute;top:3px;left:5px;font-size:clamp(6px,.5vw,7px);color:rgba(94,196,212,.4);letter-spacing:2px;pointer-events:none}
 #pip .pip-close{position:absolute;top:2px;right:4px;background:none;border:none;color:rgba(94,196,212,.3);cursor:pointer;font-size:10px}
 
@@ -1602,12 +1603,13 @@ document.getElementById('pip-close').addEventListener('click',()=>{
 })();
 function drawPIP(){
   if(!document.getElementById('pip').classList.contains('show')){requestAnimationFrame(drawPIP);return}
-  pipCanvas.width=pipCanvas.offsetWidth||200;pipCanvas.height=pipCanvas.offsetHeight||125;
-  pipCtx.fillStyle='rgba(0,0,0,.2)';pipCtx.fillRect(0,0,pipCanvas.width,pipCanvas.height);
+  const pw=document.getElementById('pip').offsetWidth,ph=document.getElementById('pip').offsetHeight;
+  if(pipCanvas.width!==pw||pipCanvas.height!==ph){pipCanvas.width=pw;pipCanvas.height=ph}
+  pipCtx.fillStyle='rgba(0,0,0,.2)';pipCtx.fillRect(0,0,pw,ph);
   pipStars.forEach(s=>{
     s.y+=.0004;if(s.y>1)s.y=0;
     pipCtx.fillStyle=`rgba(220,235,255,${s.b})`;
-    pipCtx.beginPath();pipCtx.arc(s.x*pipCanvas.width,s.y*pipCanvas.height,s.s,0,6.283);pipCtx.fill();
+    pipCtx.beginPath();pipCtx.arc(s.x*pw,s.y*ph,s.s,0,6.283);pipCtx.fill();
   });
   requestAnimationFrame(drawPIP);
 }
