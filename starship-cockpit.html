@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISS Artemis — Deep Space Cruise</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Courier New',monospace;color:#7ec8e3;user-select:none;cursor:crosshair}
+
+#engage{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity 1.2s}
+#engage.hidden{opacity:0;pointer-events:none}
+#engage .title{font-size:clamp(18px,3vw,36px);letter-spacing:12px;text-transform:uppercase;color:#5ec4d4;margin-bottom:12px;animation:pulse-text 3s ease-in-out infinite}
+#engage .sub{font-size:clamp(11px,1.4vw,16px);letter-spacing:6px;color:#3a7a8a;animation:pulse-text 3s ease-in-out infinite .5s}
+@keyframes pulse-text{0%,100%{opacity:.4}50%{opacity:1}}
+
+canvas{position:fixed;inset:0;z-index:0}
+
+/* === COCKPIT BEZEL === */
+.bezel{position:fixed;inset:0;z-index:2;pointer-events:none}
+.bezel-top{position:absolute;left:0;right:0;top:0;height:clamp(90px,14vh,160px);background:linear-gradient(180deg,#080c10 0%,#080c10 55%,#060a0e 75%,transparent 100%);border-bottom:1px solid rgba(94,196,212,.1)}
+.bezel-bottom{position:absolute;left:0;right:0;bottom:0;height:clamp(130px,22vh,240px);background:linear-gradient(0deg,#080c10 0%,#080c10 60%,#060a0e 80%,transparent 100%);border-top:1px solid rgba(94,196,212,.1)}
+.bezel-left,.bezel-right{position:absolute;top:0;bottom:0;width:clamp(40px,5.5vw,90px)}
+.bezel-left{left:0;background:linear-gradient(90deg,#080c10 0%,#080c10 50%,transparent 100%);border-right:1px solid rgba(94,196,212,.06)}
+.bezel-right{right:0;background:linear-gradient(270deg,#080c10 0%,#080c10 50%,transparent 100%);border-left:1px solid rgba(94,196,212,.06)}
+
+.viewport-border{position:fixed;z-index:3;pointer-events:none;border:1px solid rgba(94,196,212,.07);border-radius:6px;
+  top:clamp(88px,13.8vh,158px);bottom:clamp(128px,21.8vh,238px);left:clamp(38px,5.3vw,88px);right:clamp(38px,5.3vw,88px)}
+
+.edge-glow{position:fixed;z-index:3;pointer-events:none}
+.edge-glow.top{top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,rgba(94,196,212,.25),rgba(94,196,212,.08),rgba(94,196,212,.25),transparent);animation:glow-pulse 6s ease-in-out infinite}
+.edge-glow.bottom{bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,rgba(94,196,212,.2),rgba(210,160,60,.15),rgba(94,196,212,.2),transparent);animation:glow-pulse 6s ease-in-out infinite 3s}
+.edge-glow.left{top:0;bottom:0;left:0;width:3px;background:linear-gradient(180deg,transparent,rgba(94,196,212,.18),transparent);animation:glow-pulse 8s ease-in-out infinite 1s}
+.edge-glow.right{top:0;bottom:0;right:0;width:3px;background:linear-gradient(180deg,transparent,rgba(94,196,212,.18),transparent);animation:glow-pulse 8s ease-in-out infinite 5s}
+@keyframes glow-pulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* === TOP PANEL === */
+.top-panel{position:fixed;top:clamp(32px,4.5vh,55px);left:50%;transform:translateX(-50%);z-index:5;display:flex;gap:clamp(12px,2vw,30px);padding:clamp(8px,1.2vh,16px) clamp(16px,3vw,40px);pointer-events:auto}
+.sys-group{display:flex;flex-direction:column;align-items:center;gap:3px}
+.sys-group .sys-label{font-size:clamp(7px,.7vw,9px);letter-spacing:2px;color:#3a5a6a;text-transform:uppercase}
+.sys-group .sys-val{font-size:clamp(9px,.9vw,12px);color:#5ec4d4;letter-spacing:1px}
+.sys-group .sys-bar{width:clamp(40px,5vw,70px);height:3px;background:#111a20;border-radius:2px;overflow:hidden}
+.sys-group .sys-bar-fill{height:100%;border-radius:2px;transition:width 2s ease}
+.sys-bar-fill.green{background:linear-gradient(90deg,#1a6b3a,#2ecc71)}
+.sys-bar-fill.cyan{background:linear-gradient(90deg,#1a5a6a,#5ec4d4)}
+.sys-bar-fill.amber{background:linear-gradient(90deg,#6a5a1a,#d4a03c)}
+
+/* === LEFT SIDE PANEL === */
+.left-panel{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:5;padding:clamp(6px,1vw,14px);display:flex;flex-direction:column;gap:clamp(8px,1.2vh,16px);pointer-events:auto}
+.side-btn{width:clamp(28px,3vw,42px);height:clamp(18px,2vh,26px);border:1px solid rgba(94,196,212,.2);background:rgba(10,18,24,.8);border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;position:relative}
+.side-btn:hover{border-color:rgba(94,196,212,.5);background:rgba(94,196,212,.08)}
+.side-btn.on{border-color:rgba(46,204,113,.5);background:rgba(46,204,113,.06)}
+.side-btn.on::after{content:'';position:absolute;top:3px;right:3px;width:4px;height:4px;border-radius:50%;background:#2ecc71;box-shadow:0 0 4px #2ecc71}
+.side-btn.warn{border-color:rgba(212,160,60,.4);background:rgba(212,160,60,.04)}
+.side-btn.warn::after{content:'';position:absolute;top:3px;right:3px;width:4px;height:4px;border-radius:50%;background:#d4a03c;box-shadow:0 0 4px #d4a03c;animation:blink-a 2s infinite}
+.side-btn .btn-icon{font-size:clamp(8px,.8vw,11px);color:#4a8a9a;letter-spacing:1px}
+
+/* === RIGHT SIDE PANEL === */
+.right-panel{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:5;padding:clamp(6px,1vw,14px);display:flex;flex-direction:column;gap:clamp(6px,1vh,12px)}
+.right-readout{text-align:right;padding:clamp(3px,.4vh,6px) clamp(6px,.8vw,10px)}
+.right-readout .r-label{font-size:clamp(6px,.6vw,8px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase}
+.right-readout .r-val{font-size:clamp(9px,.9vw,12px);color:#5ec4d4;letter-spacing:1px}
+.right-readout .r-val.warn-val{color:#d4a03c}
+.right-readout .r-val.green-val{color:#2ecc71}
+
+/* === STATUS GRID === */
+.status-grid{position:fixed;top:clamp(14px,2.2vh,26px);right:clamp(50px,7vw,110px);z-index:5;display:grid;grid-template-columns:auto auto;gap:2px clamp(8px,1vw,14px)}
+.sg-name{font-size:clamp(6px,.6vw,8px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;text-align:right;padding:2px 0}
+.sg-status{font-size:clamp(7px,.65vw,9px);letter-spacing:1px;padding:2px 0;display:flex;align-items:center;gap:4px}
+.sg-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.sg-dot.ok{background:#2ecc71;box-shadow:0 0 4px rgba(46,204,113,.4)}
+.sg-dot.warn{background:#d4a03c;box-shadow:0 0 4px rgba(212,160,60,.4);animation:blink-a 3s infinite}
+.sg-dot.crit{background:#e74c3c;box-shadow:0 0 4px rgba(231,76,60,.4);animation:blink-crit 1.5s infinite}
+@keyframes blink-a{0%,40%,100%{opacity:1}45%,55%{opacity:.15}}
+@keyframes blink-crit{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* === NAV COMPASS === */
+.nav-compass{position:fixed;top:clamp(14px,2.2vh,26px);left:clamp(50px,7vw,110px);z-index:5}
+.nav-compass .nc-label{font-size:clamp(6px,.6vw,8px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.nc-ring{width:clamp(50px,5.5vw,80px);height:clamp(50px,5.5vw,80px);border:1px solid rgba(94,196,212,.15);border-radius:50%;position:relative}
+.nc-tick{position:absolute;width:1px;height:6px;background:rgba(94,196,212,.3);left:50%;top:2px;transform-origin:50% calc(clamp(25px,2.75vw,40px) - 2px)}
+.nc-needle{position:absolute;width:2px;height:clamp(18px,2vw,30px);background:linear-gradient(180deg,#d4503c,transparent);left:50%;top:clamp(8px,1vw,14px);transform-origin:50% calc(clamp(25px,2.75vw,40px) - clamp(8px,1vw,14px));border-radius:1px;transition:transform 4s ease}
+.nc-center{position:absolute;width:5px;height:5px;border-radius:50%;background:#5ec4d4;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 4px rgba(94,196,212,.4)}
+.nc-heading{font-size:clamp(8px,.8vw,11px);color:#5ec4d4;text-align:center;margin-top:4px;letter-spacing:2px}
+
+/* === RADIO CHATTER === */
+#radio{position:fixed;bottom:clamp(135px,23vh,250px);left:50%;transform:translateX(-50%);z-index:6;pointer-events:none;text-align:center;opacity:0;transition:opacity 1s;max-width:clamp(280px,40vw,500px)}
+#radio.show{opacity:1}
+#radio .r-src{font-size:clamp(7px,.65vw,9px);color:#d4a03c;letter-spacing:3px;text-transform:uppercase;margin-bottom:3px}
+#radio .r-msg{font-size:clamp(9px,.85vw,12px);color:rgba(212,180,100,.6);letter-spacing:1px;line-height:1.5;font-style:italic}
+#radio .r-static{font-size:clamp(6px,.55vw,8px);color:#2a3a3a;letter-spacing:4px;margin-top:4px}
+
+/* === BOTTOM CONSOLE === */
+.bottom-console{position:fixed;bottom:0;left:0;right:0;z-index:5;display:flex;align-items:flex-end;justify-content:space-between;padding:0 clamp(10px,2vw,30px) clamp(6px,1vh,14px);pointer-events:auto}
+.hud-block{display:flex;gap:clamp(14px,2.5vw,36px)}
+.hud-col{display:flex;flex-direction:column;gap:clamp(4px,.6vh,10px)}
+.hud-row label{font-size:clamp(6px,.6vw,8px);letter-spacing:2px;color:#2a4a5a;text-transform:uppercase;display:block}
+.hud-row .val{font-size:clamp(10px,1vw,14px);color:#7ec8e3;letter-spacing:1px}
+
+.btn-row{display:flex;gap:clamp(6px,1vw,12px);align-items:flex-end;padding-bottom:clamp(2px,.4vh,6px)}
+.console-btn{width:clamp(32px,3.2vw,48px);height:clamp(24px,2.5vh,36px);border:1px solid rgba(94,196,212,.18);background:rgba(10,18,24,.9);border-radius:3px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all .3s}
+.console-btn:hover{border-color:rgba(94,196,212,.5);background:rgba(94,196,212,.06)}
+.console-btn.active{border-color:#5ec4d4;background:rgba(94,196,212,.1)}
+.console-btn .cb-icon{font-size:clamp(8px,.8vw,11px);color:#4a8a9a}
+.console-btn .cb-label{font-size:clamp(5px,.5vw,7px);color:#2a4a5a;letter-spacing:1px;text-transform:uppercase}
+.console-btn .cb-led{width:4px;height:4px;border-radius:50%;background:#1a2a2a;transition:all .3s}
+.console-btn.active .cb-led{background:#2ecc71;box-shadow:0 0 6px #2ecc71}
+
+.ctrl-block{display:flex;align-items:center;gap:clamp(8px,1.2vw,18px);padding-bottom:clamp(2px,.4vh,6px)}
+.ctrl-block label{font-size:clamp(7px,.7vw,9px);letter-spacing:2px;color:#3a5a6a}
+#vol{-webkit-appearance:none;appearance:none;width:clamp(50px,6vw,90px);height:3px;background:#1a2a32;outline:none;border-radius:2px;cursor:pointer}
+#vol::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;background:#5ec4d4;border-radius:50%;cursor:pointer}
+#warp-btn{background:none;border:1px solid rgba(94,196,212,.25);color:#5ec4d4;padding:clamp(3px,.4vh,6px) clamp(8px,1vw,16px);font-family:inherit;font-size:clamp(8px,.8vw,10px);letter-spacing:3px;cursor:pointer;text-transform:uppercase;transition:all .3s;border-radius:3px}
+#warp-btn:hover{border-color:#5ec4d4;background:rgba(94,196,212,.08)}
+#warp-btn.active{border-color:#d4a03c;color:#d4a03c;background:rgba(212,160,60,.08)}
+
+/* Indicator lights */
+.indicators{position:fixed;z-index:4;pointer-events:none}
+.ind{width:5px;height:5px;border-radius:50%;position:absolute}
+.ind.g{background:#2ecc71;box-shadow:0 0 5px #2ecc71;animation:blink-g 4s ease-in-out infinite}
+.ind.a2{background:#d4a03c;box-shadow:0 0 5px #d4a03c;animation:blink-a 5.5s ease-in-out infinite}
+.ind.g2{background:#2ecc71;box-shadow:0 0 4px #2ecc71;animation:blink-g 7s ease-in-out infinite 2s}
+@keyframes blink-g{0%,40%,100%{opacity:1}45%,55%{opacity:.1}}
+
+.scan-ring{position:fixed;z-index:1;border:1px solid rgba(94,196,212,.5);border-radius:50%;pointer-events:none;animation:ring-expand .9s ease-out forwards}
+@keyframes ring-expand{0%{width:0;height:0;opacity:.7}100%{width:120px;height:120px;opacity:0}}
+.panel-line{position:fixed;z-index:4;pointer-events:none;background:rgba(94,196,212,.05)}
+
+/* === CRT SCANLINES + VIGNETTE === */
+.crt-overlay{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px)}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse 70% 60% at 50% 50%,transparent 50%,rgba(0,0,0,.45) 100%)}
+
+/* === LENS FLARE === */
+#flare{position:fixed;z-index:1;pointer-events:none;border-radius:50%;opacity:0;transition:opacity .4s;
+  background:radial-gradient(circle,rgba(200,230,255,.25) 0%,rgba(140,200,240,.08) 40%,transparent 70%)}
+
+/* === MISSION CLOCK === */
+.mission-clock{position:fixed;top:clamp(4px,.6vh,10px);left:50%;transform:translateX(-50%);z-index:6;text-align:center}
+.mission-clock .mc-label{font-size:clamp(6px,.55vw,8px);color:#2a4a5a;letter-spacing:3px;text-transform:uppercase}
+.mission-clock .mc-time{font-size:clamp(11px,1.1vw,16px);color:#5ec4d4;letter-spacing:4px}
+
+/* === CREW ACTIVITY LOG === */
+.crew-log{position:fixed;bottom:clamp(132px,22vh,242px);left:clamp(42px,5.6vw,92px);z-index:5;pointer-events:none;overflow:hidden;
+  width:clamp(180px,20vw,280px);height:clamp(50px,6vh,80px)}
+.crew-log-inner{display:flex;flex-direction:column;gap:3px}
+.crew-log-entry{font-size:clamp(6px,.55vw,8px);color:#2a4a5a;letter-spacing:1px;white-space:nowrap;transition:opacity 1s,transform 1s;opacity:0;transform:translateY(6px)}
+.crew-log-entry.visible{opacity:1;transform:translateY(0)}
+.crew-log-entry .cle-time{color:#1a3a4a;margin-right:6px}
+.crew-log-entry .cle-text{color:#3a5a6a}
+.crew-log-entry.captain .cle-text{color:#5ec4d4}
+
+/* === CAPTAIN INPUT === */
+.captain-input{position:fixed;bottom:clamp(132px,22vh,242px);right:clamp(42px,5.6vw,92px);z-index:6;display:flex;gap:6px;align-items:center}
+.captain-input input{background:rgba(10,18,24,.85);border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:clamp(8px,.75vw,11px);letter-spacing:1px;padding:4px 8px;width:clamp(140px,16vw,220px);outline:none;border-radius:3px;transition:border-color .3s}
+.captain-input input:focus{border-color:rgba(94,196,212,.5)}
+.captain-input input::placeholder{color:#2a4a5a}
+.captain-input button{background:none;border:1px solid rgba(94,196,212,.2);color:#4a8a9a;font-family:inherit;font-size:clamp(7px,.65vw,9px);letter-spacing:2px;padding:4px 8px;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .3s}
+.captain-input button:hover{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.06)}
+
+/* === PARALLAX WRAPPER === */
+.parallax-layer{position:fixed;inset:0;z-index:2;pointer-events:none;transition:transform .15s ease-out}
+
+/* === TOOLTIPS === */
+.side-btn{position:relative}
+.side-btn .tooltip{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:rgba(8,12,16,.92);border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-size:clamp(7px,.6vw,9px);letter-spacing:1px;padding:3px 8px;border-radius:3px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .25s;z-index:20}
+.side-btn:hover .tooltip{opacity:1}
+
+/* === SCREEN FLICKER === */
+.screen-flicker{animation:flicker-anim .15s linear infinite}
+@keyframes flicker-anim{0%{opacity:1}25%{opacity:.7}50%{opacity:.95}75%{opacity:.6}100%{opacity:1}}
+.interference{position:fixed;inset:0;z-index:8;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(94,196,212,.03) 3px,rgba(94,196,212,.03) 6px)}
+.interference.active{opacity:1;animation:interference-scroll 2s linear infinite}
+@keyframes interference-scroll{0%{background-position:0 0}100%{background-position:0 200px}}
+
+/* === PROXIMITY ALERT === */
+.prox-flash{position:fixed;inset:0;z-index:7;pointer-events:none;opacity:0;transition:opacity .2s;
+  border:3px solid rgba(212,160,60,.4);box-shadow:inset 0 0 60px rgba(212,160,60,.08)}
+.prox-flash.active{opacity:1;animation:prox-pulse .6s ease-in-out 3}
+@keyframes prox-pulse{0%,100%{opacity:0}50%{opacity:1}}
+
+/* === MOUSE GLOW === */
+#mouse-glow{position:fixed;z-index:3;pointer-events:none;width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle,rgba(94,196,212,.04) 0%,transparent 70%);transform:translate(-50%,-50%);opacity:0;transition:opacity .5s}
+
+/* === STAR MAP OVERLAY === */
+#starmap{position:fixed;inset:0;z-index:8;pointer-events:none;opacity:0;transition:opacity .5s}
+#starmap.show{opacity:1}
+#starmap-btn{background:none;border:1px solid rgba(94,196,212,.25);color:#5ec4d4;padding:clamp(3px,.4vh,6px) clamp(8px,1vw,16px);font-family:inherit;font-size:clamp(8px,.8vw,10px);letter-spacing:3px;cursor:pointer;text-transform:uppercase;transition:all .3s;border-radius:3px}
+#starmap-btn:hover{border-color:#5ec4d4;background:rgba(94,196,212,.08)}
+#starmap-btn.active{border-color:#5ec4d4;color:#fff;background:rgba(94,196,212,.12)}
+
+/* === SYSTEM NOTIFICATIONS === */
+.sys-notif{position:fixed;top:clamp(75px,12vh,140px);right:clamp(10px,2vw,24px);z-index:9;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.notif{background:rgba(8,12,16,.88);border:1px solid rgba(94,196,212,.15);border-left:2px solid #5ec4d4;padding:6px 12px;border-radius:3px;font-size:clamp(7px,.65vw,9px);color:#5ec4d4;letter-spacing:1px;max-width:clamp(200px,22vw,300px);
+  transform:translateX(120%);transition:transform .5s ease,opacity .5s;opacity:0}
+.notif.show{transform:translateX(0);opacity:1}
+.notif.amber{border-left-color:#d4a03c;color:#d4a03c}
+.notif .notif-time{color:#2a4a5a;font-size:.85em;margin-right:6px}
+
+/* === PANEL WEAR TEXTURE === */
+.panel-texture{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:.35;
+  background-image:url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E")}
+.bezel-top::after,.bezel-bottom::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent 40%,rgba(94,196,212,.008) 41%,transparent 42%,transparent 60%,rgba(94,196,212,.005) 61%,transparent 62%);pointer-events:none}
+
+/* === OSCILLOSCOPE === */
+.scope-panel{position:fixed;bottom:clamp(136px,22.5vh,248px);left:50%;transform:translateX(-50%);z-index:5;pointer-events:none}
+.scope-label{font-size:clamp(5px,.5vw,7px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:2px}
+#scope{border:1px solid rgba(94,196,212,.1);border-radius:2px;background:rgba(4,8,12,.6)}
+
+/* === RADAR === */
+.radar-panel{position:fixed;z-index:5;pointer-events:none}
+.radar-label{font-size:clamp(5px,.5vw,7px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
+#radar{border:1px solid rgba(94,196,212,.1);border-radius:50%;background:rgba(4,8,12,.5)}
+
+/* === CONDENSATION DRIP === */
+.drip{position:fixed;z-index:4;pointer-events:none;width:2px;border-radius:1px;
+  background:linear-gradient(180deg,transparent,rgba(140,180,200,.12),rgba(140,180,200,.06),transparent);opacity:0;transition:opacity .5s}
+.drip.active{opacity:1}
+
+/* === STAR SCANNER TOOLTIP === */
+#star-tip{position:fixed;z-index:10;pointer-events:none;opacity:0;transition:opacity .2s;
+  background:rgba(8,12,16,.88);border:1px solid rgba(94,196,212,.2);border-radius:3px;padding:4px 10px;
+  font-size:clamp(7px,.6vw,9px);color:#5ec4d4;letter-spacing:1px;white-space:nowrap}
+#star-tip.show{opacity:1}
+#star-tip .st-class{color:#d4a03c}
+
+/* === THROTTLE === */
+#throttle{-webkit-appearance:none;appearance:none;width:clamp(50px,6vw,90px);height:3px;background:#1a2a32;outline:none;border-radius:2px;cursor:pointer}
+#throttle::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;background:#d4a03c;border-radius:50%;cursor:pointer}
+
+/* === SCREEN OVERLAY SYSTEM === */
+.screen-overlay{position:fixed;inset:0;z-index:15;pointer-events:auto;opacity:0;visibility:hidden;transition:opacity .4s;background:rgba(4,8,12,.92);overflow-y:auto;padding:clamp(30px,5vh,60px) clamp(30px,5vw,80px)}
+.screen-overlay.show{opacity:1;visibility:visible}
+.screen-overlay .s-title{font-size:clamp(12px,1.2vw,18px);color:#5ec4d4;letter-spacing:4px;text-transform:uppercase;margin-bottom:clamp(12px,2vh,24px);border-bottom:1px solid rgba(94,196,212,.1);padding-bottom:8px}
+.screen-overlay .s-close{position:absolute;top:12px;right:16px;background:none;border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:11px;padding:4px 12px;cursor:pointer;border-radius:3px;letter-spacing:2px;z-index:2}
+.screen-overlay .s-close:hover{border-color:#5ec4d4;background:rgba(94,196,212,.08)}
+
+/* Screen toggle bar */
+.screen-bar{position:fixed;bottom:clamp(105px,18vh,200px);left:50%;transform:translateX(-50%);z-index:12;display:flex;gap:4px;pointer-events:auto;background:rgba(8,12,16,.7);padding:4px 8px;border-radius:4px;border:1px solid rgba(94,196,212,.08)}
+.scr-btn{background:none;border:1px solid rgba(94,196,212,.15);color:#3a6a7a;font-family:inherit;font-size:clamp(6px,.55vw,8px);padding:3px 6px;cursor:pointer;border-radius:2px;letter-spacing:1px;text-transform:uppercase;transition:all .2s}
+.scr-btn:hover{border-color:rgba(94,196,212,.4);color:#5ec4d4}
+.scr-btn.active{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.1)}
+
+/* Schematic */
+.schematic-deck{display:flex;gap:clamp(4px,.5vw,8px);margin-bottom:8px;align-items:center}
+.schematic-deck .deck-label{font-size:clamp(7px,.6vw,9px);color:#2a4a5a;width:60px;text-align:right;letter-spacing:1px}
+.schematic-room{border:1px solid rgba(94,196,212,.12);padding:6px 10px;border-radius:2px;font-size:clamp(7px,.6vw,9px);color:#4a7a8a;position:relative;min-width:60px;text-align:center;transition:border-color .3s}
+.schematic-room.has-crew{border-color:rgba(46,204,113,.3)}
+.schematic-room.warn{border-color:rgba(212,160,60,.3);color:#d4a03c}
+.crew-dot{width:5px;height:5px;border-radius:50%;background:#2ecc71;box-shadow:0 0 4px rgba(46,204,113,.4);position:absolute;top:3px;right:3px}
+
+/* Comms log */
+.comms-entry{font-size:clamp(8px,.7vw,10px);padding:4px 0;border-bottom:1px solid rgba(94,196,212,.04);line-height:1.5}
+.comms-entry .ce-time{color:#2a4a5a;margin-right:8px}
+.comms-entry .ce-src{color:#d4a03c;margin-right:6px}
+.comms-entry .ce-msg{color:#4a7a8a;font-style:italic}
+.comms-entry.captain .ce-src{color:#5ec4d4}
+.comms-cursor{display:inline-block;width:6px;height:12px;background:#5ec4d4;animation:blink-cursor .8s infinite}
+@keyframes blink-cursor{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Long range scanner */
+#lrs-canvas{width:100%;max-width:600px;height:auto;aspect-ratio:1;display:block;margin:0 auto;border:1px solid rgba(94,196,212,.1);border-radius:50%}
+
+/* Database */
+.db-nav{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.db-tab{background:none;border:1px solid rgba(94,196,212,.15);color:#4a7a8a;font-family:inherit;font-size:clamp(7px,.65vw,9px);padding:4px 10px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s}
+.db-tab:hover,.db-tab.active{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.06)}
+.db-content{font-size:clamp(8px,.75vw,11px);color:#4a7a8a;line-height:1.8;max-height:60vh;overflow-y:auto}
+.db-content h3{color:#5ec4d4;font-size:clamp(9px,.85vw,12px);margin:12px 0 4px;letter-spacing:2px}
+.db-content p{margin-bottom:8px}
+.db-content .spec{color:#2a4a5a;margin-right:10px;display:inline-block;width:120px}
+
+/* Engineering */
+.eng-graph{width:100%;height:40px;border:1px solid rgba(94,196,212,.08);border-radius:2px;margin:6px 0;background:rgba(4,8,12,.5)}
+.eng-section{margin-bottom:16px}
+.eng-section .eng-label{font-size:clamp(8px,.7vw,10px);color:#5ec4d4;letter-spacing:2px;margin-bottom:4px}
+.eng-section .eng-val{font-size:clamp(7px,.6vw,9px);color:#3a6a7a;margin-bottom:2px}
+.eng-rec{font-size:clamp(7px,.6vw,9px);color:#d4a03c;border-left:2px solid rgba(212,160,60,.3);padding-left:8px;margin-top:6px;font-style:italic}
+
+/* Crew manifest */
+.crew-card{display:flex;gap:12px;padding:10px;border:1px solid rgba(94,196,212,.08);border-radius:3px;margin-bottom:8px}
+.crew-avatar{width:40px;height:50px;border:1px solid rgba(94,196,212,.15);border-radius:2px;background:rgba(94,196,212,.03);display:flex;align-items:center;justify-content:center;font-size:20px;color:#2a4a5a}
+.crew-info{flex:1;font-size:clamp(7px,.65vw,9px);color:#4a7a8a;line-height:1.6}
+.crew-info .crew-name{color:#5ec4d4;font-size:clamp(8px,.75vw,10px);letter-spacing:1px}
+.crew-info .crew-role{color:#d4a03c;letter-spacing:1px}
+.crew-vitals{display:flex;gap:12px;margin-top:4px}
+.crew-vitals span{color:#2a4a5a}
+.crew-vitals .vital-val{color:#2ecc71}
+.crew-vitals .vital-val.cryo{color:#5ec4d4}
+
+/* Cameras */
+.cam-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:700px;margin:0 auto}
+.cam-feed{border:1px solid rgba(94,196,212,.1);border-radius:2px;aspect-ratio:16/10;position:relative;overflow:hidden;background:#000}
+.cam-feed canvas{width:100%;height:100%}
+.cam-label{position:absolute;top:4px;left:6px;font-size:clamp(6px,.5vw,8px);color:rgba(94,196,212,.5);letter-spacing:2px;text-transform:uppercase}
+.cam-feed.static::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.02) 2px,rgba(255,255,255,.02) 4px);animation:cam-static .1s infinite}
+@keyframes cam-static{0%{opacity:.5}50%{opacity:1}}
+
+/* Mission */
+.mission-obj{padding:8px 0;border-bottom:1px solid rgba(94,196,212,.04);display:flex;gap:10px;align-items:flex-start}
+.obj-check{width:14px;height:14px;border:1px solid rgba(94,196,212,.2);border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;margin-top:1px}
+.obj-check.done{border-color:#2ecc71;color:#2ecc71}
+.obj-check.active{border-color:#5ec4d4;animation:glow-pulse 2s infinite}
+.obj-check.pending{border-color:#2a3a4a}
+.obj-text{font-size:clamp(8px,.7vw,10px);line-height:1.5}
+.obj-text .obj-title{color:#5ec4d4}
+.obj-text.done .obj-title{color:#2ecc71;text-decoration:line-through;opacity:.5}
+.obj-text.pending .obj-title{color:#2a4a5a}
+.obj-text .obj-desc{color:#3a5a6a;font-size:.9em}
+
+/* Mixer */
+.mix-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.mix-label{font-size:clamp(8px,.7vw,10px);color:#4a7a8a;width:120px;letter-spacing:1px}
+.mix-slider{-webkit-appearance:none;appearance:none;width:clamp(100px,15vw,200px);height:3px;background:#1a2a32;outline:none;border-radius:2px;cursor:pointer}
+.mix-slider::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;background:#5ec4d4;border-radius:50%;cursor:pointer}
+.mix-val{font-size:clamp(7px,.6vw,9px);color:#3a5a6a;width:30px}
+
+/* PIP */
+#pip{position:fixed;z-index:11;width:clamp(140px,16vw,220px);aspect-ratio:16/10;border:1px solid rgba(94,196,212,.15);border-radius:3px;background:#000;cursor:move;bottom:clamp(140px,23vh,255px);left:clamp(42px,5.6vw,92px);overflow:hidden;display:none}
+#pip.show{display:block}
+#pip .pip-label{position:absolute;top:3px;left:5px;font-size:clamp(6px,.5vw,7px);color:rgba(94,196,212,.4);letter-spacing:2px;pointer-events:none}
+#pip .pip-close{position:absolute;top:2px;right:4px;background:none;border:none;color:rgba(94,196,212,.3);cursor:pointer;font-size:10px}
+
+/* AI Terminal */
+#ai-terminal{position:fixed;z-index:11;width:clamp(220px,24vw,340px);height:clamp(160px,18vh,240px);border:1px solid rgba(94,196,212,.15);border-radius:3px;background:rgba(4,8,12,.92);bottom:clamp(140px,23vh,255px);right:clamp(120px,14vw,200px);display:none;flex-direction:column}
+#ai-terminal.show{display:flex}
+.ai-header{font-size:clamp(7px,.6vw,8px);color:#2a4a5a;letter-spacing:2px;padding:6px 8px;border-bottom:1px solid rgba(94,196,212,.08);display:flex;justify-content:space-between;text-transform:uppercase}
+.ai-header button{background:none;border:none;color:rgba(94,196,212,.3);cursor:pointer;font-size:10px}
+.ai-log{flex:1;overflow-y:auto;padding:6px 8px;font-size:clamp(7px,.65vw,9px);line-height:1.6}
+.ai-log .ai-cmd{color:#5ec4d4}.ai-log .ai-resp{color:#3a6a7a}
+.ai-input-row{display:flex;border-top:1px solid rgba(94,196,212,.08)}
+.ai-input-row span{color:#5ec4d4;padding:4px 6px;font-size:clamp(8px,.7vw,10px)}
+#ai-input{flex:1;background:none;border:none;color:#5ec4d4;font-family:inherit;font-size:clamp(8px,.7vw,10px);outline:none;padding:4px 0}
+
+/* Fuel graph */
+#fuel-graph{position:fixed;z-index:11;width:clamp(140px,14vw,200px);height:clamp(50px,6vh,70px);border:1px solid rgba(94,196,212,.1);border-radius:2px;background:rgba(4,8,12,.6);bottom:clamp(40px,7vh,80px);left:clamp(10px,1.5vw,20px);display:none}
+#fuel-graph.show{display:block}
+.fg-label{position:absolute;top:2px;left:4px;font-size:clamp(5px,.45vw,6px);color:#2a4a5a;letter-spacing:1px;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<div id="engage"><div class="title">ISS Artemis</div><div class="sub">Click to engage systems</div></div>
+<canvas id="c"></canvas>
+<div class="crt-overlay"></div>
+<div class="vignette"></div>
+<div id="flare" style="width:120px;height:120px"></div>
+
+<!-- Mission Clock -->
+<div class="mission-clock"><div class="mc-label">Mission Elapsed</div><div class="mc-time" id="mc-time">000d 00h 00m 00s</div></div>
+
+<!-- Parallax wrapper for bezel elements -->
+<div class="parallax-layer" id="parallax">
+<div class="bezel"><div class="bezel-top"></div><div class="bezel-bottom"></div><div class="bezel-left"></div><div class="bezel-right"></div></div>
+<div class="viewport-border"></div>
+<div class="edge-glow top"></div><div class="edge-glow bottom"></div><div class="edge-glow left"></div><div class="edge-glow right"></div>
+
+<div class="indicators">
+  <div class="ind g" style="top:clamp(52px,8vh,95px);left:clamp(10px,1.5vw,22px)"></div>
+  <div class="ind a2" style="top:clamp(70px,11vh,130px);left:clamp(14px,1.8vw,28px)"></div>
+  <div class="ind g2" style="top:clamp(52px,8vh,95px);right:clamp(10px,1.5vw,22px)"></div>
+  <div class="ind g" style="bottom:clamp(136px,22.5vh,245px);right:clamp(14px,1.8vw,28px)"></div>
+  <div class="ind a2" style="top:clamp(95px,15vh,170px);right:clamp(10px,1.5vw,22px)"></div>
+  <div class="ind g2" style="bottom:clamp(150px,24vh,260px);left:clamp(10px,1.5vw,22px)"></div>
+</div>
+
+<div class="panel-line" style="top:clamp(80px,13vh,150px);left:clamp(5px,1vw,14px);width:clamp(30px,4vw,70px);height:1px"></div>
+<div class="panel-line" style="top:clamp(80px,13vh,150px);right:clamp(5px,1vw,14px);width:clamp(30px,4vw,70px);height:1px"></div>
+<div class="panel-line" style="bottom:clamp(125px,21vh,230px);left:clamp(5px,1vw,14px);width:clamp(50px,8vw,100px);height:1px"></div>
+<div class="panel-line" style="bottom:clamp(125px,21vh,230px);right:clamp(5px,1vw,14px);width:clamp(50px,8vw,100px);height:1px"></div>
+</div><!-- end parallax -->
+
+<!-- Crew Activity Log -->
+<div class="crew-log"><div class="crew-log-inner" id="crew-log"></div></div>
+
+<!-- Captain Log Input -->
+<div class="captain-input">
+  <input type="text" id="captain-msg" placeholder="Captain's log entry…" maxlength="80">
+  <button id="captain-send">Log</button>
+</div>
+
+<!-- TOP PANEL -->
+<div class="top-panel">
+  <div class="sys-group"><div class="sys-label">Shields</div><div class="sys-bar"><div class="sys-bar-fill green" id="bar-shields" style="width:94%"></div></div><div class="sys-val" id="val-shields">94%</div></div>
+  <div class="sys-group"><div class="sys-label">Reactor</div><div class="sys-bar"><div class="sys-bar-fill cyan" id="bar-reactor" style="width:100%"></div></div><div class="sys-val" id="val-reactor">100%</div></div>
+  <div class="sys-group"><div class="sys-label">O₂</div><div class="sys-bar"><div class="sys-bar-fill green" id="bar-o2" style="width:88%"></div></div><div class="sys-val" id="val-o2">88%</div></div>
+  <div class="sys-group"><div class="sys-label">Comms</div><div class="sys-bar"><div class="sys-bar-fill cyan" id="bar-comms" style="width:100%"></div></div><div class="sys-val" id="val-comms">Online</div></div>
+  <div class="sys-group"><div class="sys-label">Nav</div><div class="sys-bar"><div class="sys-bar-fill cyan" id="bar-nav" style="width:100%"></div></div><div class="sys-val" id="val-nav">Locked</div></div>
+  <div class="sys-group"><div class="sys-label">Grav</div><div class="sys-bar"><div class="sys-bar-fill amber" id="bar-grav" style="width:72%"></div></div><div class="sys-val" id="val-grav">0.72g</div></div>
+</div>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <div class="side-btn on"><div class="btn-icon">EXT</div><div class="tooltip">External Lights</div></div>
+  <div class="side-btn on"><div class="btn-icon">NAV</div><div class="tooltip">Navigation</div></div>
+  <div class="side-btn on"><div class="btn-icon">COM</div><div class="tooltip">Communications</div></div>
+  <div class="side-btn warn"><div class="btn-icon">SHD</div><div class="tooltip">Shield Array</div></div>
+  <div class="side-btn on"><div class="btn-icon">LIF</div><div class="tooltip">Life Support</div></div>
+  <div class="side-btn"><div class="btn-icon">WPN</div><div class="tooltip">Weapons Array</div></div>
+  <div class="side-btn on"><div class="btn-icon">SEN</div><div class="tooltip">Sensor Suite</div></div>
+  <div class="side-btn"><div class="btn-icon">AUX</div><div class="tooltip">Auxiliary Power</div></div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="right-readout"><div class="r-label">Dist</div><div class="r-val" id="r-dist">4.243 ly</div></div>
+  <div class="right-readout"><div class="r-label">ETA</div><div class="r-val" id="r-eta">1,012d</div></div>
+  <div class="right-readout"><div class="r-label">Crew</div><div class="r-val green-val" id="r-crew">6 / 6</div></div>
+  <div class="right-readout"><div class="r-label">Cargo</div><div class="r-val" id="r-cargo">82%</div></div>
+  <div class="right-readout"><div class="r-label">Rad</div><div class="r-val warn-val" id="r-rad">0.04 Sv</div></div>
+  <div class="right-readout"><div class="r-label">Sig</div><div class="r-val green-val" id="r-sig">Strong</div></div>
+  <div class="right-readout"><div class="r-label">Drift</div><div class="r-val" id="r-drift">+0.003°</div></div>
+</div>
+
+<!-- STATUS GRID -->
+<div class="status-grid">
+  <div class="sg-name">Life Support</div><div class="sg-status"><div class="sg-dot ok"></div><span style="color:#2ecc71">Nominal</span></div>
+  <div class="sg-name">FTL Drive</div><div class="sg-status"><div class="sg-dot ok" id="sg-ftl-dot"></div><span id="sg-ftl" style="color:#2ecc71">Standby</span></div>
+  <div class="sg-name">Port Thruster</div><div class="sg-status"><div class="sg-dot ok"></div><span style="color:#2ecc71">Online</span></div>
+  <div class="sg-name">Stbd Thruster</div><div class="sg-status"><div class="sg-dot warn" id="sg-stbd-dot"></div><span id="sg-stbd" style="color:#d4a03c">Degraded</span></div>
+  <div class="sg-name">Sensors</div><div class="sg-status"><div class="sg-dot ok"></div><span style="color:#2ecc71">Active</span></div>
+  <div class="sg-name">Comms Array</div><div class="sg-status"><div class="sg-dot ok"></div><span style="color:#2ecc71">Linked</span></div>
+  <div class="sg-name">Deflectors</div><div class="sg-status"><div class="sg-dot ok"></div><span style="color:#2ecc71">Online</span></div>
+  <div class="sg-name">Coolant</div><div class="sg-status"><div class="sg-dot warn" id="sg-cool-dot"></div><span id="sg-cool" style="color:#d4a03c">Low Press</span></div>
+</div>
+
+<!-- NAV COMPASS -->
+<div class="nav-compass">
+  <div class="nc-label">Bearing</div>
+  <div class="nc-ring">
+    <div class="nc-tick" style="transform:rotate(0deg)"></div>
+    <div class="nc-tick" style="transform:rotate(45deg)"></div>
+    <div class="nc-tick" style="transform:rotate(90deg)"></div>
+    <div class="nc-tick" style="transform:rotate(135deg)"></div>
+    <div class="nc-tick" style="transform:rotate(180deg)"></div>
+    <div class="nc-tick" style="transform:rotate(225deg)"></div>
+    <div class="nc-tick" style="transform:rotate(270deg)"></div>
+    <div class="nc-tick" style="transform:rotate(315deg)"></div>
+    <div class="nc-needle" id="nc-needle"></div>
+    <div class="nc-center"></div>
+  </div>
+  <div class="nc-heading" id="nc-heading">274.8°</div>
+</div>
+
+<!-- RADIO -->
+<div id="radio"><div class="r-src" id="radio-src"></div><div class="r-msg" id="radio-msg"></div><div class="r-static" id="radio-static"></div></div>
+
+<!-- Overlays -->
+<div class="interference" id="interference"></div>
+<div class="prox-flash" id="prox-flash"></div>
+<div id="mouse-glow"></div>
+<canvas id="starmap" width="800" height="600"></canvas>
+<div class="sys-notif" id="sys-notif"></div>
+<div class="panel-texture"></div>
+<div id="star-tip"></div>
+
+<!-- Oscilloscope -->
+<div class="scope-panel"><div class="scope-label">Sys Waveform</div><canvas id="scope" width="160" height="40"></canvas></div>
+
+<!-- Radar -->
+<div class="radar-panel" style="bottom:clamp(140px,23vh,252px);right:clamp(42px,5.6vw,92px)"><div class="radar-label">Lidar</div><canvas id="radar" width="70" height="70"></canvas></div>
+
+<!-- Condensation drips -->
+<div class="drip" id="drip1"></div>
+<div class="drip" id="drip2"></div>
+
+<!-- Screen Toggle Bar -->
+<div class="screen-bar">
+  <button class="scr-btn" data-screen="schematic">Ship</button>
+  <button class="scr-btn" data-screen="comms">Comms</button>
+  <button class="scr-btn" data-screen="lrs">Scanner</button>
+  <button class="scr-btn" data-screen="database">Data</button>
+  <button class="scr-btn" data-screen="engineering">Engr</button>
+  <button class="scr-btn" data-screen="crew">Crew</button>
+  <button class="scr-btn" data-screen="navplan">Nav</button>
+  <button class="scr-btn" data-screen="cameras">Cams</button>
+  <button class="scr-btn" data-screen="mission">Misn</button>
+  <button class="scr-btn" data-screen="mixer">Mix</button>
+  <button class="scr-btn" data-screen="pip">PIP</button>
+  <button class="scr-btn" data-screen="ai">AI</button>
+  <button class="scr-btn" data-screen="fuelg">Fuel</button>
+</div>
+
+<!-- SHIP SCHEMATIC -->
+<div class="screen-overlay" id="scr-schematic"><button class="s-close" data-close>Close</button>
+<div class="s-title">ISS Artemis — Deck Schematic</div>
+<div id="schematic-body"></div>
+</div>
+
+<!-- COMMS LOG -->
+<div class="screen-overlay" id="scr-comms"><button class="s-close" data-close>Close</button>
+<div class="s-title">Communications Log — Subspace CH-7</div>
+<div id="comms-body"></div>
+<div style="margin-top:8px"><span class="comms-cursor"></span></div>
+</div>
+
+<!-- LONG RANGE SCANNER -->
+<div class="screen-overlay" id="scr-lrs"><button class="s-close" data-close>Close</button>
+<div class="s-title">Long-Range Sensor Array</div>
+<canvas id="lrs-canvas" width="600" height="600"></canvas>
+</div>
+
+<!-- DATABASE -->
+<div class="screen-overlay" id="scr-database"><button class="s-close" data-close>Close</button>
+<div class="s-title">Ship Database — Artemis Mainframe</div>
+<div class="db-nav" id="db-nav"></div>
+<div class="db-content" id="db-content"></div>
+</div>
+
+<!-- ENGINEERING -->
+<div class="screen-overlay" id="scr-engineering"><button class="s-close" data-close>Close</button>
+<div class="s-title">Engineering Diagnostics</div>
+<div id="eng-body"></div>
+</div>
+
+<!-- CREW MANIFEST -->
+<div class="screen-overlay" id="scr-crew"><button class="s-close" data-close>Close</button>
+<div class="s-title">Crew Manifest — ISS Artemis</div>
+<div id="crew-body"></div>
+</div>
+
+<!-- NAV PLANNER -->
+<div class="screen-overlay" id="scr-navplan"><button class="s-close" data-close>Close</button>
+<div class="s-title">Navigation Planner</div>
+<canvas id="navplan-canvas" width="800" height="600" style="width:100%;max-width:700px;display:block;margin:0 auto;border:1px solid rgba(94,196,212,.08);border-radius:3px;cursor:crosshair"></canvas>
+<div id="navplan-info" style="text-align:center;margin-top:8px;font-size:clamp(7px,.65vw,9px);color:#3a6a7a"></div>
+</div>
+
+<!-- CAMERAS -->
+<div class="screen-overlay" id="scr-cameras"><button class="s-close" data-close>Close</button>
+<div class="s-title">Exterior Camera Array</div>
+<div class="cam-grid">
+  <div class="cam-feed" id="cam-fwd"><div class="cam-label">CAM 1 — Forward</div><canvas></canvas></div>
+  <div class="cam-feed" id="cam-port"><div class="cam-label">CAM 2 — Port</div><canvas></canvas></div>
+  <div class="cam-feed" id="cam-stbd"><div class="cam-label">CAM 3 — Starboard</div><canvas></canvas></div>
+  <div class="cam-feed" id="cam-aft" class="static"><div class="cam-label">CAM 4 — Aft</div><canvas></canvas></div>
+</div>
+</div>
+
+<!-- MISSION -->
+<div class="screen-overlay" id="scr-mission"><button class="s-close" data-close>Close</button>
+<div class="s-title">Mission Brief — Operation Far Reach</div>
+<div id="mission-body"></div>
+</div>
+
+<!-- MIXER -->
+<div class="screen-overlay" id="scr-mixer"><button class="s-close" data-close>Close</button>
+<div class="s-title">Ambient Sound Mixer</div>
+<div id="mixer-body"></div>
+</div>
+
+<!-- PIP -->
+<div id="pip"><div class="pip-label">Aft Cam</div><button class="pip-close" id="pip-close">×</button><canvas id="pip-canvas"></canvas></div>
+
+<!-- AI Terminal -->
+<div id="ai-terminal"><div class="ai-header"><span>Artemis AI — v4.2.1</span><button id="ai-close">×</button></div><div class="ai-log" id="ai-log"><div class="ai-resp">ARTEMIS AI online. Type a command.</div></div><div class="ai-input-row"><span>›</span><input type="text" id="ai-input" placeholder="status, scan, crew, eta, help…"></div></div>
+
+<!-- Fuel Graph -->
+<div id="fuel-graph"><div class="fg-label">Fuel Cell</div><canvas id="fg-canvas" width="200" height="70"></canvas></div>
+
+<!-- BOTTOM CONSOLE -->
+<div class="bottom-console">
+  <div class="hud-block">
+    <div class="hud-col">
+      <div class="hud-row"><label>Velocity</label><div class="val" id="h-speed">0.0042c</div></div>
+      <div class="hud-row"><label>Heading</label><div class="val" id="h-heading">274.8°</div></div>
+      <div class="hud-row"><label>Hull Temp</label><div class="val" id="h-temp">-271.4°C</div></div>
+    </div>
+    <div class="hud-col">
+      <div class="hud-row"><label>System</label><div class="val" id="h-system">Kepler-442</div></div>
+      <div class="hud-row"><label>Fuel Cell</label><div class="val" id="h-fuel">87.3%</div></div>
+      <div class="hud-row"><label>Pressure</label><div class="val" id="h-press">1.013 bar</div></div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <div class="console-btn active"><div class="cb-led"></div><div class="cb-icon">⊞</div><div class="cb-label">Auto</div></div>
+    <div class="console-btn"><div class="cb-led"></div><div class="cb-icon">◎</div><div class="cb-label">Man</div></div>
+    <div class="console-btn active"><div class="cb-led"></div><div class="cb-icon">◉</div><div class="cb-label">Scan</div></div>
+    <div class="console-btn"><div class="cb-led"></div><div class="cb-icon">⊡</div><div class="cb-label">Dock</div></div>
+    <div class="console-btn active"><div class="cb-led"></div><div class="cb-icon">●</div><div class="cb-label">Rec</div></div>
+    <div class="console-btn"><div class="cb-led"></div><div class="cb-icon">▽</div><div class="cb-label">Pod</div></div>
+    <div class="console-btn active"><div class="cb-led"></div><div class="cb-icon">≡</div><div class="cb-label">Log</div></div>
+  </div>
+  <div class="ctrl-block">
+    <label>Vol</label>
+    <input type="range" id="vol" min="0" max="100" value="50">
+    <label>Thrt</label>
+    <input type="range" id="throttle" min="5" max="100" value="30">
+    <button id="eng-mute" style="background:none;border:1px solid rgba(94,196,212,.25);color:#5ec4d4;padding:clamp(3px,.4vh,6px) clamp(8px,1vw,16px);font-family:inherit;font-size:clamp(8px,.8vw,10px);letter-spacing:3px;cursor:pointer;text-transform:uppercase;transition:all .3s;border-radius:3px">Engine</button>
+    <button id="starmap-btn">Map</button>
+    <button id="warp-btn">Warp</button>
+  </div>
+</div>
+
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W,H,audioCtx,masterGain,engineGain,hissGain,engaged=false,warping=false,warpT=0;
+let throttle=.3; // 0-1 throttle
+let panX=0,panY=0,panTargetX=0,panTargetY=0,isDragging=false,dragStartX=0,dragStartY=0;
+const stars=[],nebulae=[];
+const STAR_COUNT=700;
+let engineOscs=[]; // store engine oscillators for pitch shifting
+
+function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight}
+addEventListener('resize',resize);resize();
+
+for(let i=0;i<STAR_COUNT;i++){
+  // Color variation: mostly white, some warm yellow, cool blue, rare red
+  const cr=Math.random();
+  let starColor;
+  if(cr<.6) starColor='220,235,255';      // white-blue
+  else if(cr<.75) starColor='255,240,200'; // warm yellow
+  else if(cr<.88) starColor='180,210,255'; // cool blue
+  else if(cr<.95) starColor='255,220,180'; // pale orange
+  else starColor='255,190,180';            // pale red
+  stars.push({x:(Math.random()-.5)*2,y:(Math.random()-.5)*2,z:Math.random()*1,
+    flicker:Math.random()*6.28,flickerSpeed:.3+Math.random()*.5,color:starColor});
+}
+for(let i=0;i<3;i++){
+  nebulae.push({x:.2+Math.random()*.6,y:.2+Math.random()*.6,
+    r:80+Math.random()*120,hue:180+Math.random()*60,
+    drift:(.0001+Math.random()*.0002)*(Math.random()>.5?1:-1),
+    driftY:(.00005+Math.random()*.0001)*(Math.random()>.5?1:-1)});
+}
+
+// HUD
+const systems=['Kepler-442','Proxima Cen','Trappist-1','Gliese 667','HD 40307','Wolf 1061','Ross 128'];
+let hudSpeed=.0042,hudHeading=274.8,hudFuel=87.3,hudTemp=-271.4,hudPress=1.013;
+let hudSys=0,shieldsVal=94,o2Val=88,gravVal=.72;
+let distVal=4.243,radVal=.04,driftVal=.003;
+
+function tickHUD(){
+  hudHeading+=(Math.random()-.5)*.03;if(hudHeading>360)hudHeading-=360;if(hudHeading<0)hudHeading+=360;
+  hudFuel-=Math.random()*.001;if(hudFuel<60)hudFuel=92+Math.random()*6;
+  hudTemp+=(Math.random()-.5)*.04;
+  hudPress+=(Math.random()-.5)*.0005;
+  shieldsVal+=(Math.random()-.5)*.3;shieldsVal=Math.max(80,Math.min(100,shieldsVal));
+  o2Val+=(Math.random()-.5)*.2;o2Val=Math.max(75,Math.min(99,o2Val));
+  gravVal+=(Math.random()-.5)*.005;gravVal=Math.max(.65,Math.min(.82,gravVal));
+  distVal-=Math.random()*.0001;distVal=Math.max(0,distVal);
+  radVal+=(Math.random()-.5)*.002;radVal=Math.max(.01,Math.min(.09,radVal));
+  driftVal+=(Math.random()-.5)*.001;
+
+  hudSpeed=.001+throttle*.008+(Math.random()-.5)*.0001;
+  document.getElementById('h-speed').textContent=hudSpeed.toFixed(4)+'c';
+  const dh=((hudHeading+panX*.05)%360+360)%360;
+  document.getElementById('h-heading').textContent=dh.toFixed(1)+'°';
+  document.getElementById('h-fuel').textContent=hudFuel.toFixed(1)+'%';
+  document.getElementById('h-temp').textContent=hudTemp.toFixed(1)+'°C';
+  document.getElementById('nc-heading').textContent=dh.toFixed(1)+'°';
+  document.getElementById('nc-needle').style.transform='rotate('+dh+'deg)';
+  document.getElementById('bar-shields').style.width=shieldsVal+'%';
+  document.getElementById('val-shields').textContent=Math.round(shieldsVal)+'%';
+  document.getElementById('bar-o2').style.width=o2Val+'%';
+  document.getElementById('val-o2').textContent=Math.round(o2Val)+'%';
+  document.getElementById('bar-grav').style.width=(gravVal*100)+'%';
+  document.getElementById('val-grav').textContent=gravVal.toFixed(2)+'g';
+  document.getElementById('r-dist').textContent=distVal.toFixed(3)+' ly';
+  document.getElementById('r-eta').textContent=Math.round(distVal/.0042*365).toLocaleString()+'d';
+  document.getElementById('r-rad').textContent=radVal.toFixed(3)+' Sv';
+  document.getElementById('r-drift').textContent=(driftVal>=0?'+':'')+driftVal.toFixed(3)+'°';
+}
+setInterval(tickHUD,2000);
+setInterval(()=>{hudSys=(hudSys+1)%systems.length;document.getElementById('h-system').textContent=systems[hudSys]},45000);
+
+// Status flicker
+setInterval(()=>{
+  const d=document.getElementById('sg-stbd-dot'),t=document.getElementById('sg-stbd');
+  if(Math.random()>.7){d.className='sg-dot ok';t.style.color='#2ecc71';t.textContent='Online'}
+  else{d.className='sg-dot warn';t.style.color='#d4a03c';t.textContent='Degraded'}
+},8000);
+setInterval(()=>{
+  const d=document.getElementById('sg-cool-dot'),t=document.getElementById('sg-cool');
+  if(Math.random()>.5){d.className='sg-dot ok';t.style.color='#2ecc71';t.textContent='Nominal'}
+  else{d.className='sg-dot warn';t.style.color='#d4a03c';t.textContent='Low Press'}
+},12000);
+
+// Toggle buttons
+document.querySelectorAll('.side-btn').forEach(b=>b.addEventListener('click',()=>{
+  if(!engaged)return;
+  if(b.classList.contains('on'))b.classList.remove('on');
+  else{b.classList.remove('warn');b.classList.add('on')}
+  clickSound();
+}));
+document.querySelectorAll('.console-btn').forEach(b=>b.addEventListener('click',()=>{
+  if(!engaged)return;b.classList.toggle('active');clickSound();
+}));
+
+// === AUDIO ===
+function initAudio(){
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  masterGain=audioCtx.createGain();masterGain.gain.value=.5;masterGain.connect(audioCtx.destination);
+  engineGain=audioCtx.createGain();engineGain.gain.value=.18;engineGain.connect(masterGain);
+  function makeHum(f,type,v){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type=type;o.frequency.value=f;g.gain.value=v;
+    const lfo=audioCtx.createOscillator(),lg=audioCtx.createGain();
+    lfo.frequency.value=.08+Math.random()*.06;lg.gain.value=f*.04;
+    lfo.connect(lg);lg.connect(o.frequency);lfo.start();
+    o.connect(g);g.connect(engineGain);o.start();
+    engineOscs.push({osc:o,baseFreq:f});
+  }
+  makeHum(42,'sine',.35);makeHum(63,'triangle',.18);makeHum(84,'sine',.08);makeHum(50,'sawtooth',.03);
+
+  const bs=audioCtx.sampleRate*2,bf=audioCtx.createBuffer(1,bs,audioCtx.sampleRate);
+  const dd=bf.getChannelData(0);for(let i=0;i<bs;i++)dd[i]=Math.random()*2-1;
+  const ns=audioCtx.createBufferSource();ns.buffer=bf;ns.loop=true;
+  const hf=audioCtx.createBiquadFilter();hf.type='bandpass';hf.frequency.value=6000;hf.Q.value=.5;
+  hissGain=audioCtx.createGain();hissGain.gain.value=.02;
+  ns.connect(hf);hf.connect(hissGain);hissGain.connect(masterGain);ns.start();
+
+  function scheduleBlip(){
+    setTimeout(()=>{if(!audioCtx)return;
+      const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+      o.type='sine';o.frequency.value=800+Math.random()*400;
+      g.gain.setValueAtTime(0,audioCtx.currentTime);
+      g.gain.linearRampToValueAtTime(.03,audioCtx.currentTime+.05);
+      g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.4);
+      o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.5);
+      scheduleBlip();
+    },15000+Math.random()*15000);
+  }
+  scheduleBlip();
+  scheduleRadio();
+}
+
+function clickSound(){
+  if(!audioCtx)return;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.type='sine';o.frequency.value=1800;
+  g.gain.setValueAtTime(.04,audioCtx.currentTime);
+  g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.06);
+  o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.08);
+}
+function scanPing(){
+  if(!audioCtx)return;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.type='sine';o.frequency.value=1200;
+  o.frequency.exponentialRampToValueAtTime(600,audioCtx.currentTime+.3);
+  g.gain.setValueAtTime(.06,audioCtx.currentTime);
+  g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.5);
+  o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.6);
+}
+function warpSound(on){
+  if(!audioCtx)return;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sawtooth';
+  if(on){o.frequency.setValueAtTime(50,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(200,audioCtx.currentTime+1.5);g.gain.setValueAtTime(.04,audioCtx.currentTime);g.gain.linearRampToValueAtTime(.1,audioCtx.currentTime+1);g.gain.linearRampToValueAtTime(.06,audioCtx.currentTime+4)}
+  else{o.frequency.setValueAtTime(180,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(40,audioCtx.currentTime+1.5);g.gain.setValueAtTime(.06,audioCtx.currentTime);g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+2)}
+  const f=audioCtx.createBiquadFilter();f.type='lowpass';f.frequency.value=400;
+  o.connect(f);f.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+4);
+  const dd=document.getElementById('sg-ftl-dot'),tt=document.getElementById('sg-ftl');
+  if(on){dd.className='sg-dot ok';tt.style.color='#5ec4d4';tt.textContent='Engaged'}
+  else{dd.className='sg-dot ok';tt.style.color='#2ecc71';tt.textContent='Standby'}
+}
+
+// RADIO CHATTER
+const radioMessages=[
+  {src:'Artemis Control',msg:'Artemis, you are clear on corridor seven-niner. Maintain heading.'},
+  {src:'Relay Beacon 14',msg:'Signal relay nominal… passing telemetry packet alpha-six.'},
+  {src:'Artemis Control',msg:'Recommend reducing velocity through the Oort debris field. Acknowledge.'},
+  {src:'Cargo Vessel Hypatia',msg:'Artemis, Hypatia here. We have you on long-range. Safe travels out there.'},
+  {src:'Nav Buoy K-7',msg:'Automated beacon. Gravitational anomaly flagged at bearing two-one-five.'},
+  {src:'Artemis Control',msg:'Crew check-in window opens in four hours. Standing by.'},
+  {src:'Deep Space Relay',msg:'…kzzzt… packet loss on subspace band three… rerouting…'},
+  {src:'Science Vessel Curie',msg:'Interesting spectral readings in this sector. Anyone else picking up baryonic fluctuations?'},
+  {src:'Artemis Control',msg:'Weather advisory: elevated solar wind activity expected in twelve hours.'},
+  {src:'Mining Barge Titan',msg:'Artemis, be advised — debris trail from extraction ops at grid four-four.'},
+  {src:'Artemis Control',msg:'Copy your telemetry, Artemis. All systems reading nominal on our end.'},
+  {src:'Unknown Signal',msg:'…kzzt… repeating on all frequencies… origin unknown… kzzt…'},
+  {src:'Relay Station Orion',msg:'Subspace link stable. Bandwidth allocation confirmed for next cycle.'},
+  {src:'Artemis Med Bay',msg:'Routine bio-scan complete. All crew vitals within parameters.'},
+  {src:'Patrol Craft Sentinel',msg:'Sector sweep complete. No contacts. Returning to station.'},
+  {src:'Artemis Engineering',msg:'Starboard thruster recalibration in progress. Minor vibrations expected.'},
+  {src:'Waypoint Station Echo',msg:'Artemis, your transit visa is confirmed. Proceed on current vector.'},
+  {src:'Freighter Nostromo',msg:'Passing on your port side, Artemis. Cargo run to Kepler station. Clear skies.'},
+  {src:'Artemis Control',msg:'Long-range sensors show clear space ahead for the next two parsecs.'},
+  {src:'Automated Buoy',msg:'Caution: micrometeorite density elevated in grid seven-seven-alpha.'},
+];
+let lastRadioIdx=-1;
+function scheduleRadio(){
+  setTimeout(()=>{
+    if(!audioCtx)return;
+    let idx;do{idx=Math.floor(Math.random()*radioMessages.length)}while(idx===lastRadioIdx);
+    lastRadioIdx=idx;
+    const m=radioMessages[idx];
+    radioStaticSound();
+    const el=document.getElementById('radio');
+    document.getElementById('radio-src').textContent='◄ '+m.src+' ►';
+    document.getElementById('radio-msg').textContent='"'+m.msg+'"';
+    document.getElementById('radio-static').textContent='▮▯▮▯▮ SUBSPACE CH-7 ▮▯▮▯▮';
+    el.classList.add('show');
+    logComms(m.src,m.msg);
+    // Screen flicker for Unknown Signal
+    if(m.src==='Unknown Signal'){
+      document.body.classList.add('screen-flicker');
+      document.getElementById('interference').classList.add('active');
+      setTimeout(()=>{document.body.classList.remove('screen-flicker');document.getElementById('interference').classList.remove('active')},3000);
+    }
+    setTimeout(()=>el.classList.remove('show'),6000+m.msg.length*30);
+    scheduleRadio();
+  },20000+Math.random()*40000);
+}
+function radioStaticSound(){
+  if(!audioCtx)return;
+  const bs=audioCtx.sampleRate*.3,bf=audioCtx.createBuffer(1,bs,audioCtx.sampleRate);
+  const d=bf.getChannelData(0);for(let i=0;i<bs;i++)d[i]=(Math.random()*2-1)*(.3-i/bs*.3);
+  const s=audioCtx.createBufferSource();s.buffer=bf;
+  const f=audioCtx.createBiquadFilter();f.type='bandpass';f.frequency.value=2000;f.Q.value=2;
+  const g=audioCtx.createGain();g.gain.value=.04;
+  s.connect(f);f.connect(g);g.connect(masterGain);s.start();
+  setTimeout(()=>{
+    const o=audioCtx.createOscillator(),g2=audioCtx.createGain();
+    o.type='sine';o.frequency.value=600;
+    g2.gain.setValueAtTime(.035,audioCtx.currentTime);
+    g2.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.15);
+    o.connect(g2);g2.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.2);
+  },300);
+}
+
+// EVENTS
+document.getElementById('engage').addEventListener('click',()=>{
+  if(engaged)return;engaged=true;
+  document.getElementById('engage').classList.add('hidden');initAudio();
+});
+document.getElementById('vol').addEventListener('input',e=>{if(masterGain)masterGain.gain.value=e.target.value/100});
+let engineMuted=false;
+document.getElementById('eng-mute').addEventListener('click',()=>{
+  if(!engaged)return;
+  engineMuted=!engineMuted;
+  const btn=document.getElementById('eng-mute');
+  if(engineMuted){engineGain.gain.setTargetAtTime(0,audioCtx.currentTime,.3);hissGain.gain.setTargetAtTime(0,audioCtx.currentTime,.3);btn.style.borderColor='rgba(212,160,60,.5)';btn.style.color='#d4a03c';btn.textContent='Engine ✕'}
+  else{engineGain.gain.setTargetAtTime(.18,audioCtx.currentTime,.3);hissGain.gain.setTargetAtTime(.02,audioCtx.currentTime,.3);btn.style.borderColor='rgba(94,196,212,.25)';btn.style.color='#5ec4d4';btn.textContent='Engine'}
+  clickSound();
+});
+document.getElementById('warp-btn').addEventListener('click',()=>{
+  if(!engaged)return;warping=!warping;
+  document.getElementById('warp-btn').classList.toggle('active',warping);warpSound(warping);
+});
+canvas.addEventListener('click',e=>{
+  if(!engaged)return;scanPing();
+  const r=document.createElement('div');r.className='scan-ring';
+  r.style.left=(e.clientX-60)+'px';r.style.top=(e.clientY-60)+'px';
+  document.body.appendChild(r);setTimeout(()=>r.remove(),1000);
+});
+addEventListener('keydown',e=>{if((e.key==='f'||e.key==='F')&&e.target.tagName!=='INPUT')document.documentElement.requestFullscreen?.()});
+addEventListener('dblclick',()=>document.documentElement.requestFullscreen?.());
+
+// === MOUSE PARALLAX ===
+let mouseX=0,mouseY=0;
+const mouseGlow=document.getElementById('mouse-glow');
+addEventListener('mousemove',e=>{
+  mouseX=(e.clientX/innerWidth-.5)*2;
+  mouseY=(e.clientY/innerHeight-.5)*2;
+  mouseGlow.style.left=e.clientX+'px';
+  mouseGlow.style.top=e.clientY+'px';
+  mouseGlow.style.opacity='1';
+});
+addEventListener('mouseleave',()=>{mouseGlow.style.opacity='0'});
+function updateParallax(){
+  const px=mouseX*-4,py=mouseY*-3;
+  document.getElementById('parallax').style.transform=`translate(${px}px,${py}px)`;
+  requestAnimationFrame(updateParallax);
+}
+updateParallax();
+
+// === MISSION CLOCK ===
+const missionStart=Date.now();
+function updateClock(){
+  const elapsed=Date.now()-missionStart;
+  // Accelerated: 1 real second = ~100 mission seconds for visual interest
+  const ms=elapsed*100;
+  const totalSec=Math.floor(ms/1000);
+  const s=totalSec%60;
+  const m=Math.floor(totalSec/60)%60;
+  const h=Math.floor(totalSec/3600)%24;
+  const d=Math.floor(totalSec/86400);
+  document.getElementById('mc-time').textContent=
+    String(d).padStart(3,'0')+'d '+String(h).padStart(2,'0')+'h '+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s';
+}
+setInterval(updateClock,1000);
+
+// === CREW ACTIVITY LOG ===
+const crewEvents=[
+  'Lt. Vasquez entered cryo bay',
+  'Automated maintenance cycle — Deck 3 complete',
+  'Dr. Okafor logged medical supply audit',
+  'Ensign Park began bridge watch rotation',
+  'Hydroponics bay — nutrient cycle refreshed',
+  'Cpl. Reyes completed EVA suit inspection',
+  'AI core defragmentation — 99.7% nominal',
+  'Water reclamation filter replaced — Bay 2',
+  'Dr. Okafor updated crew health manifest',
+  'Lt. Vasquez exited cryo bay — vitals normal',
+  'Cargo drone 04 repositioned to Bay C',
+  'Ensign Park logged navigational waypoint',
+  'Reactor coolant loop pressure equalized',
+  'Mess hall — automated meal prep cycle started',
+  'Cpl. Reyes reported to engineering',
+  'Observation dome sealed for transit',
+  'Flight recorder backup completed',
+  'Air filtration module 2B cycled',
+  'Lt. Vasquez filed watch report — all clear',
+  'Automated hull integrity scan — nominal',
+];
+const logEl=document.getElementById('crew-log');
+let logCount=0;
+function addCrewEntry(){
+  const msg=crewEvents[Math.floor(Math.random()*crewEvents.length)];
+  const elapsed=Date.now()-missionStart;
+  const ms=elapsed*100;const totalSec=Math.floor(ms/1000);
+  const h=Math.floor(totalSec/3600)%24;const m=Math.floor(totalSec/60)%60;
+  const timeStr=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+  const entry=document.createElement('div');
+  entry.className='crew-log-entry';
+  entry.innerHTML='<span class="cle-time">['+timeStr+']</span><span class="cle-text">'+msg+'</span>';
+  logEl.appendChild(entry);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>entry.classList.add('visible')));
+  logCount++;
+  // Keep max 5 entries
+  while(logEl.children.length>5){logEl.removeChild(logEl.firstChild)}
+  setTimeout(addCrewEntry,12000+Math.random()*18000);
+}
+setTimeout(addCrewEntry,4000);
+
+// === CAPTAIN LOG INPUT ===
+function addCaptainEntry(msg){
+  if(!msg.trim())return;
+  const elapsed=Date.now()-missionStart;
+  const ms=elapsed*100;const totalSec=Math.floor(ms/1000);
+  const h=Math.floor(totalSec/3600)%24;const m=Math.floor(totalSec/60)%60;
+  const timeStr=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+  const entry=document.createElement('div');
+  entry.className='crew-log-entry captain';
+  entry.innerHTML='<span class="cle-time">['+timeStr+']</span><span class="cle-text">Captain: '+msg+'</span>';
+  logEl.appendChild(entry);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>entry.classList.add('visible')));
+  while(logEl.children.length>5)logEl.removeChild(logEl.firstChild);
+  if(typeof logComms==='function')logComms('Captain',msg,true);
+  if(engaged)clickSound();
+}
+document.getElementById('captain-send').addEventListener('click',()=>{
+  const input=document.getElementById('captain-msg');
+  addCaptainEntry(input.value);input.value='';
+});
+document.getElementById('captain-msg').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){e.preventDefault();const input=document.getElementById('captain-msg');addCaptainEntry(input.value);input.value=''}
+  e.stopPropagation();// prevent F key triggering fullscreen while typing
+});
+
+// === STAR MAP ===
+const starmapCanvas=document.getElementById('starmap');
+const smCtx=starmapCanvas.getContext('2d');
+let starmapVisible=false;
+function resizeStarmap(){starmapCanvas.width=innerWidth;starmapCanvas.height=innerHeight;if(starmapVisible)drawStarmap()}
+addEventListener('resize',resizeStarmap);resizeStarmap();
+
+const waypoints=[
+  {name:'Kepler-442b',x:.3,y:.35},{name:'Proxima Cen',x:.55,y:.25},
+  {name:'Trappist-1',x:.7,y:.45},{name:'Wolf 1061',x:.45,y:.65},
+  {name:'Ross 128',x:.2,y:.6},{name:'HD 40307',x:.8,y:.3},
+  {name:'Gliese 667',x:.65,y:.7},{name:'Artemis',x:.48,y:.48},
+];
+const constellationLines=[[0,1],[1,2],[1,3],[3,4],[4,0],[2,5],[5,6],[3,6],[7,1]];
+
+function drawStarmap(){
+  const sw=starmapCanvas.width,sh=starmapCanvas.height;
+  smCtx.clearRect(0,0,sw,sh);
+  smCtx.fillStyle='rgba(0,0,0,.6)';smCtx.fillRect(0,0,sw,sh);
+  // Grid
+  smCtx.strokeStyle='rgba(94,196,212,.04)';smCtx.lineWidth=1;
+  for(let i=0;i<20;i++){const x=i/20*sw;smCtx.beginPath();smCtx.moveTo(x,0);smCtx.lineTo(x,sh);smCtx.stroke()}
+  for(let i=0;i<15;i++){const y=i/15*sh;smCtx.beginPath();smCtx.moveTo(0,y);smCtx.lineTo(sw,y);smCtx.stroke()}
+  // Lines
+  smCtx.strokeStyle='rgba(94,196,212,.15)';smCtx.lineWidth=1;
+  for(const[a,b]of constellationLines){
+    smCtx.beginPath();smCtx.moveTo(waypoints[a].x*sw,waypoints[a].y*sh);
+    smCtx.lineTo(waypoints[b].x*sw,waypoints[b].y*sh);smCtx.stroke();
+  }
+  // Waypoints
+  for(const wp of waypoints){
+    const wx=wp.x*sw,wy=wp.y*sh;
+    const isArtemis=wp.name==='Artemis';
+    smCtx.fillStyle=isArtemis?'rgba(94,196,212,.9)':'rgba(94,196,212,.5)';
+    smCtx.beginPath();smCtx.arc(wx,wy,isArtemis?5:3,0,6.283);smCtx.fill();
+    if(isArtemis){smCtx.strokeStyle='rgba(94,196,212,.3)';smCtx.lineWidth=1;smCtx.beginPath();smCtx.arc(wx,wy,12,0,6.283);smCtx.stroke()}
+    smCtx.fillStyle=isArtemis?'#5ec4d4':'rgba(94,196,212,.5)';
+    smCtx.font=(isArtemis?'bold ':'')+`${Math.max(9,sw*.008)}px 'Courier New',monospace`;
+    smCtx.fillText(wp.name,wx+8,wy+3);
+  }
+  // Title
+  smCtx.fillStyle='rgba(94,196,212,.4)';
+  smCtx.font=`${Math.max(10,sw*.009)}px 'Courier New',monospace`;
+  smCtx.fillText('SECTOR NAV CHART — QUADRANT 7',20,30);
+}
+document.getElementById('starmap-btn').addEventListener('click',()=>{
+  starmapVisible=!starmapVisible;
+  document.getElementById('starmap').classList.toggle('show',starmapVisible);
+  document.getElementById('starmap-btn').classList.toggle('active',starmapVisible);
+  if(starmapVisible)drawStarmap();
+  if(engaged)clickSound();
+});
+
+// === SYSTEM NOTIFICATIONS ===
+const notifMessages=[
+  'Scheduled coolant flush in 2 hours',
+  'Firmware update available for Nav Module',
+  'Cryo bay rotation cycle due in 45 minutes',
+  'Quarterly radiation badge check — see Med Bay',
+  'Water recycler filter at 68% — replacement scheduled',
+  'Exterior camera 3 recalibrated',
+  'Galley power draw normalized',
+  'Deck 2 pressure equalization complete',
+  'Automated star chart update downloaded',
+  'Backup comms array test — 0300 ship time',
+  'Hull micro-fracture scan queued — Sector B',
+  'Crew quarters HVAC cycle refreshed',
+  'Long-range antenna repositioned',
+  'Fuel cell efficiency report logged',
+  'Observation dome UV filter replaced',
+];
+const notifEl=document.getElementById('sys-notif');
+let lastNotifIdx=-1;
+function scheduleNotif(){
+  setTimeout(()=>{
+    let idx;do{idx=Math.floor(Math.random()*notifMessages.length)}while(idx===lastNotifIdx);
+    lastNotifIdx=idx;
+    const div=document.createElement('div');
+    div.className='notif'+(Math.random()>.8?' amber':'');
+    const elapsed=Date.now()-missionStart;const ms=elapsed*100;const totalSec=Math.floor(ms/1000);
+    const h=Math.floor(totalSec/3600)%24;const m=Math.floor(totalSec/60)%60;
+    div.innerHTML='<span class="notif-time">['+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+']</span> '+notifMessages[idx];
+    notifEl.appendChild(div);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>div.classList.add('show')));
+    setTimeout(()=>{div.classList.remove('show');setTimeout(()=>div.remove(),600)},8000);
+    while(notifEl.children.length>3)notifEl.removeChild(notifEl.firstChild);
+    scheduleNotif();
+  },25000+Math.random()*35000);
+}
+scheduleNotif();
+
+// === DAY/NIGHT CYCLE ===
+// Shifts cockpit accent hue from cool blue to warm amber over ~10 min cycle
+function updateDayNight(){
+  const cycle=Date.now()*.0001; // full cycle ~10 min
+  const phase=(Math.sin(cycle*.105)+1)/2; // 0=cool blue, 1=warm amber
+  const hue=Math.round(190-phase*30); // 190 (cyan) -> 160 (teal) at midpoint
+  const r=Math.round(94+phase*120);  // 94->214
+  const g=Math.round(196-phase*50);  // 196->146
+  const b=Math.round(212-phase*140); // 212->72
+  const color=`${r},${g},${b}`;
+  // Apply to edge glows
+  document.querySelectorAll('.edge-glow').forEach(el=>{
+    el.style.filter=`hue-rotate(${phase*-25}deg)`;
+    el.style.opacity=.6+phase*.2;
+  });
+  // Viewport border
+  document.querySelector('.viewport-border').style.borderColor=`rgba(${color},.07)`;
+  requestAnimationFrame(updateDayNight);
+}
+updateDayNight();
+
+// === STARFIELD DENSITY ===
+// Gradually vary how many stars are active to simulate denser/sparser regions
+let densityTarget=STAR_COUNT,activeDensity=STAR_COUNT;
+setInterval(()=>{
+  densityTarget=Math.round(350+Math.random()*350); // 350-700
+},60000); // shift every ~60s
+
+// === PROXIMITY ALERT ===
+let proxCooldown=0;
+function triggerProxAlert(){
+  if(proxCooldown>0)return;
+  proxCooldown=10000;// 10s cooldown
+  setTimeout(()=>{proxCooldown=0},10000);
+  // Visual flash
+  const pf=document.getElementById('prox-flash');
+  pf.classList.add('active');
+  setTimeout(()=>pf.classList.remove('active'),2000);
+  // Two-tone alarm (soft)
+  if(!audioCtx)return;
+  const t1=audioCtx.currentTime;
+  for(let i=0;i<3;i++){
+    const o1=audioCtx.createOscillator(),g1=audioCtx.createGain();
+    o1.type='sine';o1.frequency.value=440;
+    g1.gain.setValueAtTime(0,t1+i*.6);g1.gain.linearRampToValueAtTime(.04,t1+i*.6+.05);
+    g1.gain.linearRampToValueAtTime(0,t1+i*.6+.25);
+    o1.connect(g1);g1.connect(masterGain);o1.start(t1+i*.6);o1.stop(t1+i*.6+.3);
+    const o2=audioCtx.createOscillator(),g2=audioCtx.createGain();
+    o2.type='sine';o2.frequency.value=520;
+    g2.gain.setValueAtTime(0,t1+i*.6+.25);g2.gain.linearRampToValueAtTime(.035,t1+i*.6+.3);
+    g2.gain.linearRampToValueAtTime(0,t1+i*.6+.55);
+    o2.connect(g2);g2.connect(masterGain);o2.start(t1+i*.6+.25);o2.stop(t1+i*.6+.6);
+  }
+}
+
+// === SPACE OBJECTS (asteroids, distant ships, planets) ===
+const spaceObjects=[];
+function spawnSpaceObject(){
+  const type=Math.random();
+  if(type<.5){
+    // Asteroid — small tumbling rock
+    spaceObjects.push({kind:'asteroid',x:(Math.random()-.5)*1.2,y:(Math.random()-.5)*1.2,z:.98,
+      rot:0,rotSpeed:.3+Math.random()*.5,size:2+Math.random()*3,verts:generateRock()});
+  } else if(type<.85){
+    // Distant ship with blinking nav lights
+    spaceObjects.push({kind:'ship',x:(Math.random()-.5)*.8,y:(Math.random()-.5)*.8,z:.95,
+      size:1.5,blinkPhase:Math.random()*6.28});
+  } else {
+    // Distant planet — slow drift across edge
+    const side=Math.random()>.5?1:-1;
+    spaceObjects.push({kind:'planet',x:side*.6,y:(Math.random()-.5)*.4,z:.92,
+      size:20+Math.random()*30,hue:Math.floor(Math.random()*360),drift:-side*.00003});
+  }
+  setTimeout(spawnSpaceObject,15000+Math.random()*30000);
+}
+function generateRock(){
+  const pts=[];const n=6+Math.floor(Math.random()*4);
+  for(let i=0;i<n;i++){const a=i/n*6.283;const r=.6+Math.random()*.4;pts.push({a,r})}
+  return pts;
+}
+setTimeout(spawnSpaceObject,5000);
+
+// === LENS FLARE ===
+const flareEl=document.getElementById('flare');
+let flareOpacity=0;
+
+// === THROTTLE ===
+document.getElementById('throttle').addEventListener('input',e=>{
+  throttle=e.target.value/100;
+  // Shift engine pitch
+  for(const eh of engineOscs){
+    eh.osc.frequency.setTargetAtTime(eh.baseFreq*(.7+throttle*.6),audioCtx?audioCtx.currentTime:0,.1);
+  }
+});
+
+// === CLICK-DRAG PAN ===
+canvas.addEventListener('mousedown',e=>{
+  isDragging=true;dragStartX=e.clientX-panTargetX;dragStartY=e.clientY-panTargetY;
+});
+addEventListener('mousemove',e=>{
+  if(isDragging){
+    panTargetX=Math.max(-150,Math.min(150,(e.clientX-dragStartX)*.3));
+    panTargetY=Math.max(-100,Math.min(100,(e.clientY-dragStartY)*.3));
+  }
+});
+addEventListener('mouseup',()=>{
+  isDragging=false;panTargetX=0;panTargetY=0; // rubber-band back
+});
+
+// === OSCILLOSCOPE ===
+const scopeCanvas=document.getElementById('scope');
+const scopeCtx=scopeCanvas.getContext('2d');
+function drawScope(){
+  const sw=scopeCanvas.width,sh=scopeCanvas.height;
+  scopeCtx.fillStyle='rgba(4,8,12,.3)';scopeCtx.fillRect(0,0,sw,sh);
+  // Grid lines
+  scopeCtx.strokeStyle='rgba(94,196,212,.06)';scopeCtx.lineWidth=.5;
+  for(let y=0;y<sh;y+=10){scopeCtx.beginPath();scopeCtx.moveTo(0,y);scopeCtx.lineTo(sw,y);scopeCtx.stroke()}
+  // Waveform
+  const now=performance.now()*.001;
+  scopeCtx.strokeStyle='rgba(94,196,212,.6)';scopeCtx.lineWidth=1.2;
+  scopeCtx.beginPath();
+  for(let x=0;x<sw;x++){
+    const v=Math.sin(x*.08+now*2)*.3+Math.sin(x*.15+now*1.3)*.15+Math.sin(x*.03+now*.7)*.4;
+    const y=sh/2+v*sh*.35*throttle;
+    x===0?scopeCtx.moveTo(x,y):scopeCtx.lineTo(x,y);
+  }
+  scopeCtx.stroke();
+  // Glow duplicate
+  scopeCtx.strokeStyle='rgba(94,196,212,.15)';scopeCtx.lineWidth=3;
+  scopeCtx.beginPath();
+  for(let x=0;x<sw;x++){
+    const v=Math.sin(x*.08+now*2)*.3+Math.sin(x*.15+now*1.3)*.15+Math.sin(x*.03+now*.7)*.4;
+    const y=sh/2+v*sh*.35*throttle;
+    x===0?scopeCtx.moveTo(x,y):scopeCtx.lineTo(x,y);
+  }
+  scopeCtx.stroke();
+  requestAnimationFrame(drawScope);
+}
+drawScope();
+
+// === RADAR ===
+const radarCanvas=document.getElementById('radar');
+const radCtx=radarCanvas.getContext('2d');
+let radarAngle=0;
+const radarBlips=[];
+function drawRadar(){
+  const rw=radarCanvas.width,rh=radarCanvas.height,rcx=rw/2,rcy=rh/2,rr=rw/2-2;
+  radCtx.fillStyle='rgba(4,8,12,.15)';radCtx.fillRect(0,0,rw,rh);
+  // Grid circles
+  radCtx.strokeStyle='rgba(94,196,212,.08)';radCtx.lineWidth=.5;
+  for(let i=1;i<=3;i++){radCtx.beginPath();radCtx.arc(rcx,rcy,rr*i/3,0,6.283);radCtx.stroke()}
+  // Cross
+  radCtx.beginPath();radCtx.moveTo(rcx,2);radCtx.lineTo(rcx,rh-2);radCtx.moveTo(2,rcy);radCtx.lineTo(rw-2,rcy);radCtx.stroke();
+  // Sweep line
+  radarAngle+=.02;
+  const sx=rcx+Math.cos(radarAngle)*rr,sy=rcy+Math.sin(radarAngle)*rr;
+  const sweepGrad=radCtx.createLinearGradient(rcx,rcy,sx,sy);
+  sweepGrad.addColorStop(0,'rgba(94,196,212,.01)');sweepGrad.addColorStop(1,'rgba(94,196,212,.35)');
+  radCtx.strokeStyle=sweepGrad;radCtx.lineWidth=1.5;
+  radCtx.beginPath();radCtx.moveTo(rcx,rcy);radCtx.lineTo(sx,sy);radCtx.stroke();
+  // Sweep fade trail
+  radCtx.fillStyle='rgba(94,196,212,.03)';
+  radCtx.beginPath();radCtx.moveTo(rcx,rcy);
+  radCtx.arc(rcx,rcy,rr,radarAngle-.4,radarAngle);radCtx.closePath();radCtx.fill();
+  // Update blips from space objects
+  while(radarBlips.length>8)radarBlips.shift();
+  // Draw blips
+  for(let i=radarBlips.length-1;i>=0;i--){
+    const b=radarBlips[i];
+    b.life-=.005;
+    if(b.life<=0){radarBlips.splice(i,1);continue}
+    radCtx.fillStyle=`rgba(94,196,212,${b.life*.8})`;
+    radCtx.beginPath();radCtx.arc(rcx+b.bx*rr,rcy+b.by*rr,2,0,6.283);radCtx.fill();
+  }
+  // Center dot (ship)
+  radCtx.fillStyle='rgba(94,196,212,.7)';radCtx.beginPath();radCtx.arc(rcx,rcy,1.5,0,6.283);radCtx.fill();
+  requestAnimationFrame(drawRadar);
+}
+drawRadar();
+
+// === CONDENSATION DRIPS ===
+function scheduleDrip(){
+  setTimeout(()=>{
+    const drip=document.getElementById(Math.random()>.5?'drip1':'drip2');
+    const x=Math.random()>.5?
+      (Math.random()*40+10)+'px': // left edge area
+      (innerWidth-Math.random()*40-10)+'px'; // right edge area
+    const startY=Math.random()*innerHeight*.3;
+    const h=30+Math.random()*40;
+    drip.style.left=x;drip.style.top=startY+'px';drip.style.height=h+'px';
+    drip.classList.add('active');
+    // Animate down
+    let dy=0;
+    const dripInterval=setInterval(()=>{
+      dy+=.3;drip.style.top=(startY+dy)+'px';
+      drip.style.opacity=Math.max(0,.12-dy*.0008);
+      if(dy>120){clearInterval(dripInterval);drip.classList.remove('active')}
+    },50);
+    scheduleDrip();
+  },20000+Math.random()*40000);
+}
+scheduleDrip();
+
+// === STAR SCANNER TOOLTIP ===
+const starTip=document.getElementById('star-tip');
+const starClasses=['Class O','Class B','Class A','Class F','Class G','Class K','Class M'];
+const starSuffixes=['dwarf','giant','supergiant','main-seq','binary'];
+let hoveredStar=null;
+canvas.addEventListener('mousemove',e=>{
+  if(isDragging)return;
+  const mx=e.clientX,my=e.clientY;
+  hoveredStar=null;
+  const cx=W/2+panX,cy=H/2+panY;
+  for(const s of stars){
+    if(s.z>.5)continue;// only nearby stars
+    const invZ=1/s.z;
+    const sx=cx+s.x*invZ*(W/2);
+    const sy=cy+s.y*invZ*(H/2);
+    const sz=Math.max(.3,(1-s.z)*2.5);
+    if(sz<1)continue;
+    const dx=mx-sx,dy=my-sy;
+    if(dx*dx+dy*dy<(sz+6)*(sz+6)){
+      hoveredStar=s;
+      // Generate procedural data from star position as seed
+      const seed=Math.abs(Math.round(s.x*10000+s.y*10000));
+      const cls=starClasses[seed%7];
+      const suf=starSuffixes[seed%5];
+      const dist=(s.z*50+.1).toFixed(1);
+      const mag=((1-s.z)*8+1).toFixed(1);
+      starTip.innerHTML='<span class="st-class">'+cls+'</span> '+suf+' — '+dist+' ly — mag '+mag;
+      starTip.style.left=(mx+14)+'px';starTip.style.top=(my-20)+'px';
+      starTip.classList.add('show');
+      break;
+    }
+  }
+  if(!hoveredStar)starTip.classList.remove('show');
+});
+canvas.addEventListener('mouseleave',()=>starTip.classList.remove('show'));
+
+// === COMET ===
+let comet=null;
+function spawnComet(){
+  const side=Math.random()>.5?1:-1;
+  comet={
+    x:side>0?-.1:1.1,y:.15+Math.random()*.5,
+    vx:-side*.0004,vy:(Math.random()-.5)*.0001,
+    tailLen:80+Math.random()*60,
+    hue:180+Math.random()*40,
+    brightness:.6+Math.random()*.3,
+    life:1
+  };
+  setTimeout(spawnComet,600000+Math.random()*300000);// 10-15 min
+}
+setTimeout(spawnComet,60000+Math.random()*120000);// first one in 1-3 min
+
+// === SCREEN TOGGLE SYSTEM ===
+let activeScreen=null;
+document.querySelectorAll('.scr-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const id=btn.dataset.screen;
+    if(id==='pip'){document.getElementById('pip').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
+    if(id==='ai'){document.getElementById('ai-terminal').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
+    if(id==='fuelg'){document.getElementById('fuel-graph').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
+    const el=document.getElementById('scr-'+id);
+    if(!el)return;
+    if(activeScreen===id){el.classList.remove('show');activeScreen=null;btn.classList.remove('active')}
+    else{
+      document.querySelectorAll('.screen-overlay.show').forEach(s=>s.classList.remove('show'));
+      document.querySelectorAll('.scr-btn.active').forEach(b=>{if(!['pip','ai','fuelg'].includes(b.dataset.screen))b.classList.remove('active')});
+      el.classList.add('show');activeScreen=id;btn.classList.add('active');
+      if(id==='schematic')renderSchematic();
+      if(id==='crew')renderCrew();
+      if(id==='mission')renderMission();
+      if(id==='engineering')renderEngineering();
+      if(id==='database')renderDatabase('ship');
+      if(id==='mixer')renderMixer();
+      if(id==='lrs')drawLRS();
+      if(id==='navplan')drawNavPlan();
+      if(id==='cameras'){initCameras();drawCameras()}
+    }
+    if(engaged)clickSound();
+  });
+});
+document.querySelectorAll('.s-close').forEach(btn=>btn.addEventListener('click',()=>{
+  btn.closest('.screen-overlay').classList.remove('show');activeScreen=null;
+  document.querySelectorAll('.scr-btn.active').forEach(b=>{if(!['pip','ai','fuelg'].includes(b.dataset.screen))b.classList.remove('active')});
+  if(engaged)clickSound();
+}));
+
+// === COMMS LOG ===
+const commsLog=[];
+function logComms(src,msg,isCaptain){
+  const elapsed=Date.now()-missionStart;const ms=elapsed*100;const ts=Math.floor(ms/1000);
+  const h=Math.floor(ts/3600)%24,m=Math.floor(ts/60)%60;
+  const time=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+  commsLog.push({time,src,msg,isCaptain:!!isCaptain});
+  if(activeScreen==='comms')renderCommsLog();
+}
+function renderCommsLog(){
+  const el=document.getElementById('comms-body');
+  el.innerHTML=commsLog.map(e=>`<div class="comms-entry${e.isCaptain?' captain':''}"><span class="ce-time">[${e.time}]</span><span class="ce-src">${e.src}</span><span class="ce-msg">${e.msg}</span></div>`).join('');
+  el.scrollTop=el.scrollHeight;
+}
+
+// === SHIP SCHEMATIC ===
+const deckData=[
+  {name:'Bridge',rooms:['Helm','Ops','Comms','Nav']},
+  {name:'Deck 1',rooms:['Quarters A','Quarters B','Mess Hall','Med Bay']},
+  {name:'Deck 2',rooms:['Lab','Cargo Bay','Armory','Rec Room']},
+  {name:'Deck 3',rooms:['Engineering','Reactor','Cryo Bay','Life Support']},
+];
+const crewPositions=['Helm','Med Bay','Engineering','Quarters A','Lab','Cryo Bay'];
+function renderSchematic(){
+  const el=document.getElementById('schematic-body');
+  let html='';
+  deckData.forEach(d=>{
+    html+='<div class="schematic-deck"><div class="deck-label">'+d.name+'</div>';
+    d.rooms.forEach(r=>{
+      const hasCrew=crewPositions.includes(r);
+      const isWarn=r==='Engineering'||r==='Reactor';
+      html+='<div class="schematic-room'+(hasCrew?' has-crew':'')+(isWarn?' warn':'')+'">'+(hasCrew?'<div class="crew-dot"></div>':'')+r+'</div>';
+    });
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+// === LONG RANGE SCANNER ===
+const lrsCanvas=document.getElementById('lrs-canvas');
+const lrsCtx=lrsCanvas.getContext('2d');
+const lrsObjects=[
+  {name:'Beacon K-7',x:.1,y:-.2,type:'beacon'},{name:'Hypatia',x:.3,y:.15,type:'ship'},
+  {name:'Asteroid Field',x:-.25,y:.1,type:'asteroid'},{name:'Kepler-442b',x:-.4,y:-.35,type:'planet'},
+  {name:'Curie',x:.15,y:-.4,type:'ship'},{name:'Titan',x:-.1,y:.35,type:'ship'},
+  {name:'Relay 14',x:.35,y:-.1,type:'beacon'},{name:'Unknown',x:-.3,y:-.15,type:'unknown'},
+];
+function drawLRS(){
+  const w=lrsCanvas.width,h=lrsCanvas.height,cx=w/2,cy=h/2,r=w/2-20;
+  lrsCtx.fillStyle='rgba(4,8,12,.95)';lrsCtx.fillRect(0,0,w,h);
+  lrsCtx.strokeStyle='rgba(94,196,212,.08)';lrsCtx.lineWidth=1;
+  [.33,.66,1].forEach(s=>{lrsCtx.beginPath();lrsCtx.arc(cx,cy,r*s,0,6.283);lrsCtx.stroke()});
+  lrsCtx.beginPath();lrsCtx.moveTo(cx,20);lrsCtx.lineTo(cx,h-20);lrsCtx.moveTo(20,cy);lrsCtx.lineTo(w-20,cy);lrsCtx.stroke();
+  // Range labels
+  lrsCtx.fillStyle='rgba(94,196,212,.2)';lrsCtx.font="9px 'Courier New'";
+  lrsCtx.fillText('5 ly',cx+r*.33+4,cy-4);lrsCtx.fillText('10 ly',cx+r*.66+4,cy-4);lrsCtx.fillText('15 ly',cx+r+4,cy-4);
+  // Ship center
+  lrsCtx.fillStyle='rgba(94,196,212,.8)';lrsCtx.beginPath();lrsCtx.arc(cx,cy,4,0,6.283);lrsCtx.fill();
+  lrsCtx.fillStyle='rgba(94,196,212,.3)';lrsCtx.fillText('ARTEMIS',cx+8,cy+3);
+  // Objects with trails
+  lrsObjects.forEach(o=>{
+    const ox=cx+o.x*r*2,oy=cy+o.y*r*2;
+    const drift=Math.sin(Date.now()*.0005+o.x*10)*.5;
+    const colors={beacon:'#d4a03c',ship:'#2ecc71',asteroid:'#888',planet:'#5ec4d4',unknown:'#e74c3c'};
+    lrsCtx.fillStyle=colors[o.type]||'#5ec4d4';
+    lrsCtx.beginPath();lrsCtx.arc(ox+drift,oy,3,0,6.283);lrsCtx.fill();
+    // Trail
+    lrsCtx.strokeStyle=colors[o.type]+'40';lrsCtx.lineWidth=1;
+    lrsCtx.beginPath();lrsCtx.moveTo(ox+drift,oy);lrsCtx.lineTo(ox+drift-o.x*8,oy-o.y*8);lrsCtx.stroke();
+    lrsCtx.fillStyle='rgba(94,196,212,.25)';lrsCtx.fillText(o.name,ox+drift+6,oy+3);
+  });
+}
+
+// === DATABASE ===
+const dbEntries={
+  ship:{title:'Ship Specifications',content:`<h3>ISS Artemis — Explorer Class</h3><p><span class="spec">Registry:</span>ISS-7742-A</p><p><span class="spec">Class:</span>Horizon Explorer</p><p><span class="spec">Length:</span>284 meters</p><p><span class="spec">Mass:</span>45,200 metric tons</p><p><span class="spec">Crew Capacity:</span>12 (6 active)</p><p><span class="spec">FTL Drive:</span>Alcubierre-Tanaka Mk IV</p><p><span class="spec">Max Velocity:</span>0.009c (sublight)</p><p><span class="spec">Reactor:</span>Dual Tokamak Fusion</p><p><span class="spec">Armament:</span>Point-defense array, mining lasers</p><p><span class="spec">Commissioned:</span>2347</p>`},
+  systems:{title:'Star Systems',content:`<h3>Kepler-442</h3><p>G-type main sequence star, 1,206 ly from Sol. One confirmed habitable exoplanet (Kepler-442b) with 60% Earth Similarity Index. Targeted for long-range survey.</p><h3>Proxima Centauri</h3><p>M-type red dwarf, 4.24 ly from Sol. Proxima b orbits in habitable zone but tidally locked. Relay station established 2298.</p><h3>Trappist-1</h3><p>Ultra-cool red dwarf, 39 ly. Seven rocky planets, three in habitable zone. Active colonization survey in progress.</p>`},
+  mission:{title:'Mission Brief',content:`<h3>Operation Far Reach</h3><p>Objective: Long-range survey and relay deployment along the Kepler corridor. Secondary: spectral analysis of anomalous baryonic readings in Sector 7.</p><p>Duration: Estimated 2,847 days. Crew rotation at Waypoint Echo (Day 1,400).</p><p>Authorization: UESA Deep Space Command, Directive 7-Alpha.</p>`},
+  crew:{title:'Crew Bios',content:`<h3>Cpt. Elara Vasquez</h3><p>Commanding officer. 14 years deep-space experience. Previously commanded ISS Magellan on Trappist survey.</p><h3>Dr. Amara Okafor</h3><p>Chief Medical Officer. Specialist in long-duration spaceflight physiology and cryo-recovery.</p><h3>Lt. Jin Park</h3><p>Navigation & Helm. Top graduate, Orbital Academy class of '44. First deep-space posting.</p><h3>Cpl. Diego Reyes</h3><p>Engineering & EVA specialist. 8 years service. Hull repair and reactor maintenance certified.</p><h3>Dr. Yuki Tanaka</h3><p>Science Officer. Astrophysics PhD, focused on baryonic matter anomalies.</p><h3>Sgt. Kwame Mensah</h3><p>Security & Comms. Currently in scheduled cryo rotation. Wake date: Day 1,026.</p>`}
+};
+function renderDatabase(tab){
+  document.querySelectorAll('.db-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  const entry=dbEntries[tab];
+  document.getElementById('db-content').innerHTML=entry?entry.content:'<p>No data.</p>';
+}
+// Build nav tabs
+(function(){
+  const nav=document.getElementById('db-nav');
+  Object.keys(dbEntries).forEach(k=>{
+    const btn=document.createElement('button');btn.className='db-tab';btn.dataset.tab=k;btn.textContent=dbEntries[k].title;
+    btn.addEventListener('click',()=>{renderDatabase(k);if(engaged)clickSound()});
+    nav.appendChild(btn);
+  });
+})();
+
+// === ENGINEERING ===
+const engGraphData={reactor:[],coolant:[],hull:[]};
+setInterval(()=>{
+  engGraphData.reactor.push(95+Math.random()*5);
+  engGraphData.coolant.push(60+Math.random()*30);
+  engGraphData.hull.push(98+Math.random()*2);
+  if(engGraphData.reactor.length>60)engGraphData.reactor.shift();
+  if(engGraphData.coolant.length>60)engGraphData.coolant.shift();
+  if(engGraphData.hull.length>60)engGraphData.hull.shift();
+},2000);
+function renderEngineering(){
+  const el=document.getElementById('eng-body');
+  el.innerHTML='';
+  [{label:'Reactor Output',data:engGraphData.reactor,unit:'%',color:'#5ec4d4'},
+   {label:'Coolant Pressure',data:engGraphData.coolant,unit:'kPa',color:'#d4a03c'},
+   {label:'Hull Integrity',data:engGraphData.hull,unit:'%',color:'#2ecc71'}].forEach(s=>{
+    const sec=document.createElement('div');sec.className='eng-section';
+    const val=s.data.length?s.data[s.data.length-1].toFixed(1):'--';
+    sec.innerHTML=`<div class="eng-label">${s.label}: <span style="color:${s.color}">${val}${s.unit}</span></div><canvas class="eng-graph" width="500" height="40"></canvas>`;
+    el.appendChild(sec);
+    const cv=sec.querySelector('canvas'),cx=cv.getContext('2d');
+    cv.width=500;cv.height=40;
+    cx.strokeStyle=s.color+'80';cx.lineWidth=1.5;cx.beginPath();
+    s.data.forEach((v,i)=>{const x=i/60*500,y=40-(v-50)/55*40;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});
+    cx.stroke();
+  });
+  el.innerHTML+=`<div class="eng-rec">► Recommend coolant flush at next waypoint. Starboard thruster recalibration scheduled T+48h.</div>`;
+}
+
+// === CREW MANIFEST ===
+const crewData=[
+  {name:'Cpt. Elara Vasquez',role:'Commanding Officer',loc:'Helm',hr:'68',status:'Active',icon:'⟐'},
+  {name:'Dr. Amara Okafor',role:'Chief Medical Officer',loc:'Med Bay',hr:'72',status:'Active',icon:'✚'},
+  {name:'Lt. Jin Park',role:'Navigation & Helm',loc:'Quarters A',hr:'64',status:'Off-Duty',icon:'◈'},
+  {name:'Cpl. Diego Reyes',role:'Engineering & EVA',loc:'Engineering',hr:'75',status:'Active',icon:'⚙'},
+  {name:'Dr. Yuki Tanaka',role:'Science Officer',loc:'Lab',hr:'70',status:'Active',icon:'◉'},
+  {name:'Sgt. Kwame Mensah',role:'Security & Comms',loc:'Cryo Bay',hr:'42',status:'Cryo — Wake: 14d',icon:'❄'},
+];
+function renderCrew(){
+  document.getElementById('crew-body').innerHTML=crewData.map(c=>`<div class="crew-card"><div class="crew-avatar">${c.icon}</div><div class="crew-info"><div class="crew-name">${c.name}</div><div class="crew-role">${c.role}</div><div style="color:#3a5a6a">Location: ${c.loc}</div><div class="crew-vitals"><span>HR: <span class="vital-val${c.status.startsWith('Cryo')?' cryo':''}">${c.hr} bpm</span></span><span>Status: <span class="vital-val${c.status.startsWith('Cryo')?' cryo':''}">${c.status}</span></span></div></div></div>`).join('');
+}
+
+// === MISSION OBJECTIVES ===
+function renderMission(){
+  const objs=[
+    {status:'done',title:'Launch from Waypoint Delta',desc:'Departed on schedule. All systems nominal at launch.'},
+    {status:'done',title:'Deploy Relay Beacon 14',desc:'Beacon active. Signal relay confirmed.'},
+    {status:'done',title:'Transit Oort Debris Field',desc:'Minor hull impacts. No structural damage.'},
+    {status:'active',title:'Survey Sector 7 Baryonic Anomalies',desc:'Spectral analysis ongoing. Dr. Tanaka collecting data.'},
+    {status:'active',title:'Maintain Course to Kepler-442',desc:'ETA: ~1,012 days. Current velocity 0.004c.'},
+    {status:'pending',title:'Crew Rotation at Waypoint Echo',desc:'Scheduled Day 1,400. Sgt. Mensah cryo-wake Day 1,026.'},
+    {status:'pending',title:'Deploy Relay Beacon 15',desc:'Pending. Components staged in Cargo Bay.'},
+    {status:'pending',title:'Arrive Kepler-442 System',desc:'Final survey and report transmission to UESA.'},
+  ];
+  document.getElementById('mission-body').innerHTML=objs.map(o=>`<div class="mission-obj"><div class="obj-check ${o.status}">${o.status==='done'?'✓':o.status==='active'?'►':''}</div><div class="obj-text ${o.status}"><div class="obj-title">${o.title}</div><div class="obj-desc">${o.desc}</div></div></div>`).join('');
+}
+
+// === AUDIO MIXER ===
+let mixerGains={};
+function renderMixer(){
+  const el=document.getElementById('mixer-body');
+  const channels=[
+    {id:'engine',label:'Engine Hum',val:engineMuted?0:100},
+    {id:'air',label:'Air Circulation',val:100},
+    {id:'blips',label:'Console Blips',val:100},
+    {id:'radio',label:'Radio Chatter Freq',val:50},
+    {id:'ambient',label:'Space Ambient Drone',val:0},
+  ];
+  el.innerHTML=channels.map(c=>`<div class="mix-row"><div class="mix-label">${c.label}</div><input type="range" class="mix-slider" data-ch="${c.id}" min="0" max="100" value="${c.val}"><div class="mix-val">${c.val}%</div></div>`).join('');
+  el.querySelectorAll('.mix-slider').forEach(s=>s.addEventListener('input',e=>{
+    e.target.nextElementSibling.textContent=e.target.value+'%';
+    mixerGains[e.target.dataset.ch]=e.target.value/100;
+  }));
+}
+
+// === NAV PLANNER ===
+const npCanvas=document.getElementById('navplan-canvas');
+const npCtx=npCanvas.getContext('2d');
+const navWaypoints=[
+  {name:'Artemis',x:.48,y:.48,current:true},{name:'Kepler-442b',x:.3,y:.35},
+  {name:'Proxima Cen',x:.55,y:.25},{name:'Trappist-1',x:.7,y:.45},
+  {name:'Wolf 1061',x:.45,y:.65},{name:'Ross 128',x:.2,y:.6},
+  {name:'HD 40307',x:.8,y:.3},{name:'Gliese 667',x:.65,y:.7},
+  {name:'Waypoint Echo',x:.38,y:.42},
+];
+let navRoute=[];
+function drawNavPlan(){
+  const w=npCanvas.width=npCanvas.offsetWidth*2||800,h=npCanvas.height=npCanvas.offsetHeight*2||600;
+  npCtx.fillStyle='rgba(4,8,12,.95)';npCtx.fillRect(0,0,w,h);
+  npCtx.strokeStyle='rgba(94,196,212,.04)';npCtx.lineWidth=1;
+  for(let i=0;i<20;i++){const x=i/20*w;npCtx.beginPath();npCtx.moveTo(x,0);npCtx.lineTo(x,h);npCtx.stroke()}
+  for(let i=0;i<15;i++){const y=i/15*h;npCtx.beginPath();npCtx.moveTo(0,y);npCtx.lineTo(w,y);npCtx.stroke()}
+  // Route
+  if(navRoute.length>1){
+    npCtx.strokeStyle='rgba(212,160,60,.3)';npCtx.lineWidth=2;npCtx.setLineDash([8,6]);npCtx.beginPath();
+    navRoute.forEach((idx,i)=>{const wp=navWaypoints[idx];i===0?npCtx.moveTo(wp.x*w,wp.y*h):npCtx.lineTo(wp.x*w,wp.y*h)});
+    npCtx.stroke();npCtx.setLineDash([]);
+  }
+  // Waypoints
+  navWaypoints.forEach((wp,i)=>{
+    const wx=wp.x*w,wy=wp.y*h,sel=navRoute.includes(i);
+    npCtx.fillStyle=wp.current?'rgba(94,196,212,.9)':sel?'rgba(212,160,60,.8)':'rgba(94,196,212,.4)';
+    npCtx.beginPath();npCtx.arc(wx,wy,wp.current?6:sel?5:3.5,0,6.283);npCtx.fill();
+    if(wp.current){npCtx.strokeStyle='rgba(94,196,212,.25)';npCtx.lineWidth=1;npCtx.beginPath();npCtx.arc(wx,wy,14,0,6.283);npCtx.stroke()}
+    npCtx.fillStyle=wp.current?'#5ec4d4':sel?'#d4a03c':'rgba(94,196,212,.4)';
+    npCtx.font=`${Math.max(10,w*.013)}px 'Courier New'`;npCtx.fillText(wp.name,wx+10,wy+4);
+  });
+  // Info
+  if(navRoute.length>1){
+    let totalDist=0;
+    for(let i=1;i<navRoute.length;i++){const a=navWaypoints[navRoute[i-1]],b=navWaypoints[navRoute[i]];totalDist+=Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2)*40}
+    document.getElementById('navplan-info').innerHTML=`Route: ${navRoute.length} waypoints — Est. distance: ${totalDist.toFixed(1)} ly — Est. fuel cost: ${(totalDist*2.3).toFixed(0)}% — <span style="color:#d4a03c">⚠ ${totalDist>15?'Exceeds single-tank range':'Route feasible'}</span>`;
+  }
+}
+npCanvas.addEventListener('click',e=>{
+  const rect=npCanvas.getBoundingClientRect();
+  const mx=(e.clientX-rect.left)/rect.width,my=(e.clientY-rect.top)/rect.height;
+  let closest=-1,closestD=Infinity;
+  navWaypoints.forEach((wp,i)=>{const d=Math.sqrt((wp.x-mx)**2+(wp.y-my)**2);if(d<.05&&d<closestD){closestD=d;closest=i}});
+  if(closest>=0){
+    const idx=navRoute.indexOf(closest);
+    if(idx>=0)navRoute.splice(idx,1);else navRoute.push(closest);
+    drawNavPlan();if(engaged)clickSound();
+  }
+});
+
+// === EXTERIOR CAMERAS ===
+const camStars=[[],[],[],[]];
+function initCameras(){
+  for(let c=0;c<4;c++){
+    camStars[c]=[];
+    for(let i=0;i<80;i++)camStars[c].push({x:Math.random(),y:Math.random(),s:.3+Math.random()*1.5,b:.3+Math.random()*.7});
+  }
+}
+initCameras();
+const camDirs=[{dx:0,dy:-.0003},{dx:-.0004,dy:0},{dx:.0004,dy:0},{dx:0,dy:.0003}];
+function drawCameras(){
+  if(activeScreen!=='cameras')return;
+  document.querySelectorAll('.cam-feed canvas').forEach((cv,i)=>{
+    if(!cv.width)cv.width=320;if(!cv.height)cv.height=200;
+    const cx=cv.getContext('2d');cx.fillStyle='rgba(0,0,0,.15)';cx.fillRect(0,0,cv.width,cv.height);
+    const d=camDirs[i];
+    camStars[i].forEach(s=>{
+      s.x+=d.dx;s.y+=d.dy;
+      if(s.x<0)s.x=1;if(s.x>1)s.x=0;if(s.y<0)s.y=1;if(s.y>1)s.y=0;
+      cx.fillStyle=`rgba(220,235,255,${s.b})`;
+      cx.beginPath();cx.arc(s.x*cv.width,s.y*cv.height,s.s,0,6.283);cx.fill();
+    });
+    // Occasional static on cam 4
+    if(i===3&&Math.random()<.03){
+      cx.fillStyle='rgba(255,255,255,.04)';
+      for(let j=0;j<5;j++){cx.fillRect(0,Math.random()*cv.height,cv.width,2)}
+    }
+  });
+  requestAnimationFrame(drawCameras);
+}
+
+// === PIP (Aft Camera) ===
+const pipCanvas=document.getElementById('pip-canvas');
+const pipCtx=pipCanvas.getContext('2d');
+const pipStars=[];
+for(let i=0;i<100;i++)pipStars.push({x:Math.random(),y:Math.random(),s:.3+Math.random()*1.5,b:.3+Math.random()*.7});
+document.getElementById('pip-close').addEventListener('click',()=>{
+  document.getElementById('pip').classList.remove('show');
+  document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='pip')b.classList.remove('active')});
+});
+// PIP drag
+(function(){
+  const pip=document.getElementById('pip');let dx=0,dy=0,dragging=false;
+  pip.addEventListener('mousedown',e=>{if(e.target.tagName==='BUTTON')return;dragging=true;dx=e.clientX-pip.offsetLeft;dy=e.clientY-pip.offsetTop;e.preventDefault()});
+  addEventListener('mousemove',e=>{if(!dragging)return;pip.style.left=(e.clientX-dx)+'px';pip.style.top=(e.clientY-dy)+'px';pip.style.bottom='auto';pip.style.right='auto'});
+  addEventListener('mouseup',()=>dragging=false);
+})();
+function drawPIP(){
+  if(!document.getElementById('pip').classList.contains('show')){requestAnimationFrame(drawPIP);return}
+  pipCanvas.width=pipCanvas.offsetWidth||200;pipCanvas.height=pipCanvas.offsetHeight||125;
+  pipCtx.fillStyle='rgba(0,0,0,.2)';pipCtx.fillRect(0,0,pipCanvas.width,pipCanvas.height);
+  pipStars.forEach(s=>{
+    s.y+=.0004;if(s.y>1)s.y=0;
+    pipCtx.fillStyle=`rgba(220,235,255,${s.b})`;
+    pipCtx.beginPath();pipCtx.arc(s.x*pipCanvas.width,s.y*pipCanvas.height,s.s,0,6.283);pipCtx.fill();
+  });
+  requestAnimationFrame(drawPIP);
+}
+drawPIP();
+
+// === AI TERMINAL ===
+document.getElementById('ai-close').addEventListener('click',()=>{
+  document.getElementById('ai-terminal').classList.remove('show');
+  document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='ai')b.classList.remove('active')});
+});
+const aiResponses={
+  status:()=>`All systems operational. Shields ${Math.round(shieldsVal)}%. O₂ ${Math.round(o2Val)}%. Reactor nominal. Starboard thruster: intermittent.`,
+  scan:()=>`Long-range scan complete. ${spaceObjects.length} objects detected. No hostile contacts. Baryonic readings within expected range.`,
+  crew:()=>`6 crew aboard. 5 active, 1 in cryo (Sgt. Mensah — scheduled wake in 14d). All vitals nominal.`,
+  eta:()=>`Current velocity: ${hudSpeed.toFixed(4)}c. Distance remaining: ${distVal.toFixed(3)} ly. Estimated arrival: ${Math.round(distVal/.0042*365).toLocaleString()} days.`,
+  fuel:()=>`Fuel cell at ${hudFuel.toFixed(1)}%. Current burn rate nominal. Estimated range: ${(hudFuel*1.2).toFixed(0)} days at present throttle.`,
+  help:()=>'Available commands: status, scan, crew, eta, fuel, shields, heading, log, hello, help.',
+  shields:()=>`Shield array at ${Math.round(shieldsVal)}%. Forward deflectors online. Minor variance in port-side emitter — within tolerance.`,
+  heading:()=>`Current heading: ${hudHeading.toFixed(1)}°. Bearing to Kepler-442: 274.8°. Drift: ${driftVal.toFixed(3)}°.`,
+  log:()=>'Captain\'s log is being recorded. '+commsLog.length+' comms entries logged this session.',
+  hello:()=>'Hello, Captain. How can I assist you today?',
+};
+function aiCommand(cmd){
+  const log=document.getElementById('ai-log');
+  log.innerHTML+=`<div class="ai-cmd">› ${cmd}</div>`;
+  const key=cmd.toLowerCase().trim().split(' ')[0];
+  const resp=aiResponses[key];
+  const text=resp?resp():`Unknown command: "${cmd}". Type "help" for available commands.`;
+  // Typewriter effect
+  const div=document.createElement('div');div.className='ai-resp';log.appendChild(div);
+  let i=0;const type=()=>{if(i<text.length){div.textContent+=text[i];i++;log.scrollTop=log.scrollHeight;setTimeout(type,15)}};type();
+  log.scrollTop=log.scrollHeight;
+}
+document.getElementById('ai-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){aiCommand(e.target.value);e.target.value='';if(engaged)clickSound()}
+  e.stopPropagation();
+});
+
+// === FUEL GRAPH ===
+const fgCanvas=document.getElementById('fg-canvas');
+const fgCtx=fgCanvas.getContext('2d');
+const fuelHistory=[];
+setInterval(()=>{fuelHistory.push(hudFuel);if(fuelHistory.length>100)fuelHistory.shift()},3000);
+function drawFuelGraph(){
+  if(!document.getElementById('fuel-graph').classList.contains('show')){requestAnimationFrame(drawFuelGraph);return}
+  const w=fgCanvas.width,h=fgCanvas.height;
+  fgCtx.fillStyle='rgba(4,8,12,.3)';fgCtx.fillRect(0,0,w,h);
+  fgCtx.strokeStyle='rgba(94,196,212,.06)';fgCtx.lineWidth=.5;
+  for(let y=0;y<h;y+=14){fgCtx.beginPath();fgCtx.moveTo(0,y);fgCtx.lineTo(w,y);fgCtx.stroke()}
+  if(fuelHistory.length>1){
+    fgCtx.strokeStyle='rgba(46,204,113,.5)';fgCtx.lineWidth=1.5;fgCtx.beginPath();
+    fuelHistory.forEach((v,i)=>{const x=i/100*w,y=h-(v-50)/55*h;i===0?fgCtx.moveTo(x,y):fgCtx.lineTo(x,y)});
+    fgCtx.stroke();
+  }
+  requestAnimationFrame(drawFuelGraph);
+}
+drawFuelGraph();
+
+// Hook comms logging into existing radio
+const origScheduleRadio=scheduleRadio;
+
+// RENDER
+let t=0;
+function draw(now){
+  t=now*.001;
+  ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+
+  // Pan rubber-band interpolation
+  panX+=(panTargetX-panX)*.05;
+  panY+=(panTargetY-panY)*.05;
+  // Update heading from pan offset
+  const panHeadingOffset=panX*.05;
+
+  for(const n of nebulae){
+    n.x+=n.drift;n.y+=n.driftY;
+    if(n.x<-.2)n.x=1.2;if(n.x>1.2)n.x=-.2;if(n.y<-.1)n.y=1.1;if(n.y>1.1)n.y=-.1;
+    const nx=n.x*W+panX*.3,ny=n.y*H+panY*.3;
+    const g=ctx.createRadialGradient(nx,ny,0,nx,ny,n.r);
+    g.addColorStop(0,`hsla(${n.hue},60%,30%,.06)`);g.addColorStop(.5,`hsla(${n.hue},50%,20%,.03)`);g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+    // Nebula lightning — occasional flash
+    if(Math.random()<.002){
+      const lg=ctx.createRadialGradient(nx,ny,0,nx,ny,n.r*.6);
+      lg.addColorStop(0,`hsla(${n.hue},80%,60%,.12)`);lg.addColorStop(.5,`hsla(${n.hue},60%,40%,.04)`);lg.addColorStop(1,'transparent');
+      ctx.fillStyle=lg;ctx.fillRect(0,0,W,H);
+    }
+  }
+
+  // Space objects
+  const cx=W/2+panX,cy=H/2+panY;
+  for(let i=spaceObjects.length-1;i>=0;i--){
+    const o=spaceObjects[i];
+    o.z-=.0004;
+    if(o.kind==='planet')o.x+=o.drift;
+    if(o.z<=.01||o.z>1){spaceObjects.splice(i,1);continue}
+    const invZ=1/o.z;
+    const ox=cx+o.x*invZ*(W/2);
+    const oy=cy+o.y*invZ*(H/2);
+    if(ox<-100||ox>W+100||oy<-100||oy>H+100){spaceObjects.splice(i,1);continue}
+    const sc=(1-o.z)*invZ;
+
+    // Feed radar blips
+    if(o.z<.8&&Math.random()<.01){
+      radarBlips.push({bx:o.x*.4,by:o.y*.4,life:1});
+    }
+
+    if(o.kind==='asteroid'){
+      o.rot+=o.rotSpeed*.016;
+      ctx.save();ctx.translate(ox,oy);ctx.rotate(o.rot);
+      ctx.fillStyle=`rgba(100,90,80,${Math.min(1,(1-o.z)*2)})`;
+      ctx.beginPath();
+      const pts=o.verts;
+      for(let j=0;j<pts.length;j++){
+        const px=Math.cos(pts[j].a)*pts[j].r*o.size*sc;
+        const py=Math.sin(pts[j].a)*pts[j].r*o.size*sc;
+        j===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+      }
+      ctx.closePath();ctx.fill();ctx.restore();
+      if(o.z<.15){const dd=Math.sqrt((ox-cx)*(ox-cx)+(oy-cy)*(oy-cy));if(dd<W*.25)triggerProxAlert()}
+    } else if(o.kind==='ship'){
+      const blink=Math.sin(t*2+o.blinkPhase)>.3;
+      const sa=Math.min(1,(1-o.z)*2);
+      ctx.fillStyle=`rgba(150,160,170,${sa*.5})`;
+      ctx.fillRect(ox-3*sc,oy-1*sc,6*sc,2*sc);
+      if(blink){
+        ctx.fillStyle=`rgba(255,60,60,${sa})`;ctx.beginPath();ctx.arc(ox-3*sc,oy,1.2*sc,0,6.283);ctx.fill();
+        ctx.fillStyle=`rgba(60,255,60,${sa})`;ctx.beginPath();ctx.arc(ox+3*sc,oy,1.2*sc,0,6.283);ctx.fill();
+      }
+    } else if(o.kind==='planet'){
+      const r=o.size*(1-o.z)*.8;
+      const pa=Math.min(.3,(1-o.z)*.5);
+      const pg=ctx.createRadialGradient(ox-r*.3,oy-r*.3,0,ox,oy,r);
+      pg.addColorStop(0,`hsla(${o.hue},40%,35%,${pa})`);
+      pg.addColorStop(.7,`hsla(${o.hue},30%,20%,${pa*.7})`);
+      pg.addColorStop(1,`hsla(${o.hue},20%,10%,0)`);
+      ctx.fillStyle=pg;ctx.beginPath();ctx.arc(ox,oy,r,0,6.283);ctx.fill();
+    }
+  }
+
+  // Comet
+  if(comet){
+    comet.x+=comet.vx;comet.y+=comet.vy;
+    if(comet.x<-.2||comet.x>1.2){comet=null}
+    else{
+      const comX=comet.x*W+panX*.5,comY=comet.y*H+panY*.5;
+      // Tail
+      const tailGrad=ctx.createLinearGradient(comX,comY,comX-comet.vx*comet.tailLen*2000,comY);
+      tailGrad.addColorStop(0,`hsla(${comet.hue},60%,70%,${comet.brightness*.4})`);
+      tailGrad.addColorStop(.3,`hsla(${comet.hue},50%,50%,${comet.brightness*.15})`);
+      tailGrad.addColorStop(1,'transparent');
+      ctx.strokeStyle=tailGrad;ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(comX,comY);
+      ctx.lineTo(comX-comet.vx*comet.tailLen*2000,comY-comet.vy*comet.tailLen*500);
+      ctx.stroke();
+      // Secondary diffuse tail
+      ctx.strokeStyle=`hsla(${comet.hue},40%,60%,${comet.brightness*.06})`;ctx.lineWidth=6;
+      ctx.beginPath();ctx.moveTo(comX,comY);
+      ctx.lineTo(comX-comet.vx*comet.tailLen*1500,comY-comet.vy*comet.tailLen*800+3);
+      ctx.stroke();
+      // Head glow
+      const headGrad=ctx.createRadialGradient(comX,comY,0,comX,comY,8);
+      headGrad.addColorStop(0,`hsla(${comet.hue},60%,80%,${comet.brightness*.7})`);
+      headGrad.addColorStop(.5,`hsla(${comet.hue},50%,50%,${comet.brightness*.2})`);
+      headGrad.addColorStop(1,'transparent');
+      ctx.fillStyle=headGrad;ctx.beginPath();ctx.arc(comX,comY,8,0,6.283);ctx.fill();
+      // Core
+      ctx.fillStyle=`hsla(0,0%,100%,${comet.brightness*.8})`;
+      ctx.beginPath();ctx.arc(comX,comY,1.5,0,6.283);ctx.fill();
+    }
+  }
+
+  // Stars
+  const wt=warping?1:0;warpT+=(wt-warpT)*.02;
+  const speed=(.001+throttle*.005+warpT*.04);
+  activeDensity+=(densityTarget-activeDensity)*.001;
+  const activeCount=Math.round(activeDensity);
+  let flareTarget=0;
+  for(let si=0;si<stars.length;si++){
+    const s=stars[si];
+    s.z-=speed;
+    if(s.z<=.001){s.z=1;s.x=(Math.random()-.5)*2;s.y=(Math.random()-.5)*2}
+    if(si>=activeCount)continue;
+    const invZ=1/s.z;
+    const sx=cx+s.x*invZ*(W/2);
+    const sy=cy+s.y*invZ*(H/2);
+    if(sx<-50||sx>W+50||sy<-50||sy>H+50){s.z=1;s.x=(Math.random()-.5)*2;s.y=(Math.random()-.5)*2;continue}
+    const sz=Math.max(.3,(1-s.z)*2.5);
+    const fl=.7+.3*Math.sin(t*s.flickerSpeed+s.flicker);
+    const a=Math.min(1,(1-s.z)*1.3)*fl;
+    if(warpT>.05){
+      const pz=Math.min(1,s.z+speed*6);
+      const pinvZ=1/pz;
+      const px=cx+s.x*pinvZ*(W/2);
+      const py=cy+s.y*pinvZ*(H/2);
+      ctx.strokeStyle=`rgba(180,220,255,${a*.4})`;ctx.lineWidth=sz*.5;
+      ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(sx,sy);ctx.stroke();
+    }
+    ctx.fillStyle=`rgba(${s.color},${a})`;
+    ctx.beginPath();ctx.arc(sx,sy,sz,0,6.283);ctx.fill();
+
+    if(sz>1.8&&a>.7){
+      const dx=sx-cx,dy=sy-cy,dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<W*.15){
+        const intensity=(1-dist/(W*.15))*a*.8;
+        if(intensity>flareTarget){flareTarget=intensity;flareEl.style.left=(sx-60)+'px';flareEl.style.top=(sy-60)+'px'}
+      }
+    }
+  }
+  flareOpacity+=(flareTarget-flareOpacity)*.08;
+  flareEl.style.opacity=flareOpacity;
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>
