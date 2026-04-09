@@ -64,8 +64,27 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .right-readout .r-val.green-val{color:#2ecc71}
 
 /* === STATUS GRID === */
-.status-grid{position:fixed;top:clamp(14px,2.2vh,26px);right:clamp(50px,7vw,110px);z-index:5;display:grid;grid-template-columns:auto auto;gap:2px clamp(8px,1vw,14px)}
-.sg-name{font-size:clamp(6px,.6vw,8px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;text-align:right;padding:2px 0}
+.status-grid{position:fixed;top:clamp(14px,2.2vh,26px);right:clamp(50px,7vw,110px);z-index:5;display:flex;flex-direction:column;gap:2px;pointer-events:auto}
+.sg-row{display:flex;gap:clamp(8px,1vw,14px);cursor:pointer;padding:1px 4px;border-radius:2px;transition:background .2s}
+.sg-row:hover{background:rgba(94,196,212,.05)}
+.sg-name{font-size:clamp(6px,.6vw,8px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;text-align:right;padding:2px 0;min-width:clamp(60px,7vw,100px);transition:color .2s}
+.sg-row:hover .sg-name{color:#5ec4d4}
+
+/* Status detail popup */
+#sg-popup{position:fixed;z-index:16;display:none;width:clamp(240px,22vw,320px);background:rgba(6,10,14,.95);border:1px solid rgba(94,196,212,.15);border-radius:4px;pointer-events:auto}
+#sg-popup.show{display:block}
+.sgp-header{padding:8px 12px;border-bottom:1px solid rgba(94,196,212,.06);display:flex;justify-content:space-between;align-items:center}
+.sgp-header .sgp-title{font-size:clamp(9px,.85vw,12px);color:#5ec4d4;letter-spacing:2px;text-transform:uppercase}
+.sgp-header .sgp-close{background:none;border:none;color:#3a6a7a;cursor:pointer;font-size:12px}
+.sgp-body{padding:10px 12px}
+.sgp-row{display:flex;justify-content:space-between;margin-bottom:5px;font-size:clamp(7px,.65vw,9px)}
+.sgp-row .sgp-label{color:#2a4a5a;letter-spacing:1px}
+.sgp-row .sgp-val{color:#5ec4d4}
+.sgp-row .sgp-val.ok{color:#2ecc71}
+.sgp-row .sgp-val.warn{color:#d4a03c}
+.sgp-row .sgp-val.crit{color:#e74c3c}
+.sgp-graph{width:100%;height:36px;border:1px solid rgba(94,196,212,.06);border-radius:2px;margin-top:8px;background:rgba(4,8,12,.5)}
+.sgp-graph-label{font-size:clamp(5px,.45vw,7px);color:#2a4a5a;letter-spacing:1px;margin-top:3px;text-align:center}
 .sg-status{font-size:clamp(7px,.65vw,9px);letter-spacing:1px;padding:2px 0;display:flex;align-items:center;gap:4px}
 .sg-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 .sg-dot.ok{background:#2ecc71;box-shadow:0 0 4px rgba(46,204,113,.4)}
@@ -577,16 +596,19 @@ canvas#c{position:fixed;inset:0;z-index:0}
 </div>
 
 <!-- STATUS GRID -->
-<div class="status-grid">
-  <div class="sg-name">Life Support</div><div class="sg-status"><div class="sg-dot ok" id="sg-life-dot"></div><span style="color:#2ecc71" id="sg-life">Nominal</span></div>
-  <div class="sg-name">FTL Drive</div><div class="sg-status"><div class="sg-dot ok" id="sg-ftl-dot"></div><span id="sg-ftl" style="color:#2ecc71">Standby</span></div>
-  <div class="sg-name">Port Thruster</div><div class="sg-status"><div class="sg-dot ok"></div><span style="color:#2ecc71">Online</span></div>
-  <div class="sg-name">Stbd Thruster</div><div class="sg-status"><div class="sg-dot warn" id="sg-stbd-dot"></div><span id="sg-stbd" style="color:#d4a03c">Degraded</span></div>
-  <div class="sg-name">Sensors</div><div class="sg-status"><div class="sg-dot ok" id="sg-sens-dot"></div><span style="color:#2ecc71" id="sg-sens">Active</span></div>
-  <div class="sg-name">Comms Array</div><div class="sg-status"><div class="sg-dot ok" id="sg-comms-dot"></div><span style="color:#2ecc71" id="sg-comms">Linked</span></div>
-  <div class="sg-name">Deflectors</div><div class="sg-status"><div class="sg-dot ok" id="sg-defl-dot"></div><span style="color:#2ecc71" id="sg-defl">Online</span></div>
-  <div class="sg-name">Coolant</div><div class="sg-status"><div class="sg-dot warn" id="sg-cool-dot"></div><span id="sg-cool" style="color:#d4a03c">Low Press</span></div>
+<div class="status-grid" id="status-grid">
+  <div class="sg-row" data-sys="life"><div class="sg-name">Life Support</div><div class="sg-status"><div class="sg-dot ok" id="sg-life-dot"></div><span style="color:#2ecc71" id="sg-life">Nominal</span></div></div>
+  <div class="sg-row" data-sys="ftl"><div class="sg-name">FTL Drive</div><div class="sg-status"><div class="sg-dot ok" id="sg-ftl-dot"></div><span id="sg-ftl" style="color:#2ecc71">Standby</span></div></div>
+  <div class="sg-row" data-sys="port"><div class="sg-name">Port Thruster</div><div class="sg-status"><div class="sg-dot ok" id="sg-port-dot"></div><span style="color:#2ecc71" id="sg-port">Online</span></div></div>
+  <div class="sg-row" data-sys="stbd"><div class="sg-name">Stbd Thruster</div><div class="sg-status"><div class="sg-dot warn" id="sg-stbd-dot"></div><span id="sg-stbd" style="color:#d4a03c">Degraded</span></div></div>
+  <div class="sg-row" data-sys="sens"><div class="sg-name">Sensors</div><div class="sg-status"><div class="sg-dot ok" id="sg-sens-dot"></div><span style="color:#2ecc71" id="sg-sens">Active</span></div></div>
+  <div class="sg-row" data-sys="comms"><div class="sg-name">Comms Array</div><div class="sg-status"><div class="sg-dot ok" id="sg-comms-dot"></div><span style="color:#2ecc71" id="sg-comms">Linked</span></div></div>
+  <div class="sg-row" data-sys="defl"><div class="sg-name">Deflectors</div><div class="sg-status"><div class="sg-dot ok" id="sg-defl-dot"></div><span style="color:#2ecc71" id="sg-defl">Online</span></div></div>
+  <div class="sg-row" data-sys="cool"><div class="sg-name">Coolant</div><div class="sg-status"><div class="sg-dot warn" id="sg-cool-dot"></div><span id="sg-cool" style="color:#d4a03c">Low Press</span></div></div>
 </div>
+
+<!-- Status Detail Popup -->
+<div id="sg-popup"><div class="sgp-header"><div class="sgp-title" id="sgp-title"></div><button class="sgp-close" id="sgp-close">×</button></div><div class="sgp-body" id="sgp-body"></div></div>
 
 <!-- NAV COMPASS -->
 <div class="nav-compass">
@@ -936,6 +958,121 @@ setInterval(()=>{
   if(Math.random()>.5){d.className='sg-dot ok';t.style.color='#2ecc71';t.textContent='Nominal'}
   else{d.className='sg-dot warn';t.style.color='#d4a03c';t.textContent='Low Press'}
 },12000);
+
+// === STATUS GRID POPUP ===
+const sgSpecs={
+  life:{name:'Life Support System',model:'Meridian LS-400',installed:'Day 0',specs:[
+    {l:'O₂ Generator',v:()=>Math.round(o2Val)+'%',s:()=>o2Val>80?'ok':o2Val>70?'warn':'crit'},
+    {l:'CO₂ Scrubber',v:()=>'98.2%',s:()=>'ok'},
+    {l:'Humidity Control',v:()=>'45%',s:()=>'ok'},
+    {l:'Temp Regulation',v:()=>'21.4°C',s:()=>'ok'},
+  ]},
+  ftl:{name:'FTL Drive',model:'Alcubierre-Tanaka Mk IV',installed:'Day 0',specs:[
+    {l:'Drive Status',v:()=>warping?'Engaged':'Standby',s:()=>warping?'ok':'ok'},
+    {l:'Field Integrity',v:()=>'99.8%',s:()=>'ok'},
+    {l:'Coolant Temp',v:()=>'4.2K',s:()=>'ok'},
+    {l:'Capacitor Bank',v:()=>'100%',s:()=>'ok'},
+  ]},
+  port:{name:'Port Thruster Assembly',model:'Nakamura T-12',installed:'Day 0',specs:[
+    {l:'Gimbal Range',v:()=>'±15°',s:()=>'ok'},
+    {l:'Fuel Injector',v:()=>'Nominal',s:()=>'ok'},
+    {l:'Thrust Output',v:()=>'100%',s:()=>'ok'},
+    {l:'Nozzle Temp',v:()=>'1,240°C',s:()=>'ok'},
+  ]},
+  stbd:{name:'Starboard Thruster Assembly',model:'Nakamura T-12',installed:'Day 0',specs:[
+    {l:'Gimbal Range',v:()=>'±12° (limited)',s:()=>'warn'},
+    {l:'Fuel Injector',v:()=>'Intermittent',s:()=>'warn'},
+    {l:'Thrust Output',v:()=>'84%',s:()=>'warn'},
+    {l:'Nozzle Temp',v:()=>'1,180°C',s:()=>'ok'},
+  ]},
+  sens:{name:'Sensor Array',model:'Vanguard SA-7',installed:'Day 0',specs:[
+    {l:'Long Range',v:()=>'15 ly',s:()=>'ok'},
+    {l:'Resolution',v:()=>'0.02 arcsec',s:()=>'ok'},
+    {l:'Spectral Bands',v:()=>'All Active',s:()=>'ok'},
+    {l:'Data Throughput',v:()=>'4.2 Gbps',s:()=>'ok'},
+  ]},
+  comms:{name:'Communications Array',model:'Orion SubCom III',installed:'Day 0',specs:[
+    {l:'Subspace Link',v:()=>'Active',s:()=>'ok'},
+    {l:'Signal Strength',v:()=>'Strong',s:()=>'ok'},
+    {l:'Encryption',v:()=>'AES-4096',s:()=>'ok'},
+    {l:'Bandwidth',v:()=>'12 Mbps',s:()=>'ok'},
+  ]},
+  defl:{name:'Deflector Grid',model:'Aegis DF-200',installed:'Day 0',specs:[
+    {l:'Coverage',v:()=>Math.round(shieldsVal)+'%',s:()=>shieldsVal>85?'ok':shieldsVal>70?'warn':'crit'},
+    {l:'Emitter Power',v:()=>'Nominal',s:()=>'ok'},
+    {l:'Particle Disp.',v:()=>'98.4%',s:()=>'ok'},
+    {l:'Frequency',v:()=>'42.7 GHz',s:()=>'ok'},
+  ]},
+  cool:{name:'Coolant Loop',model:'Cryo-Flow CL-8',installed:'Day 0',specs:[
+    {l:'Pressure',v:()=>hudPress.toFixed(2)+' bar',s:()=>hudPress>.9?'ok':hudPress>.6?'warn':'crit'},
+    {l:'Flow Rate',v:()=>hudPress>.9?'12.4 L/min':'8.1 L/min',s:()=>hudPress>.9?'ok':'warn'},
+    {l:'Coolant Temp',v:()=>'-12.3°C',s:()=>'ok'},
+    {l:'Loop Integrity',v:()=>hudPress>.9?'Sealed':'Minor Leak',s:()=>hudPress>.9?'ok':'warn'},
+  ]},
+};
+const sgHistory={};// performance history per system
+Object.keys(sgSpecs).forEach(k=>{sgHistory[k]=[]});
+setInterval(()=>{
+  Object.keys(sgSpecs).forEach(k=>{
+    const specs=sgSpecs[k].specs;
+    const score=specs.filter(s=>s.s()==='ok').length/specs.length*100;
+    sgHistory[k].push(score);
+    if(sgHistory[k].length>40)sgHistory[k].shift();
+  });
+},3000);
+
+const sgPopup=document.getElementById('sg-popup');
+document.getElementById('sgp-close').addEventListener('click',()=>{sgPopup.classList.remove('show');if(engaged)clickSound()});
+
+document.querySelectorAll('.sg-row').forEach(row=>{
+  row.addEventListener('click',()=>{
+    const sysId=row.dataset.sys;
+    const spec=sgSpecs[sysId];
+    if(!spec)return;
+    const elapsed=Date.now()-missionStart;const ms=elapsed*100;const days=Math.floor(ms/1000/86400);
+    const uptime=sgHistory[sysId].length?sgHistory[sysId].reduce((a,b)=>a+b,0)/sgHistory[sysId].length:100;
+    // Position popup near the grid
+    const rect=row.getBoundingClientRect();
+    sgPopup.style.right=(innerWidth-rect.left+12)+'px';
+    sgPopup.style.top=Math.max(10,rect.top)+'px';
+    sgPopup.style.left='auto';
+    sgPopup.style.bottom='auto';
+
+    document.getElementById('sgp-title').textContent=spec.name;
+    let html='';
+    html+=`<div class="sgp-row"><span class="sgp-label">Model</span><span class="sgp-val">${spec.model}</span></div>`;
+    html+=`<div class="sgp-row"><span class="sgp-label">Installed</span><span class="sgp-val">${spec.installed}</span></div>`;
+    html+=`<div class="sgp-row"><span class="sgp-label">Uptime</span><span class="sgp-val ${uptime>90?'ok':uptime>70?'warn':'crit'}">${uptime.toFixed(1)}%</span></div>`;
+    html+=`<div class="sgp-row"><span class="sgp-label">Mission Day</span><span class="sgp-val">${days}</span></div>`;
+    html+='<div style="border-top:1px solid rgba(94,196,212,.06);margin:6px 0"></div>';
+    spec.specs.forEach(s=>{
+      html+=`<div class="sgp-row"><span class="sgp-label">${s.l}</span><span class="sgp-val ${s.s()}">${s.v()}</span></div>`;
+    });
+    // Mini graph
+    html+=`<canvas class="sgp-graph" id="sgp-graph-cv" width="280" height="36"></canvas>`;
+    html+=`<div class="sgp-graph-label">Performance — Last ${sgHistory[sysId].length} samples</div>`;
+    document.getElementById('sgp-body').innerHTML=html;
+    sgPopup.classList.add('show');
+
+    // Draw graph
+    const cv=document.getElementById('sgp-graph-cv');
+    const cx=cv.getContext('2d');
+    const data=sgHistory[sysId];
+    cx.fillStyle='rgba(4,8,12,.5)';cx.fillRect(0,0,cv.width,cv.height);
+    cx.strokeStyle='rgba(94,196,212,.06)';cx.lineWidth=.5;
+    for(let y=0;y<cv.height;y+=9){cx.beginPath();cx.moveTo(0,y);cx.lineTo(cv.width,y);cx.stroke()}
+    if(data.length>1){
+      cx.strokeStyle='rgba(94,196,212,.6)';cx.lineWidth=1.5;cx.beginPath();
+      data.forEach((v,i)=>{const x=i/(data.length-1)*cv.width,y=cv.height-(v/100)*cv.height;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});
+      cx.stroke();
+      // Glow
+      cx.strokeStyle='rgba(94,196,212,.15)';cx.lineWidth=4;cx.beginPath();
+      data.forEach((v,i)=>{const x=i/(data.length-1)*cv.width,y=cv.height-(v/100)*cv.height;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});
+      cx.stroke();
+    }
+    if(engaged)clickSound();
+  });
+});
 
 // Toggle buttons
 document.querySelectorAll('.side-btn').forEach(b=>b.addEventListener('click',()=>{
@@ -2237,10 +2374,17 @@ function scheduleMaintenance(){
 }
 scheduleMaintenance();
 
-// Dismiss notification (but problem persists)
+// Dismiss notification (re-shows after 20s if not repaired)
 document.getElementById('maint-dismiss').addEventListener('click',()=>{
   document.getElementById('maint-notif').classList.remove('show');
   if(engaged)clickSound();
+  if(activeMaint){
+    setTimeout(()=>{
+      if(!activeMaint)return;
+      const notif=document.getElementById('maint-notif');
+      notif.classList.add('show');
+    },20000);
+  }
 });
 
 // Open repair modal
