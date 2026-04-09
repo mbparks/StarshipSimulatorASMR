@@ -1799,6 +1799,7 @@ document.getElementById('nm-engage').addEventListener('click',()=>{
     engaged=true;
     document.getElementById('engage').classList.add('hidden');
     initAudio();
+    scheduleMaintenance();
   }
 });
 document.getElementById('ship-name-input').addEventListener('keydown',e=>{
@@ -3697,11 +3698,11 @@ const maintSystems=[
 let activeMaint=null,maintEscalateTimer=null,maintIgnoreCount=0;
 
 function scheduleMaintenance(){
-  const baseDelay=activeMaint?90000+Math.random()*90000:30000+Math.random()*30000;
+  const baseDelay=activeMaint?60000+Math.random()*60000:15000+Math.random()*15000;
   const delay=baseDelay*getDifficultyMultiplier('maintDelay');
   setTimeout(()=>{
-    if(!engaged){scheduleMaintenance();return} // wait for engage
-    if(activeMaint){scheduleMaintenance();return} // don't stack
+    if(!engaged){scheduleMaintenance();return}
+    if(activeMaint){scheduleMaintenance();return}
     const sys=maintSystems[Math.floor(Math.random()*maintSystems.length)];
     activeMaint={sys,level:'amber',time:Date.now()};
     // Set status to amber
@@ -3745,7 +3746,7 @@ function scheduleMaintenance(){
     scheduleMaintenance();
   },delay);
 }
-scheduleMaintenance();
+// scheduleMaintenance called from engage handler
 
 // Dismiss notification (re-shows after 20s if not repaired)
 document.getElementById('maint-dismiss').addEventListener('click',()=>{
