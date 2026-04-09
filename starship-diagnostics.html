@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USS Horizon NCC-2487 — Ship Diagnostics</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#0a0c14;
+  --panel:#0d1020;
+  --border:#1a2444;
+  --cyan:#00e5ff;
+  --cyan-dim:#00e5ff44;
+  --amber:#ffab00;
+  --amber-dim:#ffab0044;
+  --red:#ff1744;
+  --red-dim:#ff174444;
+  --green:#00e676;
+  --green-dim:#00e67644;
+  --blue:#448aff;
+  --text:#c0d0e8;
+  --text-dim:#5a6a8a;
+  --glow-cyan:0 0 20px #00e5ff66, 0 0 40px #00e5ff22;
+  --glow-amber:0 0 20px #ffab0066;
+  --glow-red:0 0 20px #ff174466;
+}
+
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;overflow:hidden}
+
+/* Scanline overlay */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);
+}
+
+.app{display:grid;grid-template-rows:56px 1fr 32px;height:100vh;gap:0}
+
+/* ── HEADER ── */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,#111628,var(--panel));
+}
+.header-left{display:flex;align-items:center;gap:14px}
+.ship-icon{width:32px;height:32px;fill:var(--cyan);filter:drop-shadow(var(--glow-cyan));animation:pulse-icon 3s ease-in-out infinite}
+@keyframes pulse-icon{0%,100%{opacity:1}50%{opacity:.6}}
+.header h1{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-transform:uppercase}
+.header h1 span{color:var(--text-dim);font-weight:400;font-size:11px;letter-spacing:2px;margin-left:8px}
+.header-right{display:flex;align-items:center;gap:20px;font-size:11px;letter-spacing:1px}
+.stardate{color:var(--amber)}
+.status-chip{padding:3px 10px;border-radius:2px;font-size:10px;letter-spacing:2px;text-transform:uppercase;animation:blink-chip 2s step-end infinite}
+.status-chip.green{background:var(--green-dim);color:var(--green);border:1px solid var(--green)}
+.status-chip.red{background:var(--red-dim);color:var(--red);border:1px solid var(--red)}
+.status-chip.amber{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber)}
+@keyframes blink-chip{0%,100%{opacity:1}50%{opacity:.7}}
+
+/* ── MAIN ── */
+.main{display:grid;grid-template-columns:220px 1fr 280px;gap:0;overflow:hidden}
+
+/* ── LEFT NAV ── */
+.nav{border-right:1px solid var(--border);padding:12px 0;display:flex;flex-direction:column;gap:2px;overflow-y:auto;background:var(--panel)}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;
+  font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);
+  border-left:3px solid transparent;transition:all .15s;
+}
+.nav-item:hover{color:var(--text);background:#ffffff06}
+.nav-item.active{color:var(--cyan);border-left-color:var(--cyan);background:#00e5ff08}
+.nav-item svg{width:16px;height:16px;fill:currentColor;flex-shrink:0}
+.nav-divider{height:1px;background:var(--border);margin:8px 16px}
+
+/* ── CENTER ── */
+.center{display:flex;flex-direction:column;overflow:hidden}
+
+/* Ship visualization */
+.ship-view{
+  flex:1;position:relative;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at center,#111a3a 0%,var(--bg) 70%);
+  overflow:hidden;
+}
+.ship-view .grid-bg{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(var(--border) 1px,transparent 1px),
+    linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:40px 40px;opacity:.3;
+}
+
+.ship-svg{width:80%;max-width:700px;height:auto;position:relative;z-index:1}
+.ship-svg .hull{fill:none;stroke:var(--cyan);stroke-width:1.5;filter:drop-shadow(var(--glow-cyan))}
+.ship-svg .hull-fill{fill:#00e5ff08}
+.ship-svg .detail{fill:none;stroke:var(--text-dim);stroke-width:.8}
+.ship-svg .engine-glow{fill:var(--cyan);opacity:.6;animation:engine-pulse 1.5s ease-in-out infinite}
+@keyframes engine-pulse{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* Hotspots */
+.hotspot{
+  position:absolute;z-index:5;cursor:pointer;
+}
+.hotspot .ring{
+  width:28px;height:28px;border-radius:50%;border:2px solid var(--cyan);
+  display:flex;align-items:center;justify-content:center;
+  background:#00e5ff11;transition:all .2s;
+}
+.hotspot:hover .ring{background:#00e5ff33;transform:scale(1.15)}
+.hotspot .ring::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--cyan);animation:hotspot-ping 2s ease-out infinite}
+@keyframes hotspot-ping{0%{transform:scale(1);opacity:1}100%{transform:scale(2.5);opacity:0}}
+.hotspot.warning .ring{border-color:var(--amber)}
+.hotspot.warning .ring::after{background:var(--amber)}
+.hotspot.critical .ring{border-color:var(--red)}
+.hotspot.critical .ring::after{background:var(--red)}
+.hotspot-label{
+  position:absolute;top:-22px;left:50%;transform:translateX(-50%);
+  font-size:9px;letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap;
+  color:var(--cyan);text-shadow:0 0 8px var(--cyan);
+}
+.hotspot.warning .hotspot-label{color:var(--amber);text-shadow:0 0 8px var(--amber)}
+.hotspot.critical .hotspot-label{color:var(--red);text-shadow:0 0 8px var(--red)}
+
+/* Bottom bar in center */
+.systems-bar{
+  display:flex;gap:1px;padding:1px;background:var(--border);flex-shrink:0;
+}
+.sys-cell{
+  flex:1;padding:8px 6px;text-align:center;font-size:9px;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;transition:all .15s;background:var(--panel);
+}
+.sys-cell:hover{background:#ffffff0a}
+.sys-cell.active{background:#00e5ff0d;color:var(--cyan)}
+.sys-cell .sys-val{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;margin-bottom:2px}
+.sys-cell .sys-val.green{color:var(--green)}
+.sys-cell .sys-val.amber{color:var(--amber)}
+.sys-cell .sys-val.red{color:var(--red)}
+.sys-cell .sys-val.cyan{color:var(--cyan)}
+
+/* ── RIGHT PANEL ── */
+.right{border-left:1px solid var(--border);display:flex;flex-direction:column;background:var(--panel);overflow:hidden}
+.right-header{
+  padding:12px 16px;border-bottom:1px solid var(--border);
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);
+}
+
+.detail-panel{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:12px}
+.detail-section{border:1px solid var(--border);border-radius:2px;overflow:hidden}
+.detail-section-head{
+  padding:8px 12px;background:#ffffff04;font-size:10px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.detail-section-body{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+
+.metric-row{display:flex;justify-content:space-between;align-items:center;font-size:11px}
+.metric-row .label{color:var(--text-dim)}
+.metric-row .value{font-family:'Orbitron',sans-serif;font-weight:500;font-size:12px}
+.metric-row .value.green{color:var(--green)}
+.metric-row .value.amber{color:var(--amber)}
+.metric-row .value.red{color:var(--red)}
+
+/* Bar gauge */
+.bar-gauge{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:2px}
+.bar-gauge-fill{height:100%;border-radius:2px;transition:width 1s ease}
+.bar-gauge-fill.green{background:linear-gradient(90deg,var(--green),#69f0ae)}
+.bar-gauge-fill.amber{background:linear-gradient(90deg,var(--amber),#ffd740)}
+.bar-gauge-fill.red{background:linear-gradient(90deg,var(--red),#ff5252)}
+.bar-gauge-fill.cyan{background:linear-gradient(90deg,var(--cyan),#80d8ff)}
+
+/* Log feed */
+.log-feed{flex-shrink:0;border-top:1px solid var(--border);height:160px;overflow-y:auto;padding:8px 16px}
+.log-entry{font-size:10px;line-height:1.7;display:flex;gap:8px}
+.log-entry .log-time{color:var(--text-dim);flex-shrink:0}
+.log-entry .log-tag{flex-shrink:0;font-size:9px;padding:0 4px;border-radius:1px;text-transform:uppercase;letter-spacing:1px}
+.log-entry .log-tag.info{color:var(--cyan);background:var(--cyan-dim)}
+.log-entry .log-tag.warn{color:var(--amber);background:var(--amber-dim)}
+.log-entry .log-tag.crit{color:var(--red);background:var(--red-dim)}
+.log-entry .log-tag.ok{color:var(--green);background:var(--green-dim)}
+.log-entry .log-msg{color:var(--text)}
+
+/* ── FOOTER ── */
+.footer{
+  display:flex;align-items:center;justify-content:space-between;padding:0 20px;
+  border-top:1px solid var(--border);font-size:10px;color:var(--text-dim);letter-spacing:1px;
+  background:var(--panel);
+}
+.footer-pulse{display:flex;align-items:center;gap:6px}
+.footer-pulse .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse-dot 1s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Animations */
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.detail-section{animation:fadeIn .3s ease both}
+.detail-section:nth-child(2){animation-delay:.05s}
+.detail-section:nth-child(3){animation-delay:.1s}
+.detail-section:nth-child(4){animation-delay:.15s}
+
+/* Tooltip */
+.tooltip{
+  position:absolute;z-index:100;padding:8px 14px;border-radius:2px;
+  background:#151b35ee;border:1px solid var(--cyan);backdrop-filter:blur(10px);
+  font-size:11px;color:var(--text);pointer-events:none;
+  box-shadow:var(--glow-cyan);white-space:nowrap;
+  animation:fadeIn .15s ease;
+}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <svg class="ship-icon" viewBox="0 0 32 32"><polygon points="16,2 28,28 16,22 4,28"/></svg>
+      <h1>Ship Diagnostics<span>USS Horizon NCC-2487</span></h1>
+    </div>
+    <div class="header-right">
+      <span class="stardate" id="stardate">SD 48721.3</span>
+      <span class="status-chip green" id="shipStatus">All Systems Nominal</span>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- LEFT NAV -->
+    <nav class="nav" id="nav">
+      <div class="nav-item active" data-panel="overview">
+        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+        Overview
+      </div>
+      <div class="nav-item" data-panel="propulsion">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zM17.9 17.39c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        Propulsion
+      </div>
+      <div class="nav-item" data-panel="shields">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+        Shields
+      </div>
+      <div class="nav-item" data-panel="weapons">
+        <svg viewBox="0 0 24 24"><path d="M7 5h10v2h2V3H5v4h2V5zm10 14H7v-2H5v4h14v-4h-2v2zM12 8l-4 4h3v4h2v-4h3l-4-4z"/></svg>
+        Weapons
+      </div>
+      <div class="nav-divider"></div>
+      <div class="nav-item" data-panel="lifesupport">
+        <svg viewBox="0 0 24 24"><path d="M19.8 18.4L14 10.67V6.5l1.35-1.69c.26-.33.03-.81-.39-.81H9.04c-.42 0-.65.48-.39.81L10 6.5v4.17L4.2 18.4c-.49.66-.02 1.6.8 1.6h14c.82 0 1.29-.94.8-1.6z"/></svg>
+        Life Support
+      </div>
+      <div class="nav-item" data-panel="comms">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10h5v-2h-5c-4.34 0-8-3.66-8-8s3.66-8 8-8 8 3.66 8 8v1.43c0 .79-.71 1.57-1.5 1.57s-1.5-.78-1.5-1.57V12c0-2.76-2.24-5-5-5s-5 2.24-5 5 2.24 5 5 5c1.38 0 2.64-.56 3.54-1.47.65.89 1.77 1.47 2.96 1.47 1.97 0 3.5-1.6 3.5-3.57V12c0-5.52-4.48-10-10-10zm0 13c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
+        Comms
+      </div>
+      <div class="nav-item" data-panel="power">
+        <svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+        Power Grid
+      </div>
+    </nav>
+
+    <!-- CENTER -->
+    <div class="center">
+      <div class="ship-view" id="shipView">
+        <div class="grid-bg"></div>
+        <!-- Top-down ship SVG -->
+        <svg class="ship-svg" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+          <!-- Saucer section -->
+          <ellipse class="hull-fill" cx="300" cy="150" rx="130" ry="70"/>
+          <ellipse class="hull" cx="300" cy="150" rx="130" ry="70"/>
+          <ellipse class="detail" cx="300" cy="150" rx="90" ry="45"/>
+          <ellipse class="detail" cx="300" cy="145" rx="30" ry="15"/>
+          <!-- Bridge -->
+          <circle cx="300" cy="140" r="8" fill="var(--cyan)" opacity=".5"/>
+          <!-- Neck -->
+          <rect class="hull-fill" x="288" y="218" width="24" height="50"/>
+          <line class="hull" x1="288" y1="218" x2="288" y2="268"/>
+          <line class="hull" x1="312" y1="218" x2="312" y2="268"/>
+          <!-- Engineering hull -->
+          <path class="hull-fill" d="M260,268 L340,268 L350,360 L250,360Z"/>
+          <path class="hull" d="M260,268 L340,268 L350,360 L250,360Z"/>
+          <line class="detail" x1="270" y1="290" x2="330" y2="290"/>
+          <line class="detail" x1="265" y1="320" x2="335" y2="320"/>
+          <!-- Nacelle pylons -->
+          <line class="hull" x1="260" y1="300" x2="150" y2="280"/>
+          <line class="hull" x1="340" y1="300" x2="450" y2="280"/>
+          <!-- Port nacelle -->
+          <rect class="hull-fill" x="115" y="250" width="40" height="80" rx="8"/>
+          <rect class="hull" x="115" y="250" width="40" height="80" rx="8"/>
+          <rect class="engine-glow" x="120" y="252" width="30" height="10" rx="4"/>
+          <!-- Starboard nacelle -->
+          <rect class="hull-fill" x="445" y="250" width="40" height="80" rx="8"/>
+          <rect class="hull" x="445" y="250" width="40" height="80" rx="8"/>
+          <rect class="engine-glow" x="450" y="252" width="30" height="10" rx="4"/>
+          <!-- Deflector -->
+          <ellipse cx="300" cy="362" rx="18" ry="6" fill="var(--amber)" opacity=".4"/>
+          <ellipse cx="300" cy="362" rx="18" ry="6" fill="none" stroke="var(--amber)" stroke-width="1"/>
+        </svg>
+
+        <!-- Interactive hotspots -->
+        <div class="hotspot" style="top:32%;left:49%" data-system="bridge" onclick="selectSystem('bridge')">
+          <span class="hotspot-label">Bridge</span><div class="ring"></div>
+        </div>
+        <div class="hotspot" style="top:55%;left:49%" data-system="engineering" onclick="selectSystem('engineering')">
+          <span class="hotspot-label">Main Eng.</span><div class="ring"></div>
+        </div>
+        <div class="hotspot warning" style="top:52%;left:24%" data-system="port-nacelle" onclick="selectSystem('port-nacelle')">
+          <span class="hotspot-label">Port Nacelle</span><div class="ring"></div>
+        </div>
+        <div class="hotspot" style="top:52%;left:74%" data-system="starboard-nacelle" onclick="selectSystem('starboard-nacelle')">
+          <span class="hotspot-label">Stbd Nacelle</span><div class="ring"></div>
+        </div>
+        <div class="hotspot" style="top:80%;left:49%" data-system="deflector" onclick="selectSystem('deflector')">
+          <span class="hotspot-label">Deflector</span><div class="ring"></div>
+        </div>
+        <div class="hotspot" style="top:27%;left:35%" data-system="saucer-port" onclick="selectSystem('saucer-port')">
+          <span class="hotspot-label">Phaser Bank A</span><div class="ring"></div>
+        </div>
+      </div>
+
+      <!-- Systems overview bar -->
+      <div class="systems-bar">
+        <div class="sys-cell active" onclick="selectNav('overview')">
+          <div class="sys-val cyan" id="hullVal">98%</div>Hull
+        </div>
+        <div class="sys-cell" onclick="selectNav('shields')">
+          <div class="sys-val green" id="shieldVal">100%</div>Shields
+        </div>
+        <div class="sys-cell" onclick="selectNav('propulsion')">
+          <div class="sys-val amber" id="warpVal">W6.2</div>Warp
+        </div>
+        <div class="sys-cell" onclick="selectNav('power')">
+          <div class="sys-val green" id="powerVal">94%</div>Power
+        </div>
+        <div class="sys-cell" onclick="selectNav('lifesupport')">
+          <div class="sys-val green" id="lifeVal">100%</div>Life Sup.
+        </div>
+        <div class="sys-cell" onclick="selectNav('comms')">
+          <div class="sys-val green" id="commsVal">OK</div>Comms
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right">
+      <div class="right-header" id="rightHeader">System Detail — Overview</div>
+      <div class="detail-panel" id="detailPanel"></div>
+      <div class="log-feed" id="logFeed"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-pulse"><div class="dot"></div> Diagnostic Link Active</div>
+    <span>LCARS Build 47.3.1 — Authorized Personnel Only</span>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───
+const systems = {
+  overview: {
+    title:'System Detail — Overview',
+    sections:[
+      {name:'Hull Integrity',tag:'NOMINAL',tagClass:'ok',metrics:[
+        {label:'Primary Hull',value:'99.2%',cls:'green',bar:99.2},
+        {label:'Secondary Hull',value:'96.8%',cls:'green',bar:96.8},
+        {label:'Structural Field',value:'100%',cls:'green',bar:100},
+      ]},
+      {name:'Crew Status',tag:'231 ABOARD',tagClass:'info',metrics:[
+        {label:'Officers',value:'42',cls:''},
+        {label:'Enlisted',value:'178',cls:''},
+        {label:'Civilians',value:'11',cls:''},
+        {label:'Sickbay',value:'3',cls:'amber'},
+      ]},
+      {name:'Environmental',tag:'STABLE',tagClass:'ok',metrics:[
+        {label:'Atmosphere',value:'21% O₂',cls:'green'},
+        {label:'Gravity',value:'1.00g',cls:'green'},
+        {label:'Temperature',value:'22.4°C',cls:''},
+        {label:'Radiation',value:'0.02 mSv',cls:'green'},
+      ]},
+    ]
+  },
+  propulsion:{
+    title:'System Detail — Propulsion',
+    sections:[
+      {name:'Warp Drive',tag:'ADVISORY',tagClass:'warn',metrics:[
+        {label:'Current Speed',value:'Warp 6.2',cls:'amber'},
+        {label:'Max Rated',value:'Warp 9.6',cls:''},
+        {label:'Field Stability',value:'87.3%',cls:'amber',bar:87.3},
+        {label:'Dilithium Matrix',value:'91%',cls:'green',bar:91},
+      ]},
+      {name:'Impulse Engines',tag:'ONLINE',tagClass:'ok',metrics:[
+        {label:'Thrust Output',value:'25%',cls:'green',bar:25},
+        {label:'Deuterium Flow',value:'Normal',cls:'green'},
+        {label:'Exhaust Temp',value:'4,200 K',cls:''},
+      ]},
+      {name:'Maneuvering',tag:'NOMINAL',tagClass:'ok',metrics:[
+        {label:'RCS Thrusters',value:'Online',cls:'green'},
+        {label:'Inertial Dampers',value:'98.7%',cls:'green',bar:98.7},
+      ]},
+    ]
+  },
+  shields:{
+    title:'System Detail — Shields',
+    sections:[
+      {name:'Shield Grid',tag:'STANDBY',tagClass:'info',metrics:[
+        {label:'Forward',value:'100%',cls:'green',bar:100},
+        {label:'Aft',value:'100%',cls:'green',bar:100},
+        {label:'Port',value:'100%',cls:'green',bar:100},
+        {label:'Starboard',value:'100%',cls:'green',bar:100},
+      ]},
+      {name:'Generator Status',tag:'NOMINAL',tagClass:'ok',metrics:[
+        {label:'Primary Generator',value:'Online',cls:'green'},
+        {label:'Backup Generator',value:'Standby',cls:''},
+        {label:'Recharge Rate',value:'4.2 GW/s',cls:''},
+        {label:'Modulation Freq',value:'257.4 MHz',cls:'cyan'},
+      ]},
+    ]
+  },
+  weapons:{
+    title:'System Detail — Tactical',
+    sections:[
+      {name:'Phaser Arrays',tag:'ARMED',tagClass:'warn',metrics:[
+        {label:'Dorsal Array',value:'Online',cls:'green'},
+        {label:'Ventral Array',value:'Online',cls:'green'},
+        {label:'Charge Level',value:'100%',cls:'green',bar:100},
+        {label:'Power Coupling',value:'Optimal',cls:'green'},
+      ]},
+      {name:'Torpedo Systems',tag:'LOADED',tagClass:'warn',metrics:[
+        {label:'Photon Tubes',value:'2 / 2 Ready',cls:'green'},
+        {label:'Quantum Tubes',value:'1 / 1 Ready',cls:'green'},
+        {label:'Photon Stock',value:'186',cls:''},
+        {label:'Quantum Stock',value:'24',cls:'amber'},
+      ]},
+    ]
+  },
+  lifesupport:{
+    title:'System Detail — Life Support',
+    sections:[
+      {name:'Atmosphere Processing',tag:'NOMINAL',tagClass:'ok',metrics:[
+        {label:'O₂ Generation',value:'100%',cls:'green',bar:100},
+        {label:'CO₂ Scrubbers',value:'98.4%',cls:'green',bar:98.4},
+        {label:'Nitrogen Balance',value:'78.1%',cls:'green'},
+      ]},
+      {name:'Water Reclamation',tag:'NOMINAL',tagClass:'ok',metrics:[
+        {label:'Recycling Rate',value:'99.7%',cls:'green',bar:99.7},
+        {label:'Reserve Tanks',value:'84%',cls:'green',bar:84},
+      ]},
+      {name:'Gravity Control',tag:'ONLINE',tagClass:'ok',metrics:[
+        {label:'Deck Plating',value:'Nominal',cls:'green'},
+        {label:'Variance',value:'±0.003g',cls:'green'},
+      ]},
+    ]
+  },
+  comms:{
+    title:'System Detail — Communications',
+    sections:[
+      {name:'Subspace Radio',tag:'ACTIVE',tagClass:'ok',metrics:[
+        {label:'Signal Strength',value:'-42 dBm',cls:'green'},
+        {label:'Bandwidth',value:'18.6 THz',cls:''},
+        {label:'Encryption',value:'AES-4096',cls:'green'},
+        {label:'Nearest Relay',value:'SB 47 — 12.3 ly',cls:''},
+      ]},
+      {name:'Universal Translator',tag:'ONLINE',tagClass:'ok',metrics:[
+        {label:'Languages Loaded',value:'4,892',cls:''},
+        {label:'Active Translations',value:'0',cls:''},
+      ]},
+    ]
+  },
+  power:{
+    title:'System Detail — Power Grid',
+    sections:[
+      {name:'Warp Core',tag:'ONLINE',tagClass:'ok',metrics:[
+        {label:'Output',value:'1,245 GW',cls:'green'},
+        {label:'M/AM Ratio',value:'1:1.0002',cls:'green'},
+        {label:'Core Temp',value:'3.4M K',cls:''},
+        {label:'Containment',value:'99.97%',cls:'green',bar:99.97},
+      ]},
+      {name:'Power Distribution',tag:'BALANCED',tagClass:'ok',metrics:[
+        {label:'EPS Grid',value:'94%',cls:'green',bar:94},
+        {label:'Auxiliary Fusion',value:'Standby',cls:''},
+        {label:'Battery Reserve',value:'78 hrs',cls:'green'},
+        {label:'Emergency Power',value:'Ready',cls:'green'},
+      ]},
+    ]
+  },
+};
+
+const hotspotInfo = {
+  bridge:{panel:'overview',msg:'Bridge: All stations manned, conn operational.'},
+  engineering:{panel:'power',msg:'Main Engineering: Warp core stable, M/AM injection nominal.'},
+  'port-nacelle':{panel:'propulsion',msg:'Port Nacelle: Minor plasma relay variance detected — monitoring.'},
+  'starboard-nacelle':{panel:'propulsion',msg:'Starboard Nacelle: All parameters within tolerance.'},
+  deflector:{panel:'shields',msg:'Deflector Array: Navigational deflector online, emitters at 100%.'},
+  'saucer-port':{panel:'weapons',msg:'Phaser Bank Alpha: Charged, targeting sensors calibrated.'},
+};
+
+// ─── RENDER ───
+function renderPanel(key){
+  const s = systems[key];
+  if(!s) return;
+  document.getElementById('rightHeader').textContent = s.title;
+  const html = s.sections.map(sec => {
+    const tagCls = {ok:'ok',warn:'warn',crit:'crit',info:'info'}[sec.tagClass]||'info';
+    const metricsHtml = sec.metrics.map(m => {
+      const barHtml = m.bar != null ? `<div class="bar-gauge"><div class="bar-gauge-fill ${m.cls||'cyan'}" style="width:${m.bar}%"></div></div>` : '';
+      return `<div><div class="metric-row"><span class="label">${m.label}</span><span class="value ${m.cls}">${m.value}</span></div>${barHtml}</div>`;
+    }).join('');
+    return `<div class="detail-section"><div class="detail-section-head"><span>${sec.name}</span><span class="log-tag ${tagCls}">${sec.tag}</span></div><div class="detail-section-body">${metricsHtml}</div></div>`;
+  }).join('');
+  document.getElementById('detailPanel').innerHTML = html;
+}
+
+function selectNav(key){
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.panel===key));
+  document.querySelectorAll('.sys-cell').forEach((el,i)=>{
+    const map=['overview','shields','propulsion','power','lifesupport','comms'];
+    el.classList.toggle('active', map[i]===key);
+  });
+  renderPanel(key);
+}
+
+function selectSystem(sys){
+  const info = hotspotInfo[sys];
+  if(!info) return;
+  selectNav(info.panel);
+  addLog(info.msg, sys==='port-nacelle'?'warn':'info');
+}
+
+// ─── LOG ───
+const logMessages = [
+  {time:'14:32:07',tag:'info',msg:'Diagnostic sweep initiated — all decks.'},
+  {time:'14:32:09',tag:'ok',msg:'Primary hull integrity confirmed at 99.2%.'},
+  {time:'14:32:11',tag:'warn',msg:'Port nacelle plasma relay P-47 showing 0.3% variance.'},
+  {time:'14:32:14',tag:'info',msg:'Shield generator modulation frequency updated.'},
+  {time:'14:32:18',tag:'ok',msg:'Life support systems — all green.'},
+  {time:'14:32:22',tag:'info',msg:'Subspace comm link to Starbase 47 confirmed.'},
+];
+
+function renderLogs(){
+  const el = document.getElementById('logFeed');
+  el.innerHTML = logMessages.map(l => `<div class="log-entry"><span class="log-time">${l.time}</span><span class="log-tag ${l.tag}">${l.tag}</span><span class="log-msg">${l.msg}</span></div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+function addLog(msg, tag='info'){
+  const now = new Date();
+  const t = [now.getHours(),now.getMinutes(),now.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
+  logMessages.push({time:t, tag, msg});
+  if(logMessages.length > 50) logMessages.shift();
+  renderLogs();
+}
+
+// ─── STARDATE ───
+function updateStardate(){
+  const now = new Date();
+  const sd = 41000 + ((now.getFullYear()-2020)*1000) + (now.getMonth()*83) + now.getDate() + now.getHours()/24;
+  document.getElementById('stardate').textContent = `SD ${sd.toFixed(1)}`;
+}
+
+// ─── LIVE SIMULATION ───
+function simulateTelemetry(){
+  const fields = [
+    {id:'hullVal',base:98,range:1,unit:'%',cls:v=>v>95?'cyan':'amber'},
+    {id:'shieldVal',base:100,range:2,unit:'%',cls:v=>v>95?'green':'amber'},
+    {id:'warpVal',base:6.2,range:.3,unit:'',prefix:'W',cls:()=>'amber'},
+    {id:'powerVal',base:94,range:3,unit:'%',cls:v=>v>90?'green':'amber'},
+  ];
+  fields.forEach(f=>{
+    const v = f.base + (Math.random()-.5)*f.range;
+    const el = document.getElementById(f.id);
+    const display = (f.prefix||'') + v.toFixed(f.unit==='%'?0:1) + (f.unit||'');
+    el.textContent = display;
+    el.className = 'sys-val ' + f.cls(v);
+  });
+}
+
+// ─── NAV CLICK ───
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => selectNav(el.dataset.panel));
+});
+
+// ─── INIT ───
+renderPanel('overview');
+renderLogs();
+updateStardate();
+setInterval(simulateTelemetry, 2000);
+setInterval(updateStardate, 10000);
+setInterval(()=>{
+  const msgs = [
+    'EPS conduit Deck 7 — nominal.',
+    'Sensor array recalibration complete.',
+    'Warp field geometry within parameters.',
+    'Transporter pad 2 — self-test passed.',
+    'Turbolift system diagnostic — no faults.',
+    'Holodeck 3 safety protocols verified.',
+    'Replicator system — energy reserve stable.',
+  ];
+  addLog(msgs[Math.floor(Math.random()*msgs.length)],'info');
+}, 8000);
+</script>
+</body>
+</html>
