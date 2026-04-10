@@ -3946,12 +3946,15 @@ function renderTargetList(){
 function renderTorpRack(){
   const el=document.getElementById('wpn-torp-rack');
   el.innerHTML='';
+  const reloading=wpnTorpReloadTimers.length;
   for(let i=0;i<wpnTorpMax;i++){
     const div=document.createElement('div');
-    div.className='wpn-torp'+(i<wpnTorpedoes?' loaded':' fired');
+    if(i<wpnTorpedoes) div.className='wpn-torp loaded';
+    else if(i<wpnTorpedoes+reloading) {div.className='wpn-torp';div.style.borderColor='rgba(212,160,60,.3)';div.style.background='rgba(212,160,60,.06)'}
+    else div.className='wpn-torp fired';
     el.appendChild(div);
   }
-  document.getElementById('wpn-torp-status').textContent=wpnTorpedoes+' / '+wpnTorpMax+' loaded';
+  updateTorpStatus();
   document.getElementById('wpn-fire-torp').disabled=wpnTorpedoes<=0||!wpnLockedTarget;
 }
 
@@ -4069,11 +4072,50 @@ document.getElementById('wpn-fire-laser').addEventListener('click',()=>{
 });
 
 // Fire torpedo
+let wpnTorpReloadTimers=[];
+function scheduleTorpReload(){
+  const timer={remaining:300,interval:null};
+  timer.interval=setInterval(()=>{
+    timer.remaining--;
+    updateTorpStatus();
+    if(timer.remaining<=0){
+      clearInterval(timer.interval);
+      wpnTorpReloadTimers=wpnTorpReloadTimers.filter(t=>t!==timer);
+      if(wpnTorpedoes<wpnTorpMax){
+        wpnTorpedoes++;
+        renderTorpRack();
+        wpnLogEntry('Torpedo tube reloaded ('+wpnTorpedoes+'/'+wpnTorpMax+')','');
+        logComms('Tactical','Torpedo auto-loader: tube '+wpnTorpedoes+' reloaded.');
+        if(audioCtx){
+          const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+          o.type='sine';o.frequency.value=400;o.frequency.linearRampToValueAtTime(600,audioCtx.currentTime+.2);
+          g.gain.setValueAtTime(.03,audioCtx.currentTime);g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.3);
+          o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.4);
+        }
+      }
+      updateTorpStatus();
+    }
+  },1000);
+  wpnTorpReloadTimers.push(timer);
+}
+function updateTorpStatus(){
+  const reloading=wpnTorpReloadTimers.length;
+  let text=wpnTorpedoes+' / '+wpnTorpMax+' loaded';
+  if(reloading>0){
+    const nearest=Math.min(...wpnTorpReloadTimers.map(t=>t.remaining));
+    const min=Math.floor(nearest/60);
+    const sec=nearest%60;
+    text+=' — '+reloading+' reloading ('+min+':'+String(sec).padStart(2,'0')+')';
+  }
+  document.getElementById('wpn-torp-status').textContent=text;
+}
+
 document.getElementById('wpn-fire-torp').addEventListener('click',()=>{
   if(wpnTorpedoes<=0||!wpnLockedTarget)return;
   wpnTorpedoes--;
   const target=wpnLockedTarget;
   renderTorpRack();
+  scheduleTorpReload();
   // Visual trail
   const cx=wpnCanvas.width/2,cy=wpnCanvas.height/2;
   const tObj=target.obj;
@@ -4285,7 +4327,7 @@ function drawWeaponsView(){
   // Status bar
   document.getElementById('wpn-status-bar').innerHTML=`
     <div class="wpn-stat"><div class="ws-label">Laser</div><div class="ws-val ${wpnHeat>70?'hot':'armed'}">${wpnMode.toUpperCase()} ${wpnIntensity}%</div></div>
-    <div class="wpn-stat"><div class="ws-label">Torpedoes</div><div class="ws-val">${wpnTorpedoes}/${wpnTorpMax}</div></div>
+    <div class="wpn-stat"><div class="ws-label">Torpedoes</div><div class="ws-val">${wpnTorpedoes}/${wpnTorpMax}${wpnTorpReloadTimers.length?' ↻'+wpnTorpReloadTimers.length:''}</div></div>
     <div class="wpn-stat"><div class="ws-label">Heat</div><div class="ws-val ${wpnHeat>70?'hot':''}">${Math.round(wpnHeat)}%</div></div>
     <div class="wpn-stat"><div class="ws-label">Shields</div><div class="ws-val">${Math.round(shieldsVal)}%</div></div>`;
 
