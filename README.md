@@ -1,6 +1,6 @@
 # Starship ASMR Simulator
 
-**A browser-based ambient starship cockpit experience designed for relaxation, immersion, and creative production.**
+**A browser-based ambient starship cockpit experience designed for relaxation, immersion, and creative production.  It is an interactive painting, drawn with bits and keystrokes versus paint and brushes.**
 
 *Authored by M.B. Parks*
 
