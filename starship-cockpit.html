@@ -875,6 +875,162 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .pressure-status.solving{color:#d4a03c}
 .pressure-status.solved{color:#2ecc71}
 .pressure-attempts{font-size:clamp(7px,.6vw,9px);color:#2a4a5a;text-align:center}
+
+/* === WIRE MATCHING === */
+.wire-puzzle{display:flex;justify-content:center;gap:clamp(40px,6vw,80px);padding:8px 0;position:relative}
+.wire-col{display:flex;flex-direction:column;gap:6px}
+.wire-node{width:clamp(28px,3vw,36px);height:clamp(22px,2.5vh,30px);border:1px solid rgba(94,196,212,.2);border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:clamp(8px,.7vw,10px);transition:all .2s}
+.wire-node:hover{border-color:rgba(94,196,212,.5)}
+.wire-node.selected{border-width:2px;box-shadow:0 0 8px}
+.wire-node.matched{opacity:.4;pointer-events:none}
+.wire-canvas{position:absolute;inset:0;pointer-events:none}
+
+/* === SEQUENCE MEMORY === */
+.seq-grid{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:8px 0}
+.seq-btn{width:clamp(36px,4vw,50px);height:clamp(36px,4vh,50px);border:1px solid rgba(94,196,212,.15);border-radius:4px;cursor:pointer;transition:all .15s;background:rgba(10,18,24,.6)}
+.seq-btn:hover{border-color:rgba(94,196,212,.3)}
+.seq-btn.flash{border-color:rgba(94,196,212,.8);background:rgba(94,196,212,.15);box-shadow:0 0 12px rgba(94,196,212,.3)}
+.seq-btn.wrong{border-color:rgba(231,76,60,.6);background:rgba(231,76,60,.1);box-shadow:0 0 8px rgba(231,76,60,.2)}
+.seq-btn.correct{border-color:rgba(46,204,113,.6);background:rgba(46,204,113,.1)}
+
+/* === FREQUENCY ALIGNMENT === */
+.freq-puzzle{text-align:center;padding:8px 0}
+.freq-scope{width:100%;height:clamp(60px,8vh,80px);border:1px solid rgba(94,196,212,.1);border-radius:3px;margin-bottom:8px;background:rgba(4,8,12,.5)}
+.freq-dials{display:flex;gap:clamp(12px,2vw,20px);justify-content:center}
+.freq-dial{display:flex;flex-direction:column;align-items:center;gap:3px}
+.freq-dial label{font-size:clamp(7px,.6vw,9px);color:#2a4a5a;letter-spacing:1px}
+.freq-dial input{-webkit-appearance:none;appearance:none;width:clamp(60px,7vw,90px);height:4px;background:#1a2a32;outline:none;border-radius:2px;cursor:pointer}
+.freq-dial input::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:#5ec4d4;border-radius:50%;cursor:pointer}
+.freq-dial .fd-val{font-size:clamp(8px,.7vw,10px);color:#5ec4d4;font-variant-numeric:tabular-nums}
+
+/* === LEAK DETECTION === */
+.leak-grid{display:grid;gap:2px;justify-content:center;padding:8px 0}
+.leak-cell{width:clamp(30px,3vw,40px);height:clamp(22px,2.5vh,30px);border:1px solid rgba(94,196,212,.08);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:clamp(7px,.6vw,9px);color:#2a4a5a;transition:all .2s;border-radius:2px}
+.leak-cell.pipe{border-color:rgba(94,196,212,.15);background:rgba(94,196,212,.03)}
+.leak-cell.tested{border-color:rgba(212,160,60,.3);background:rgba(212,160,60,.04)}
+.leak-cell.leak{border-color:rgba(231,76,60,.5);background:rgba(231,76,60,.1);color:#e74c3c;animation:blink-crit 1s infinite}
+.leak-cell.sealed{border-color:rgba(46,204,113,.4);background:rgba(46,204,113,.06);color:#2ecc71}
+.leak-indicator{font-size:clamp(8px,.7vw,10px);color:#d4a03c;text-align:center;margin-top:4px;min-height:16px}
+
+/* === BOLT TIGHTENING === */
+.bolt-gauge{width:clamp(160px,18vw,240px);height:clamp(160px,18vw,240px);border:2px solid rgba(94,196,212,.12);border-radius:50%;margin:8px auto;position:relative;background:rgba(4,8,12,.3)}
+.bolt-needle{position:absolute;width:2px;height:45%;background:linear-gradient(180deg,#e74c3c,transparent);left:50%;bottom:50%;transform-origin:50% 100%;border-radius:1px;transition:none}
+.bolt-zone{position:absolute;inset:4px;border-radius:50%;overflow:hidden}
+.bolt-zone-arc{position:absolute;inset:0}
+.bolt-center{position:absolute;width:10px;height:10px;background:#5ec4d4;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%)}
+.bolt-info{display:flex;justify-content:center;gap:16px;margin-top:6px}
+.bolt-count{font-size:clamp(9px,.8vw,11px);color:#5ec4d4}
+
+/* === THERMAL MGMT === */
+.thermal-grid{display:grid;gap:3px;justify-content:center;padding:8px 0}
+.thermal-cell{width:clamp(32px,3.2vw,42px);height:clamp(32px,3.2vw,42px);border:1px solid rgba(94,196,212,.08);border-radius:2px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:clamp(7px,.6vw,9px)}
+.thermal-cell.cool{background:rgba(94,196,212,.06);border-color:rgba(94,196,212,.12);color:#2a4a5a}
+.thermal-cell.warm{background:rgba(212,160,60,.1);border-color:rgba(212,160,60,.2);color:#d4a03c}
+.thermal-cell.hot{background:rgba(231,76,60,.12);border-color:rgba(231,76,60,.3);color:#e74c3c;animation:blink-crit 1.5s infinite}
+.thermal-cell.overheated{background:rgba(231,76,60,.25);border-color:rgba(231,76,60,.5);color:#ff6b6b}
+
+/* === POWER REROUTE === */
+.reroute-grid{display:grid;gap:3px;justify-content:center;padding:8px 0}
+.reroute-cell{width:clamp(32px,3.2vw,42px);height:clamp(32px,3.2vw,42px);border:1px solid rgba(94,196,212,.08);border-radius:2px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;font-size:clamp(9px,.8vw,12px);color:#2a4a5a}
+.reroute-cell.source{border-color:rgba(46,204,113,.4);background:rgba(46,204,113,.08);color:#2ecc71;cursor:default}
+.reroute-cell.target{border-color:rgba(94,196,212,.4);background:rgba(94,196,212,.08);color:#5ec4d4;cursor:default}
+.reroute-cell.node{border-color:rgba(94,196,212,.12);cursor:pointer}
+.reroute-cell.node:hover{border-color:rgba(94,196,212,.3);background:rgba(94,196,212,.04)}
+.reroute-cell.active{border-color:rgba(46,204,113,.5);background:rgba(46,204,113,.1);color:#2ecc71}
+.reroute-cell.damaged{border-color:rgba(231,76,60,.3);background:rgba(231,76,60,.06);color:#e74c3c;cursor:not-allowed;animation:blink-crit 2s infinite}
+.reroute-cell.wall{background:rgba(10,10,15,.5);border-color:rgba(20,20,30,.3);cursor:default}
+.reroute-timer{font-size:clamp(10px,.9vw,13px);color:#d4a03c;text-align:center;font-variant-numeric:tabular-nums}
+
+/* === CREW ASSIST === */
+.crew-assist{margin-top:8px;padding:6px 8px;border:1px solid rgba(46,204,113,.15);border-radius:3px;display:none;text-align:center}
+.crew-assist.show{display:block}
+.crew-assist .ca-text{font-size:clamp(7px,.6vw,9px);color:#3a6a7a;line-height:1.5;margin-bottom:6px;font-style:italic}
+.crew-assist .ca-btn{background:none;border:1px solid rgba(46,204,113,.25);color:#2ecc71;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:4px 14px;cursor:pointer;border-radius:3px;letter-spacing:1px;transition:all .2s}
+.crew-assist .ca-btn:hover{border-color:#2ecc71;background:rgba(46,204,113,.06)}
+
+/* === WIRE MATCHING === */
+.wire-panel{display:flex;justify-content:center;gap:clamp(30px,4vw,60px);padding:10px 0}
+.wire-col{display:flex;flex-direction:column;gap:6px}
+.wire-node{width:clamp(28px,3vw,38px);height:clamp(20px,2vh,28px);border:1px solid rgba(94,196,212,.2);border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:clamp(8px,.7vw,10px);transition:all .2s}
+.wire-node:hover{border-color:rgba(94,196,212,.5);background:rgba(94,196,212,.06)}
+.wire-node.selected{border-width:2px;background:rgba(94,196,212,.08)}
+.wire-node.matched{opacity:.4;pointer-events:none;border-style:dashed}
+.wire-canvas{width:clamp(60px,6vw,80px)}
+
+/* === FREQUENCY ALIGNMENT === */
+.freq-panel{text-align:center;padding:8px 0}
+.freq-scope{width:100%;height:clamp(60px,8vh,90px);border:1px solid rgba(94,196,212,.1);border-radius:3px;margin-bottom:8px;background:rgba(4,8,12,.5)}
+.freq-dials{display:flex;gap:clamp(10px,1.5vw,20px);justify-content:center}
+.freq-dial{display:flex;flex-direction:column;align-items:center;gap:3px}
+.freq-dial label{font-size:clamp(7px,.6vw,9px);color:#2a4a5a;letter-spacing:1px}
+.freq-dial input{-webkit-appearance:none;appearance:none;width:clamp(60px,7vw,90px);height:4px;background:#1a2a32;outline:none;border-radius:2px;cursor:pointer}
+.freq-dial input::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:#5ec4d4;border-radius:50%;cursor:pointer}
+.freq-match{font-size:clamp(9px,.8vw,11px);margin-top:6px;min-height:16px;letter-spacing:1px}
+
+/* === SEQUENCE MEMORY === */
+.seq-panel{text-align:center;padding:8px 0}
+.seq-lights{display:flex;gap:clamp(6px,.8vw,10px);justify-content:center;margin:10px 0}
+.seq-light{width:clamp(30px,3.5vw,44px);height:clamp(30px,3.5vw,44px);border-radius:50%;border:2px solid rgba(94,196,212,.15);cursor:pointer;transition:all .15s;opacity:.3}
+.seq-light.flash{opacity:1;transform:scale(1.15)}
+.seq-light:hover{opacity:.6}
+.seq-light[data-c="0"]{background:#e74c3c;border-color:rgba(231,76,60,.3)}
+.seq-light[data-c="1"]{background:#2ecc71;border-color:rgba(46,204,113,.3)}
+.seq-light[data-c="2"]{background:#5ec4d4;border-color:rgba(94,196,212,.3)}
+.seq-light[data-c="3"]{background:#d4a03c;border-color:rgba(212,160,60,.3)}
+.seq-light[data-c="4"]{background:#9b59b6;border-color:rgba(155,89,182,.3)}
+
+/* === LEAK DETECTION === */
+.leak-panel{text-align:center;padding:8px 0}
+.leak-grid{display:grid;gap:0;margin:8px auto;border:1px solid rgba(94,196,212,.08);border-radius:3px;overflow:hidden}
+.leak-cell{border:1px solid rgba(94,196,212,.04);padding:clamp(6px,.8vh,10px);cursor:pointer;transition:all .15s;font-size:clamp(7px,.6vw,9px);color:#2a4a5a;text-align:center;min-height:clamp(28px,3vh,36px);display:flex;align-items:center;justify-content:center}
+.leak-cell.pipe{background:rgba(94,196,212,.03);color:#3a6a7a}
+.leak-cell.tested{background:rgba(212,160,60,.06);border-color:rgba(212,160,60,.1)}
+.leak-cell.found{background:rgba(231,76,60,.1);border-color:rgba(231,76,60,.2);color:#e74c3c}
+.leak-cell.sealed{background:rgba(46,204,113,.06);border-color:rgba(46,204,113,.1);color:#2ecc71}
+.leak-gauge{display:flex;align-items:center;gap:8px;justify-content:center;margin:8px 0;font-size:clamp(8px,.7vw,10px);color:#3a6a7a}
+.leak-gauge-bar{width:clamp(100px,12vw,160px);height:6px;background:#111a20;border-radius:3px;overflow:hidden}
+.leak-gauge-fill{height:100%;border-radius:3px;transition:width .3s}
+
+/* === BOLT TIGHTENING === */
+.bolt-panel{text-align:center;padding:8px 0}
+.bolt-gauge{width:clamp(120px,14vw,180px);height:clamp(120px,14vw,180px);border-radius:50%;border:2px solid rgba(94,196,212,.15);margin:8px auto;position:relative}
+.bolt-zone{position:absolute;border-radius:50%;inset:3px}
+.bolt-needle{position:absolute;width:2px;height:45%;background:linear-gradient(180deg,#e74c3c,transparent);left:50%;top:5%;transform-origin:50% 100%;border-radius:1px}
+.bolt-center{position:absolute;width:8px;height:8px;border-radius:50%;background:#5ec4d4;top:50%;left:50%;transform:translate(-50%,-50%)}
+.bolt-progress{display:flex;gap:4px;justify-content:center;margin:8px 0}
+.bolt-pip{width:clamp(10px,1.2vw,14px);height:clamp(10px,1.2vw,14px);border-radius:50%;border:1px solid rgba(94,196,212,.2)}
+.bolt-pip.done{background:rgba(46,204,113,.4);border-color:rgba(46,204,113,.3)}
+.bolt-pip.fail{background:rgba(231,76,60,.4);border-color:rgba(231,76,60,.3)}
+
+/* === THERMAL MANAGEMENT === */
+.therm-panel{text-align:center;padding:8px 0}
+.therm-grid{display:grid;gap:3px;margin:8px auto}
+.therm-cell{border:1px solid rgba(94,196,212,.06);border-radius:2px;cursor:pointer;transition:all .2s;min-height:clamp(24px,3vh,32px);display:flex;align-items:center;justify-content:center;font-size:clamp(7px,.6vw,9px)}
+.therm-cell.cool{background:rgba(94,196,212,.06);color:#3a6a7a}
+.therm-cell.warm{background:rgba(212,160,60,.1);color:#d4a03c;border-color:rgba(212,160,60,.15)}
+.therm-cell.hot{background:rgba(231,76,60,.12);color:#e74c3c;border-color:rgba(231,76,60,.2);animation:therm-pulse .5s infinite}
+.therm-cell.critical{background:rgba(231,76,60,.25);color:#ff6b6b;border-color:rgba(231,76,60,.4);animation:therm-pulse .3s infinite}
+@keyframes therm-pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.therm-cell.cooled{background:rgba(46,204,113,.06);color:#2ecc71;border-color:rgba(46,204,113,.1)}
+
+/* === POWER REROUTING === */
+.reroute-panel{text-align:center;padding:8px 0}
+.reroute-grid{display:grid;gap:2px;margin:8px auto}
+.reroute-cell{border:1px solid rgba(94,196,212,.06);border-radius:2px;cursor:pointer;transition:all .15s;min-height:clamp(24px,3vh,32px);display:flex;align-items:center;justify-content:center;font-size:clamp(8px,.7vw,10px)}
+.reroute-cell.empty{background:rgba(4,8,12,.3);color:#1a2a3a}
+.reroute-cell.node{background:rgba(94,196,212,.06);color:#3a6a7a;border-color:rgba(94,196,212,.1)}
+.reroute-cell.active{background:rgba(46,204,113,.1);color:#2ecc71;border-color:rgba(46,204,113,.2)}
+.reroute-cell.damaged{background:rgba(231,76,60,.08);color:#5a2020;border-color:rgba(231,76,60,.15);cursor:not-allowed}
+.reroute-cell.source{background:rgba(212,160,60,.12);color:#d4a03c;border-color:rgba(212,160,60,.2)}
+.reroute-cell.target{background:rgba(94,196,212,.1);color:#5ec4d4;border-color:rgba(94,196,212,.2)}
+.reroute-timer{font-size:clamp(10px,.9vw,13px);color:#d4a03c;letter-spacing:2px;margin:6px 0}
+
+/* === CREW ASSISTANCE === */
+.crew-assist{margin-top:8px;padding:6px 10px;border:1px solid rgba(94,196,212,.1);border-radius:3px;background:rgba(4,8,12,.4);display:none;text-align:center}
+.crew-assist.show{display:block}
+.crew-assist .ca-text{font-size:clamp(8px,.7vw,10px);color:#4a7a8a;margin-bottom:6px;font-style:italic}
+.crew-assist .ca-btn{background:none;border:1px solid rgba(46,204,113,.2);color:#2ecc71;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:4px 12px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s}
+.crew-assist .ca-btn:hover{border-color:#2ecc71;background:rgba(46,204,113,.06)}
 </style>
 </head>
 <body>
@@ -3792,156 +3948,262 @@ document.getElementById('maint-repair-btn').addEventListener('click',()=>{
   if(engaged)clickSound();
 });
 
+// REPAIR SYSTEM — Unique puzzle per system type
+const puzzleTypes={
+  coolant:'leak',thruster:'bolt',sensors:'freq',deflectors:'sequence',comms:'wire',lifesupport:'thermal'
+};
+let repairFailCount=0;
+
 function openRepairModal(sys){
   const modal=document.getElementById('repair-modal');
   document.getElementById('repair-title').textContent='⚙ '+sys.name+' — Diagnostics';
   const body=document.getElementById('repair-body');
   let currentStep=0;
+  repairFailCount=0;
+  const puzzleType=puzzleTypes[sys.id]||'pressure';
 
-  function renderStep(){
-    if(currentStep>=sys.steps.length){
-      // Complete
-      body.innerHTML=`
-        <div class="repair-step active">
-          <div class="rs-desc" style="color:#2ecc71;text-align:center">✓ All diagnostics passed. ${sys.name} restored to nominal operation.</div>
-          <div class="rs-indicator"><div class="rs-fill complete"></div></div>
-          <button class="repair-action-btn success" id="repair-done">Complete</button>
-        </div>`;
-      document.getElementById('repair-done').addEventListener('click',()=>{
-        modal.classList.remove('show');
-        if(sys.sgDot){
-          document.getElementById(sys.sgDot).className='sg-dot ok';
-          document.getElementById(sys.sgText).style.color='#2ecc71';
-          document.getElementById(sys.sgText).textContent='Nominal';
-        }
-        sys.recover();
-        if(maintEscalateTimer){clearTimeout(maintEscalateTimer);maintEscalateTimer=null}
-        activeMaint=null;
-        logComms('Engineering',sys.name+' diagnostics complete. All systems nominal.');
-        sessionStats.repairs++;
-        if(engaged)clickSound();
-      });
-      if(audioCtx){
-        const o=audioCtx.createOscillator(),g=audioCtx.createGain();
-        o.type='sine';o.frequency.value=600;
-        o.frequency.linearRampToValueAtTime(900,audioCtx.currentTime+.15);
-        g.gain.setValueAtTime(.04,audioCtx.currentTime);
-        g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.4);
-        o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.5);
-      }
-      return;
-    }
-    const step=sys.steps[currentStep];
-    const stepNum=currentStep+1;
-    // Generate pressure puzzle
-    const gaugeCount=3+Math.min(2,currentStep); // 3-5 gauges, more on later steps
-    const targetMin=35,targetMax=65; // green zone
-    const gauges=[];
-    for(let i=0;i<gaugeCount;i++){
-      // Start with random pressures, mostly outside the zone
-      let v=Math.random()*100;
-      if(Math.random()<.6)v=v<50?Math.random()*25:75+Math.random()*25; // bias outside zone
-      gauges.push({value:Math.round(v),id:'pg-'+currentStep+'-'+i});
-    }
-    // Connection map — each valve affects its gauge and neighbors
-    const connections=[];
-    for(let i=0;i<gaugeCount;i++){
-      const conn=[i];
-      if(i>0)conn.push(i-1);
-      if(i<gaugeCount-1)conn.push(i+1);
-      connections.push(conn);
-    }
+  function completeRepair(){
+    body.innerHTML=`<div class="repair-step active">
+      <div class="rs-desc" style="color:#2ecc71;text-align:center">✓ All diagnostics passed. ${sys.name} restored to nominal operation.</div>
+      <div class="rs-indicator"><div class="rs-fill complete"></div></div>
+      <button class="repair-action-btn success" id="repair-done">Complete</button></div>`;
+    document.getElementById('repair-done').addEventListener('click',()=>{
+      modal.classList.remove('show');
+      if(sys.sgDot){document.getElementById(sys.sgDot).className='sg-dot ok';document.getElementById(sys.sgText).style.color='#2ecc71';document.getElementById(sys.sgText).textContent='Nominal'}
+      sys.recover();if(maintEscalateTimer){clearTimeout(maintEscalateTimer);maintEscalateTimer=null}
+      activeMaint=null;logComms('Engineering',sys.name+' diagnostics complete. All systems nominal.');sessionStats.repairs++;
+      if(engaged)clickSound();
+    });
+    if(audioCtx){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=600;o.frequency.linearRampToValueAtTime(900,audioCtx.currentTime+.15);g.gain.setValueAtTime(.04,audioCtx.currentTime);g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.4);o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.5)}
+  }
 
-    const gaugeNames=['α','β','γ','δ','ε'];
-    let attempts=0;
+  function nextStep(){currentStep++;if(currentStep>=sys.steps.length)completeRepair();else renderPuzzle()}
 
-    body.innerHTML=`
-      <div class="repair-step active">
-        <div class="rs-desc">Step ${stepNum}/${sys.steps.length}: ${step}</div>
-        <div class="rs-desc" style="color:#3a5a6a;font-size:clamp(7px,.6vw,9px)">Balance all gauges into the green zone (${targetMin}–${targetMax}). Valves affect connected gauges.</div>
-        <div class="pressure-puzzle">
-          <div class="pressure-gauges" id="pp-gauges-${currentStep}">
-            ${gauges.map((g,i)=>`<div class="pressure-gauge">
-              <div class="pg-label">${gaugeNames[i]}</div>
-              <div class="pg-tube"><div class="pg-zone" style="bottom:${targetMin}%;height:${targetMax-targetMin}%"></div><div class="pg-fill" id="${g.id}" style="height:${g.value}%;background:${g.value>=targetMin&&g.value<=targetMax?'rgba(46,204,113,.4)':g.value>80||g.value<20?'rgba(231,76,60,.4)':'rgba(212,160,60,.4)'}"></div></div>
-              <div class="pg-val ${g.value>=targetMin&&g.value<=targetMax?'in-zone':g.value>80||g.value<20?'danger':''}" id="${g.id}-val">${g.value}</div>
-            </div>`).join('')}
-          </div>
-          <div class="pressure-valves" id="pp-valves-${currentStep}">
-            ${gauges.map((g,i)=>`<div style="display:flex;flex-direction:column;gap:3px;align-items:center">
-              <button class="valve-btn boost" data-gauge="${i}" data-dir="up">▲ ${gaugeNames[i]}</button>
-              <button class="valve-btn vent" data-gauge="${i}" data-dir="down">▼ ${gaugeNames[i]}</button>
-            </div>`).join('')}
-          </div>
-          <div class="pressure-status solving" id="pp-status-${currentStep}">Adjust valves to balance all gauges</div>
-          <div class="pressure-attempts" id="pp-attempts-${currentStep}">Adjustments: 0</div>
-        </div>
-      </div>`;
-
-    // Attach valve handlers
-    body.querySelectorAll('.valve-btn').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const gi=parseInt(btn.dataset.gauge);
-        const dir=btn.dataset.dir;
-        const amount=dir==='up'?8:-8;
-        attempts++;
-        // Affect this gauge and connected neighbors
-        connections[gi].forEach((ci,idx)=>{
-          const effect=idx===0?amount:Math.round(amount*(-.3-.2*Math.random())); // primary gets full, neighbors get partial inverse
-          gauges[ci].value=Math.max(0,Math.min(100,gauges[ci].value+effect));
-        });
-        // Update visuals
-        gauges.forEach((g,i)=>{
-          const fill=document.getElementById(g.id);
-          const val=document.getElementById(g.id+'-val');
-          if(!fill||!val)return;
-          const inZone=g.value>=targetMin&&g.value<=targetMax;
-          const danger=g.value>80||g.value<20;
-          fill.style.height=g.value+'%';
-          fill.style.background=inZone?'rgba(46,204,113,.4)':danger?'rgba(231,76,60,.4)':'rgba(212,160,60,.4)';
-          val.textContent=g.value;
-          val.className='pg-val'+(inZone?' in-zone':danger?' danger':'');
-        });
-        document.getElementById('pp-attempts-'+currentStep).textContent='Adjustments: '+attempts;
-        // Valve sound
-        if(audioCtx){
-          const o=audioCtx.createOscillator(),g2=audioCtx.createGain();
-          o.type='sine';o.frequency.value=dir==='up'?400:300;
-          o.frequency.linearRampToValueAtTime(dir==='up'?500:200,audioCtx.currentTime+.08);
-          g2.gain.setValueAtTime(.03,audioCtx.currentTime);
-          g2.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.1);
-          o.connect(g2);g2.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.12);
-        }
-        // Check if all in zone
-        const allBalanced=gauges.every(g=>g.value>=targetMin&&g.value<=targetMax);
-        if(allBalanced){
-          const status=document.getElementById('pp-status-'+currentStep);
-          status.textContent='✓ Pressure balanced — Step '+stepNum+' complete';
-          status.className='pressure-status solved';
-          // Disable valves
-          body.querySelectorAll('.valve-btn').forEach(b=>{b.disabled=true;b.style.opacity='.3'});
-          // Success sound
-          if(audioCtx){
-            const o=audioCtx.createOscillator(),g3=audioCtx.createGain();
-            o.type='sine';o.frequency.value=500;
-            o.frequency.linearRampToValueAtTime(800,audioCtx.currentTime+.2);
-            g3.gain.setValueAtTime(.04,audioCtx.currentTime);
-            g3.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.4);
-            o.connect(g3);g3.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.5);
-          }
-          logComms('Engineering','Step '+stepNum+': '+step+' — balanced in '+attempts+' adjustments.');
-          if(engaged)clickSound();
-          setTimeout(()=>{
-            currentStep++;
-            renderStep();
-          },1000);
-        }
-      });
+  function showCrewAssist(){
+    if(repairFailCount<2)return;
+    const existing=body.querySelector('.crew-assist');
+    if(existing)existing.remove();
+    const div=document.createElement('div');div.className='crew-assist show';
+    div.innerHTML=`<div class="ca-text">"Captain, I can handle this step if you authorize. It'll take a bit longer, but I'll get it done." — Cpl. Reyes</div><button class="ca-btn" id="ca-accept">Authorize Reyes</button>`;
+    body.appendChild(div);
+    document.getElementById('ca-accept').addEventListener('click',()=>{
+      logComms('Engineering','Cpl. Reyes: "On it, Captain." Step '+(currentStep+1)+' completed.');
+      repairFailCount=0;nextStep();
+      if(engaged)clickSound();
     });
   }
 
+  function puzzleSound(freq,dur){
+    if(!audioCtx)return;const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(.03,audioCtx.currentTime);g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+dur);
+    o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+dur+.05);
+  }
+
+  function renderPuzzle(){
+    const step=sys.steps[currentStep];const stepNum=currentStep+1;
+    if(puzzleType==='pressure')renderPressure(step,stepNum);
+    else if(puzzleType==='leak')renderLeak(step,stepNum);
+    else if(puzzleType==='bolt')renderBolt(step,stepNum);
+    else if(puzzleType==='freq')renderFreqAlign(step,stepNum);
+    else if(puzzleType==='sequence')renderSequence(step,stepNum);
+    else if(puzzleType==='wire')renderWire(step,stepNum);
+    else if(puzzleType==='thermal')renderThermal(step,stepNum);
+    else renderPressure(step,stepNum);
+  }
+
+  // === PRESSURE BALANCING ===
+  function renderPressure(step,stepNum){
+    const gc=3+Math.min(2,currentStep),tMin=35,tMax=65;
+    const gauges=[];for(let i=0;i<gc;i++){let v=Math.random()*100;if(Math.random()<.6)v=v<50?Math.random()*25:75+Math.random()*25;gauges.push({value:Math.round(v),id:'pg-'+currentStep+'-'+i})}
+    const conn=[];for(let i=0;i<gc;i++){const c=[i];if(i>0)c.push(i-1);if(i<gc-1)c.push(i+1);conn.push(c)}
+    const gn=['α','β','γ','δ','ε'];let att=0;
+    body.innerHTML=`<div class="repair-step active"><div class="rs-desc">Step ${stepNum}/${sys.steps.length}: ${step}</div><div class="rs-desc" style="color:#3a5a6a;font-size:clamp(7px,.6vw,9px)">Balance all gauges into green zone (${tMin}–${tMax})</div><div class="pressure-puzzle"><div class="pressure-gauges">${gauges.map((g,i)=>`<div class="pressure-gauge"><div class="pg-label">${gn[i]}</div><div class="pg-tube"><div class="pg-zone" style="bottom:${tMin}%;height:${tMax-tMin}%"></div><div class="pg-fill" id="${g.id}" style="height:${g.value}%;background:${g.value>=tMin&&g.value<=tMax?'rgba(46,204,113,.4)':'rgba(212,160,60,.4)'}"></div></div><div class="pg-val" id="${g.id}-val">${g.value}</div></div>`).join('')}</div><div class="pressure-valves">${gauges.map((g,i)=>`<div style="display:flex;flex-direction:column;gap:3px"><button class="valve-btn boost" data-g="${i}" data-d="up">▲ ${gn[i]}</button><button class="valve-btn vent" data-g="${i}" data-d="down">▼ ${gn[i]}</button></div>`).join('')}</div><div class="pressure-status solving" id="pp-st">Adjust valves</div><div class="pressure-attempts" id="pp-att">0</div></div></div>`;
+    body.querySelectorAll('.valve-btn').forEach(b=>b.addEventListener('click',()=>{
+      const gi=parseInt(b.dataset.g),dir=b.dataset.d,amt=dir==='up'?8:-8;att++;
+      conn[gi].forEach((ci,idx)=>{const e=idx===0?amt:Math.round(amt*(-.3-.2*Math.random()));gauges[ci].value=Math.max(0,Math.min(100,gauges[ci].value+e))});
+      gauges.forEach(g=>{const f=document.getElementById(g.id),v=document.getElementById(g.id+'-val');if(!f||!v)return;const iz=g.value>=tMin&&g.value<=tMax;f.style.height=g.value+'%';f.style.background=iz?'rgba(46,204,113,.4)':'rgba(212,160,60,.4)';v.textContent=g.value;v.className='pg-val'+(iz?' in-zone':'')});
+      document.getElementById('pp-att').textContent=att;puzzleSound(dir==='up'?400:300,.1);
+      if(gauges.every(g=>g.value>=tMin&&g.value<=tMax)){document.getElementById('pp-st').textContent='✓ Balanced';document.getElementById('pp-st').className='pressure-status solved';body.querySelectorAll('.valve-btn').forEach(x=>{x.disabled=true;x.style.opacity='.3'});puzzleSound(600,.3);logComms('Engineering','Step '+stepNum+': balanced in '+att+' adjustments.');setTimeout(nextStep,1000)}
+    }));
+  }
+
+  // === LEAK DETECTION ===
+  function renderLeak(step,stepNum){
+    const size=3+currentStep,cells=[];let leakPos=Math.floor(Math.random()*size*3);let tests=0,maxTests=size+3;
+    for(let i=0;i<size*3;i++)cells.push({isPipe:true,tested:false,isLeak:i===leakPos});
+    body.innerHTML=`<div class="repair-step active"><div class="rs-desc">Step ${stepNum}/${sys.steps.length}: ${step}</div><div class="rs-desc" style="color:#3a5a6a;font-size:clamp(7px,.6vw,9px)">Find the leak! Click pipe sections to pressurize and test. Tests remaining: <span id="leak-tests">${maxTests}</span></div><div class="leak-grid" style="grid-template-columns:repeat(${size},1fr)" id="leak-grid"></div><div class="leak-indicator" id="leak-ind"></div></div>`;
+    const grid=document.getElementById('leak-grid');
+    cells.forEach((c,i)=>{
+      const el=document.createElement('div');el.className='leak-cell pipe';el.textContent='—';el.dataset.idx=i;
+      el.addEventListener('click',()=>{
+        if(c.tested)return;c.tested=true;tests++;
+        document.getElementById('leak-tests').textContent=maxTests-tests;
+        if(c.isLeak){el.className='leak-cell leak';el.textContent='✕';document.getElementById('leak-ind').textContent='Leak found! Sealing…';document.getElementById('leak-ind').style.color='#e74c3c';puzzleSound(200,.3);
+          setTimeout(()=>{el.className='leak-cell sealed';el.textContent='✓';document.getElementById('leak-ind').textContent='✓ Sealed';document.getElementById('leak-ind').style.color='#2ecc71';puzzleSound(600,.3);logComms('Engineering','Step '+stepNum+': leak located and sealed in '+tests+' tests.');setTimeout(nextStep,1000)},1000);
+        } else {
+          const dist=Math.abs(i-leakPos);const dir=i<leakPos?'downstream ►':'◄ upstream';
+          el.className='leak-cell tested';el.textContent=dist<=2?'◉':'○';
+          document.getElementById('leak-ind').textContent='Pressure '+(dist<=2?'fluctuating':'stable')+' — leak is '+dir;
+          puzzleSound(300+dist*50,.1);
+          if(tests>=maxTests){repairFailCount++;document.getElementById('leak-ind').textContent='⚠ Tests exhausted — resetting';document.getElementById('leak-ind').style.color='#e74c3c';setTimeout(()=>renderLeak(step,stepNum),1500);showCrewAssist()}
+        }
+      });
+      grid.appendChild(el);
+    });
+  }
+
+  // === BOLT TIGHTENING ===
+  function renderBolt(step,stepNum){
+    let boltsNeeded=4+currentStep,boltsDone=0,angle=0,speed=2+currentStep*.5,greenStart=0,greenSize=50-currentStep*8;
+    let animId,failed=false;
+    body.innerHTML=`<div class="repair-step active"><div class="rs-desc">Step ${stepNum}/${sys.steps.length}: ${step}</div><div class="rs-desc" style="color:#3a5a6a;font-size:clamp(7px,.6vw,9px)">Click when needle is in the green zone. ${boltsNeeded} fasteners needed.</div><div class="bolt-gauge" id="bolt-gauge"><canvas id="bolt-cv" width="200" height="200" style="width:100%;height:100%;border-radius:50%"></canvas><div class="bolt-center"></div></div><div class="bolt-info"><span class="bolt-count" id="bolt-count">0 / ${boltsNeeded}</span><span class="pressure-status solving" id="bolt-status">Click to torque</span></div></div>`;
+    const cv=document.getElementById('bolt-cv'),cx=cv.getContext('2d');
+    greenStart=Math.random()*300;
+    function drawBolt(){
+      if(failed)return;angle=(angle+speed)%360;
+      cx.clearRect(0,0,200,200);
+      // Zones
+      cx.fillStyle='rgba(231,76,60,.08)';cx.beginPath();cx.moveTo(100,100);cx.arc(100,100,90,0,6.283);cx.fill();
+      cx.fillStyle='rgba(46,204,113,.12)';cx.beginPath();cx.moveTo(100,100);cx.arc(100,100,90,(greenStart)*Math.PI/180,(greenStart+greenSize)*Math.PI/180);cx.fill();
+      // Needle
+      const rad=angle*Math.PI/180;
+      cx.strokeStyle='#e74c3c';cx.lineWidth=2;cx.beginPath();cx.moveTo(100,100);cx.lineTo(100+Math.cos(rad)*80,100+Math.sin(rad)*80);cx.stroke();
+      // Tick marks
+      cx.strokeStyle='rgba(94,196,212,.15)';cx.lineWidth=1;
+      for(let i=0;i<12;i++){const a=i*30*Math.PI/180;cx.beginPath();cx.moveTo(100+Math.cos(a)*85,100+Math.sin(a)*85);cx.lineTo(100+Math.cos(a)*90,100+Math.sin(a)*90);cx.stroke()}
+      animId=requestAnimationFrame(drawBolt);
+    }
+    drawBolt();
+    document.getElementById('bolt-gauge').addEventListener('click',()=>{
+      if(failed)return;
+      const inGreen=angle>=greenStart&&angle<=greenStart+greenSize;
+      const inRed=!inGreen;
+      if(inGreen){boltsDone++;document.getElementById('bolt-count').textContent=boltsDone+' / '+boltsNeeded;puzzleSound(500,.15);
+        greenSize=Math.max(15,greenSize-5);greenStart=Math.random()*300;speed+=.3;
+        if(boltsDone>=boltsNeeded){cancelAnimationFrame(animId);document.getElementById('bolt-status').textContent='✓ All fasteners torqued';document.getElementById('bolt-status').className='pressure-status solved';puzzleSound(600,.3);logComms('Engineering','Step '+stepNum+': '+boltsNeeded+' fasteners torqued.');setTimeout(nextStep,1000)}
+      } else {
+        puzzleSound(150,.2);document.getElementById('bolt-status').textContent='⚠ Stripped! Retrying…';document.getElementById('bolt-status').style.color='#e74c3c';
+        repairFailCount++;failed=true;cancelAnimationFrame(animId);
+        setTimeout(()=>{failed=false;renderBolt(step,stepNum)},1500);showCrewAssist();
+      }
+    });
+  }
+
+  // === FREQUENCY ALIGNMENT ===
+  function renderFreqAlign(step,stepNum){
+    const tA=15+Math.floor(Math.random()*70),tB=15+Math.floor(Math.random()*70),tC=15+Math.floor(Math.random()*70);
+    body.innerHTML=`<div class="repair-step active"><div class="rs-desc">Step ${stepNum}/${sys.steps.length}: ${step}</div><div class="rs-desc" style="color:#3a5a6a;font-size:clamp(7px,.6vw,9px)">Align waveforms by adjusting dials. Match cyan to gold.</div><div class="freq-puzzle"><canvas class="freq-scope" id="freq-cv" width="400" height="60"></canvas><div class="freq-dials"><div class="freq-dial"><label>Amp</label><input type="range" id="fd-a" min="0" max="100" value="50"><div class="fd-val" id="fd-a-v">50</div></div><div class="freq-dial"><label>Freq</label><input type="range" id="fd-b" min="0" max="100" value="50"><div class="fd-val" id="fd-b-v">50</div></div><div class="freq-dial"><label>Phase</label><input type="range" id="fd-c" min="0" max="100" value="50"><div class="fd-val" id="fd-c-v">50</div></div></div><div class="pressure-status solving" id="freq-st">Adjust to match</div></div></div>`;
+    let fAnim;
+    function drawFreq(){
+      const cv=document.getElementById('freq-cv');if(!cv)return;const cx=cv.getContext('2d'),w=cv.width,h=cv.height;
+      cx.fillStyle='rgba(4,8,12,.3)';cx.fillRect(0,0,w,h);const n=performance.now()*.001;
+      const a=parseFloat(document.getElementById('fd-a').value),b=parseFloat(document.getElementById('fd-b').value),c=parseFloat(document.getElementById('fd-c').value);
+      cx.strokeStyle='rgba(212,160,60,.25)';cx.lineWidth=2;cx.beginPath();
+      for(let x=0;x<w;x++){const v=Math.sin(x*.02*tA/50+n)+Math.sin(x*.04*tB/50+n*1.3)*.5+Math.sin(x*.01*tC/50)*.3;const y=h/2+v*h*.2;x===0?cx.moveTo(x,y):cx.lineTo(x,y)}cx.stroke();
+      cx.strokeStyle='rgba(94,196,212,.7)';cx.lineWidth=1.5;cx.beginPath();
+      for(let x=0;x<w;x++){const v=Math.sin(x*.02*a/50+n)+Math.sin(x*.04*b/50+n*1.3)*.5+Math.sin(x*.01*c/50)*.3;const y=h/2+v*h*.2;x===0?cx.moveTo(x,y):cx.lineTo(x,y)}cx.stroke();
+      fAnim=requestAnimationFrame(drawFreq);
+    }
+    drawFreq();
+    ['fd-a','fd-b','fd-c'].forEach(id=>{document.getElementById(id).addEventListener('input',e=>{
+      document.getElementById(id+'-v').textContent=e.target.value;
+      const a=parseFloat(document.getElementById('fd-a').value),b=parseFloat(document.getElementById('fd-b').value),c=parseFloat(document.getElementById('fd-c').value);
+      const diff=Math.abs(a-tA)+Math.abs(b-tB)+Math.abs(c-tC);
+      const st=document.getElementById('freq-st');
+      if(diff<10){st.textContent='✓ Aligned!';st.className='pressure-status solved';cancelAnimationFrame(fAnim);puzzleSound(700,.3);logComms('Engineering','Step '+stepNum+': frequencies aligned.');setTimeout(nextStep,1000)}
+      else if(diff<25){st.textContent='◎ Close…';st.className='pressure-status solving'}
+      else{st.textContent='Adjust to match';st.className='pressure-status solving'}
+    })});
+  }
+
+  // === SEQUENCE MEMORY ===
+  function renderSequence(step,stepNum){
+    const seqLen=4,colors=['#e74c3c','#5ec4d4','#2ecc71','#d4a03c','#9b59b6','#e67e22'];
+    const btnCount=4+Math.min(2,currentStep);const sequence=[];for(let i=0;i<seqLen;i++)sequence.push(Math.floor(Math.random()*btnCount));
+    let playerIdx=0,showing=true;
+    body.innerHTML=`<div class="repair-step active"><div class="rs-desc">Step ${stepNum}/${sys.steps.length}: ${step}</div><div class="rs-desc" style="color:#3a5a6a;font-size:clamp(7px,.6vw,9px)">Watch the sequence, then repeat it.</div><div class="seq-grid" id="seq-grid">${Array.from({length:btnCount},(_, i)=>`<div class="seq-btn" data-idx="${i}" style="border-color:${colors[i]}30;color:${colors[i]}40">${i+1}</div>`).join('')}</div><div class="pressure-status solving" id="seq-st">Watch…</div></div>`;
+    // Show sequence
+    let showIdx=0;
+    const showInt=setInterval(()=>{
+      if(showIdx>0){const prev=body.querySelector(`[data-idx="${sequence[showIdx-1]}"]`);if(prev)prev.classList.remove('flash')}
+      if(showIdx>=seqLen){clearInterval(showInt);showing=false;document.getElementById('seq-st').textContent='Your turn — repeat the sequence';return}
+      const el=body.querySelector(`[data-idx="${sequence[showIdx]}"]`);if(el)el.classList.add('flash');
+      puzzleSound(400+sequence[showIdx]*100,.15);showIdx++;
+    },600);
+    // Player input
+    body.querySelectorAll('.seq-btn').forEach(btn=>btn.addEventListener('click',()=>{
+      if(showing)return;const idx=parseInt(btn.dataset.idx);
+      if(idx===sequence[playerIdx]){btn.classList.add('correct');puzzleSound(400+idx*100,.1);setTimeout(()=>btn.classList.remove('correct'),300);playerIdx++;
+        if(playerIdx>=seqLen){document.getElementById('seq-st').textContent='✓ Sequence correct!';document.getElementById('seq-st').className='pressure-status solved';puzzleSound(600,.3);logComms('Engineering','Step '+stepNum+': frequency sequence entered.');setTimeout(nextStep,1000)}
+      } else {btn.classList.add('wrong');puzzleSound(150,.2);repairFailCount++;
+        document.getElementById('seq-st').textContent='⚠ Wrong — watch again';document.getElementById('seq-st').style.color='#e74c3c';
+        setTimeout(()=>{btn.classList.remove('wrong');renderSequence(step,stepNum)},1200);showCrewAssist();
+      }
+    }));
+  }
+
+  // === WIRE MATCHING ===
+  function renderWire(step,stepNum){
+    const wireCount=4+Math.min(2,currentStep);const wColors=['#e74c3c','#5ec4d4','#2ecc71','#d4a03c','#9b59b6','#e67e22'];
+    const rightOrder=[...Array(wireCount).keys()];const shuffled=[...rightOrder].sort(()=>Math.random()-.5);
+    let selectedLeft=null,matched=0;
+    const matchMap={};// left->right
+    body.innerHTML=`<div class="repair-step active"><div class="rs-desc">Step ${stepNum}/${sys.steps.length}: ${step}</div><div class="rs-desc" style="color:#3a5a6a;font-size:clamp(7px,.6vw,9px)">Match colored wire endpoints. Click left, then matching right.</div><div class="wire-puzzle"><div class="wire-col" id="wire-left">${rightOrder.map(i=>`<div class="wire-node" data-side="l" data-idx="${i}" style="border-color:${wColors[i]};color:${wColors[i]}">${i+1}</div>`).join('')}</div><div class="wire-col" id="wire-right">${shuffled.map(i=>`<div class="wire-node" data-side="r" data-idx="${i}" style="border-color:${wColors[i]};color:${wColors[i]}">${i+1}</div>`).join('')}</div></div><div class="pressure-status solving" id="wire-st">${matched}/${wireCount} connected</div></div>`;
+    body.querySelectorAll('.wire-node').forEach(node=>node.addEventListener('click',()=>{
+      const side=node.dataset.side,idx=parseInt(node.dataset.idx);
+      if(node.classList.contains('matched'))return;
+      if(side==='l'){body.querySelectorAll('.wire-node[data-side="l"]').forEach(n=>n.classList.remove('selected'));node.classList.add('selected');selectedLeft=idx;puzzleSound(400,.08)}
+      else if(selectedLeft!==null){
+        if(idx===selectedLeft){// correct match
+          matchMap[selectedLeft]=idx;matched++;node.classList.add('matched');
+          body.querySelector(`.wire-node[data-side="l"][data-idx="${selectedLeft}"]`).classList.add('matched');
+          body.querySelector(`.wire-node[data-side="l"][data-idx="${selectedLeft}"]`).classList.remove('selected');
+          selectedLeft=null;puzzleSound(500,.15);document.getElementById('wire-st').textContent=matched+'/'+wireCount+' connected';
+          if(matched>=wireCount){document.getElementById('wire-st').textContent='✓ All wires connected!';document.getElementById('wire-st').className='pressure-status solved';puzzleSound(600,.3);logComms('Engineering','Step '+stepNum+': signal paths reconnected.');setTimeout(nextStep,1000)}
+        } else {// wrong
+          node.classList.add('wrong');setTimeout(()=>node.classList.remove('wrong'),500);
+          puzzleSound(150,.15);repairFailCount++;document.getElementById('wire-st').textContent='⚠ Wrong pair — try again';document.getElementById('wire-st').style.color='#e74c3c';
+          setTimeout(()=>{document.getElementById('wire-st').textContent=matched+'/'+wireCount+' connected';document.getElementById('wire-st').style.color=''},800);
+          showCrewAssist();
+        }
+      }
+    }));
+  }
+
+  // === THERMAL MANAGEMENT ===
+  function renderThermal(step,stepNum){
+    const size=3+Math.min(1,currentStep);const cells=[];for(let i=0;i<size*size;i++)cells.push({heat:0});
+    let hotCount=0,maxHot=3,interval,overheated=0;
+    body.innerHTML=`<div class="repair-step active"><div class="rs-desc">Step ${stepNum}/${sys.steps.length}: ${step}</div><div class="rs-desc" style="color:#3a5a6a;font-size:clamp(7px,.6vw,9px)">Click hot cells to cool them before they spread. Don't let ${maxHot} overheat!</div><div class="thermal-grid" style="grid-template-columns:repeat(${size},1fr)" id="th-grid"></div><div class="pressure-status solving" id="th-st">Monitoring…</div><div class="pressure-attempts" id="th-ovh">Overheated: 0/${maxHot}</div></div>`;
+    const grid=document.getElementById('th-grid');
+    function renderCells(){
+      grid.innerHTML='';cells.forEach((c,i)=>{
+        const el=document.createElement('div');
+        el.className='thermal-cell'+(c.heat>=3?' overheated':c.heat>=2?' hot':c.heat>=1?' warm':' cool');
+        el.textContent=c.heat>=2?'⚠':c.heat>=1?'●':'·';el.dataset.idx=i;
+        el.addEventListener('click',()=>{if(c.heat>0){c.heat=0;puzzleSound(500,.1);renderCells()}});
+        grid.appendChild(el);
+      });
+    }
+    renderCells();
+    let ticks=0,targetTicks=15+currentStep*5;
+    interval=setInterval(()=>{
+      // Random hotspot
+      if(Math.random()<.3+currentStep*.1){const ri=Math.floor(Math.random()*cells.length);cells[ri].heat=Math.min(3,cells[ri].heat+1)}
+      // Spread heat
+      cells.forEach((c,i)=>{if(c.heat>=2){const neighbors=[];if(i%size>0)neighbors.push(i-1);if(i%size<size-1)neighbors.push(i+1);if(i>=size)neighbors.push(i-size);if(i<cells.length-size)neighbors.push(i+size);
+        neighbors.forEach(n=>{if(Math.random()<.2)cells[n].heat=Math.min(3,cells[n].heat+1)})}});
+      // Check overheated
+      cells.forEach(c=>{if(c.heat>=3){overheated++;c.heat=0}});
+      document.getElementById('th-ovh').textContent='Overheated: '+overheated+'/'+maxHot;
+      ticks++;renderCells();
+      if(overheated>=maxHot){clearInterval(interval);document.getElementById('th-st').textContent='⚠ Too many overheats — resetting';document.getElementById('th-st').style.color='#e74c3c';repairFailCount++;setTimeout(()=>renderThermal(step,stepNum),1500);showCrewAssist()}
+      if(ticks>=targetTicks&&overheated<maxHot){clearInterval(interval);document.getElementById('th-st').textContent='✓ Thermal stabilized!';document.getElementById('th-st').className='pressure-status solved';puzzleSound(600,.3);logComms('Engineering','Step '+stepNum+': thermal management complete.');setTimeout(nextStep,1000)}
+    },1000);
+  }
+
   modal.classList.add('show');
-  renderStep();
+  renderPuzzle();
 }
 
 // === WEAPONS SYSTEM ===
