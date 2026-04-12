@@ -833,7 +833,7 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .maint-notif .mn-dismiss{background:none;border:none;color:#3a5a6a;cursor:pointer;font-size:12px;padding:0 4px}
 
 /* Repair modal */
-.repair-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:16;width:clamp(320px,35vw,460px);background:rgba(6,10,14,.95);border:1px solid rgba(212,160,60,.2);border-radius:5px;display:none;pointer-events:auto}
+.repair-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:16;width:clamp(380px,42vw,560px);background:rgba(6,10,14,.95);border:1px solid rgba(212,160,60,.2);border-radius:5px;display:none;pointer-events:auto}
 .repair-modal.show{display:block}
 .repair-header{padding:10px 14px;border-bottom:1px solid rgba(212,160,60,.08);display:flex;justify-content:space-between;align-items:center}
 .repair-header .rh-title{font-size:clamp(10px,.95vw,14px);color:#d4a03c;letter-spacing:3px;text-transform:uppercase}
@@ -852,6 +852,29 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .repair-action-btn:hover{border-color:#5ec4d4;background:rgba(94,196,212,.08)}
 .repair-action-btn.success{border-color:#2ecc71;color:#2ecc71;background:rgba(46,204,113,.06)}
 .repair-status{font-size:clamp(7px,.6vw,9px);color:#3a6a7a;text-align:center;margin-top:6px;min-height:14px}
+
+/* === PRESSURE PUZZLE === */
+.pressure-puzzle{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 0}
+.pressure-gauges{display:flex;gap:clamp(6px,.8vw,12px);justify-content:center;align-items:flex-end}
+.pressure-gauge{display:flex;flex-direction:column;align-items:center;gap:4px;width:clamp(50px,5vw,70px)}
+.pg-label{font-size:clamp(7px,.6vw,9px);color:#2a4a5a;letter-spacing:1px;text-transform:uppercase}
+.pg-tube{width:clamp(24px,2.4vw,34px);height:clamp(80px,10vh,120px);border:1px solid rgba(94,196,212,.15);border-radius:3px;background:rgba(4,8,12,.5);position:relative;overflow:hidden}
+.pg-fill{position:absolute;bottom:0;left:0;right:0;border-radius:0 0 2px 2px;transition:height .3s}
+.pg-zone{position:absolute;left:0;right:0;border-top:1px dashed rgba(46,204,113,.25);border-bottom:1px dashed rgba(46,204,113,.25);background:rgba(46,204,113,.04)}
+.pg-val{font-size:clamp(9px,.8vw,12px);color:#5ec4d4;font-variant-numeric:tabular-nums;letter-spacing:1px}
+.pg-val.in-zone{color:#2ecc71}
+.pg-val.danger{color:#e74c3c}
+.pressure-valves{display:flex;gap:clamp(4px,.6vw,8px);justify-content:center;flex-wrap:wrap;margin-top:4px}
+.valve-btn{background:none;border:1px solid rgba(94,196,212,.2);color:#4a7a8a;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:4px 8px;cursor:pointer;border-radius:2px;transition:all .15s;min-width:clamp(40px,4vw,55px);text-align:center}
+.valve-btn:hover{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.06)}
+.valve-btn:active{background:rgba(94,196,212,.12)}
+.valve-btn.boost{border-color:rgba(212,160,60,.3);color:#d4a03c}
+.valve-btn.boost:hover{border-color:#d4a03c;background:rgba(212,160,60,.06)}
+.valve-btn.vent{border-color:rgba(94,196,212,.2);color:#5ec4d4}
+.pressure-status{font-size:clamp(8px,.7vw,10px);letter-spacing:2px;text-align:center;min-height:18px;margin-top:4px}
+.pressure-status.solving{color:#d4a03c}
+.pressure-status.solved{color:#2ecc71}
+.pressure-attempts{font-size:clamp(7px,.6vw,9px);color:#2a4a5a;text-align:center}
 </style>
 </head>
 <body>
@@ -3786,7 +3809,6 @@ function openRepairModal(sys){
         </div>`;
       document.getElementById('repair-done').addEventListener('click',()=>{
         modal.classList.remove('show');
-        // Restore system
         if(sys.sgDot){
           document.getElementById(sys.sgDot).className='sg-dot ok';
           document.getElementById(sys.sgText).style.color='#2ecc71';
@@ -3799,7 +3821,6 @@ function openRepairModal(sys){
         sessionStats.repairs++;
         if(engaged)clickSound();
       });
-      // Success sound
       if(audioCtx){
         const o=audioCtx.createOscillator(),g=audioCtx.createGain();
         o.type='sine';o.frequency.value=600;
@@ -3812,41 +3833,110 @@ function openRepairModal(sys){
     }
     const step=sys.steps[currentStep];
     const stepNum=currentStep+1;
-    const animClass=stepNum%2===0?'calibrating':'scanning';
+    // Generate pressure puzzle
+    const gaugeCount=3+Math.min(2,currentStep); // 3-5 gauges, more on later steps
+    const targetMin=35,targetMax=65; // green zone
+    const gauges=[];
+    for(let i=0;i<gaugeCount;i++){
+      // Start with random pressures, mostly outside the zone
+      let v=Math.random()*100;
+      if(Math.random()<.6)v=v<50?Math.random()*25:75+Math.random()*25; // bias outside zone
+      gauges.push({value:Math.round(v),id:'pg-'+currentStep+'-'+i});
+    }
+    // Connection map — each valve affects its gauge and neighbors
+    const connections=[];
+    for(let i=0;i<gaugeCount;i++){
+      const conn=[i];
+      if(i>0)conn.push(i-1);
+      if(i<gaugeCount-1)conn.push(i+1);
+      connections.push(conn);
+    }
+
+    const gaugeNames=['α','β','γ','δ','ε'];
+    let attempts=0;
+
     body.innerHTML=`
       <div class="repair-step active">
         <div class="rs-desc">Step ${stepNum}/${sys.steps.length}: ${step}</div>
-        <div class="rs-indicator"><div class="rs-fill" id="rs-bar"></div></div>
-        <button class="repair-action-btn" id="repair-next">${stepNum<sys.steps.length?'Execute':'Run Final Check'}</button>
-        <div class="repair-status" id="repair-status">Ready</div>
+        <div class="rs-desc" style="color:#3a5a6a;font-size:clamp(7px,.6vw,9px)">Balance all gauges into the green zone (${targetMin}–${targetMax}). Valves affect connected gauges.</div>
+        <div class="pressure-puzzle">
+          <div class="pressure-gauges" id="pp-gauges-${currentStep}">
+            ${gauges.map((g,i)=>`<div class="pressure-gauge">
+              <div class="pg-label">${gaugeNames[i]}</div>
+              <div class="pg-tube"><div class="pg-zone" style="bottom:${targetMin}%;height:${targetMax-targetMin}%"></div><div class="pg-fill" id="${g.id}" style="height:${g.value}%;background:${g.value>=targetMin&&g.value<=targetMax?'rgba(46,204,113,.4)':g.value>80||g.value<20?'rgba(231,76,60,.4)':'rgba(212,160,60,.4)'}"></div></div>
+              <div class="pg-val ${g.value>=targetMin&&g.value<=targetMax?'in-zone':g.value>80||g.value<20?'danger':''}" id="${g.id}-val">${g.value}</div>
+            </div>`).join('')}
+          </div>
+          <div class="pressure-valves" id="pp-valves-${currentStep}">
+            ${gauges.map((g,i)=>`<div style="display:flex;flex-direction:column;gap:3px;align-items:center">
+              <button class="valve-btn boost" data-gauge="${i}" data-dir="up">▲ ${gaugeNames[i]}</button>
+              <button class="valve-btn vent" data-gauge="${i}" data-dir="down">▼ ${gaugeNames[i]}</button>
+            </div>`).join('')}
+          </div>
+          <div class="pressure-status solving" id="pp-status-${currentStep}">Adjust valves to balance all gauges</div>
+          <div class="pressure-attempts" id="pp-attempts-${currentStep}">Adjustments: 0</div>
+        </div>
       </div>`;
-    document.getElementById('repair-next').addEventListener('click',()=>{
-      const btn=document.getElementById('repair-next');
-      const bar=document.getElementById('rs-bar');
-      const status=document.getElementById('repair-status');
-      btn.disabled=true;btn.style.opacity='.5';btn.textContent='Running…';
-      status.textContent='Processing…';
-      bar.className='rs-fill '+animClass;
-      // Scan sound
-      if(audioCtx){
-        const o=audioCtx.createOscillator(),g=audioCtx.createGain();
-        o.type='sine';o.frequency.value=300+stepNum*100;
-        o.frequency.linearRampToValueAtTime(500+stepNum*100,audioCtx.currentTime+1.5);
-        g.gain.setValueAtTime(.025,audioCtx.currentTime);
-        g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+1.8);
-        o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+2);
-      }
-      const duration=1500+Math.random()*1500;
-      setTimeout(()=>{
-        bar.className='rs-fill complete';
-        status.textContent='✓ Step '+stepNum+' complete';
-        status.style.color='#2ecc71';
-        if(engaged)clickSound();
-        setTimeout(()=>{
-          currentStep++;
-          renderStep();
-        },600);
-      },duration);
+
+    // Attach valve handlers
+    body.querySelectorAll('.valve-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const gi=parseInt(btn.dataset.gauge);
+        const dir=btn.dataset.dir;
+        const amount=dir==='up'?8:-8;
+        attempts++;
+        // Affect this gauge and connected neighbors
+        connections[gi].forEach((ci,idx)=>{
+          const effect=idx===0?amount:Math.round(amount*(-.3-.2*Math.random())); // primary gets full, neighbors get partial inverse
+          gauges[ci].value=Math.max(0,Math.min(100,gauges[ci].value+effect));
+        });
+        // Update visuals
+        gauges.forEach((g,i)=>{
+          const fill=document.getElementById(g.id);
+          const val=document.getElementById(g.id+'-val');
+          if(!fill||!val)return;
+          const inZone=g.value>=targetMin&&g.value<=targetMax;
+          const danger=g.value>80||g.value<20;
+          fill.style.height=g.value+'%';
+          fill.style.background=inZone?'rgba(46,204,113,.4)':danger?'rgba(231,76,60,.4)':'rgba(212,160,60,.4)';
+          val.textContent=g.value;
+          val.className='pg-val'+(inZone?' in-zone':danger?' danger':'');
+        });
+        document.getElementById('pp-attempts-'+currentStep).textContent='Adjustments: '+attempts;
+        // Valve sound
+        if(audioCtx){
+          const o=audioCtx.createOscillator(),g2=audioCtx.createGain();
+          o.type='sine';o.frequency.value=dir==='up'?400:300;
+          o.frequency.linearRampToValueAtTime(dir==='up'?500:200,audioCtx.currentTime+.08);
+          g2.gain.setValueAtTime(.03,audioCtx.currentTime);
+          g2.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.1);
+          o.connect(g2);g2.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.12);
+        }
+        // Check if all in zone
+        const allBalanced=gauges.every(g=>g.value>=targetMin&&g.value<=targetMax);
+        if(allBalanced){
+          const status=document.getElementById('pp-status-'+currentStep);
+          status.textContent='✓ Pressure balanced — Step '+stepNum+' complete';
+          status.className='pressure-status solved';
+          // Disable valves
+          body.querySelectorAll('.valve-btn').forEach(b=>{b.disabled=true;b.style.opacity='.3'});
+          // Success sound
+          if(audioCtx){
+            const o=audioCtx.createOscillator(),g3=audioCtx.createGain();
+            o.type='sine';o.frequency.value=500;
+            o.frequency.linearRampToValueAtTime(800,audioCtx.currentTime+.2);
+            g3.gain.setValueAtTime(.04,audioCtx.currentTime);
+            g3.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.4);
+            o.connect(g3);g3.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.5);
+          }
+          logComms('Engineering','Step '+stepNum+': '+step+' — balanced in '+attempts+' adjustments.');
+          if(engaged)clickSound();
+          setTimeout(()=>{
+            currentStep++;
+            renderStep();
+          },1000);
+        }
+      });
     });
   }
 
