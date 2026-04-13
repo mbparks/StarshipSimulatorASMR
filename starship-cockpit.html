@@ -1407,6 +1407,14 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
       <div id="np-legs-body" style="font-size:clamp(8px,.7vw,10px);color:#3a6a7a;padding:4px 8px"></div>
     </div>
     <button id="np-clear-route" style="background:none;border:1px solid rgba(212,160,60,.2);color:#d4a03c;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:4px 8px;cursor:pointer;border-radius:2px;letter-spacing:1px">Clear Route</button>
+    <div id="np-wp-input" style="display:none;border:1px solid rgba(46,204,113,.2);border-radius:3px;padding:8px;background:rgba(4,8,12,.6)">
+      <div style="font-size:clamp(8px,.7vw,10px);color:#2ecc71;letter-spacing:1px;margin-bottom:4px">Name this waypoint</div>
+      <input type="text" id="np-wp-name" maxlength="24" style="width:100%;background:rgba(10,18,24,.8);border:1px solid rgba(46,204,113,.2);color:#2ecc71;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:4px 8px;outline:none;border-radius:2px;box-sizing:border-box" placeholder="Enter name…">
+      <div style="display:flex;gap:4px;margin-top:4px">
+        <button id="np-wp-confirm" style="flex:1;background:none;border:1px solid rgba(46,204,113,.25);color:#2ecc71;font-family:inherit;font-size:clamp(7px,.6vw,9px);padding:3px;cursor:pointer;border-radius:2px">Place</button>
+        <button id="np-wp-cancel" style="flex:1;background:none;border:1px solid rgba(94,196,212,.15);color:#3a6a7a;font-family:inherit;font-size:clamp(7px,.6vw,9px);padding:3px;cursor:pointer;border-radius:2px">Cancel</button>
+      </div>
+    </div>
   </div>
 </div>
 </div>
@@ -3583,7 +3591,7 @@ const territories=[
 // Fog of war - cleared positions
 const fogCleared=new Set();fogCleared.add('0.48,0.48');
 const customWaypoints=[];
-let navRoute=[],npZoom=1,npPanX=0,npPanY=0,npDragging=false,npDragStartX=0,npDragStartY=0,npSelectedWp=null;
+let navRoute=[],npZoom=1,npPanX=.48,npPanY=.48,npDragging=false,npDragStartX=0,npDragStartY=0,npSelectedWp=null;
 let npShipProgress=0,npAnimFrame=0;
 
 function npWorldToScreen(wx,wy,w,h){
@@ -3825,16 +3833,35 @@ npCanvas.addEventListener('click',e=>{
 });
 
 // Right-click to add custom waypoint
+let npPendingWpWorld=null;
 npCanvas.addEventListener('contextmenu',e=>{
   e.preventDefault();
   const rect=npCanvas.getBoundingClientRect();
   const sx=(e.clientX-rect.left)*2,sy=(e.clientY-rect.top)*2;
-  const world=npScreenToWorld(sx,sy,npCanvas.width,npCanvas.height);
-  const name=prompt('Name this waypoint:');
-  if(!name)return;
-  customWaypoints.push({name,x:world.x,y:world.y,z:0,custom:true,visited:false,fuel:false,relay:false,type:'Custom Marker',planets:0,faction:'Unknown',hazard:'Unknown'});
-  logComms('Nav','Custom waypoint "'+name+'" placed at bearing '+(Math.round(world.x*360))+'°.');
+  npPendingWpWorld=npScreenToWorld(sx,sy,npCanvas.width,npCanvas.height);
+  const inputPanel=document.getElementById('np-wp-input');
+  inputPanel.style.display='block';
+  const nameInput=document.getElementById('np-wp-name');
+  nameInput.value='';nameInput.focus();
+});
+document.getElementById('np-wp-confirm').addEventListener('click',()=>{
+  const name=document.getElementById('np-wp-name').value.trim();
+  if(!name||!npPendingWpWorld)return;
+  customWaypoints.push({name,x:npPendingWpWorld.x,y:npPendingWpWorld.y,z:0,custom:true,visited:false,fuel:false,relay:false,type:'Custom Marker',planets:0,faction:'Unknown',hazard:'Unknown'});
+  logComms('Nav','Custom waypoint "'+name+'" placed.');
+  document.getElementById('np-wp-input').style.display='none';
+  npPendingWpWorld=null;
   if(engaged)clickSound();
+});
+document.getElementById('np-wp-cancel').addEventListener('click',()=>{
+  document.getElementById('np-wp-input').style.display='none';
+  npPendingWpWorld=null;
+  if(engaged)clickSound();
+});
+document.getElementById('np-wp-name').addEventListener('keydown',e=>{
+  if(e.key==='Enter')document.getElementById('np-wp-confirm').click();
+  if(e.key==='Escape')document.getElementById('np-wp-cancel').click();
+  e.stopPropagation();
 });
 
 // Zoom
