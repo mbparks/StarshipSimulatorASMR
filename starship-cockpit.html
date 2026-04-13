@@ -1030,6 +1030,37 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .flare-warning.show{display:block}
 .flare-warning .fw-text{font-size:clamp(11px,1vw,14px);color:#e74c3c;letter-spacing:4px;text-transform:uppercase;animation:blink-crit 1s infinite}
 .flare-warning .fw-timer{font-size:clamp(16px,1.5vw,22px);color:#d4a03c;font-variant-numeric:tabular-nums;margin-top:4px}
+
+/* === EMERGENCY LIGHTING === */
+body.red-alert{background:#0a0000}
+body.red-alert .bezel{background:linear-gradient(180deg,rgba(20,4,4,.85),rgba(10,2,2,.9));border-color:rgba(231,76,60,.06)}
+body.red-alert .top-panel,body.red-alert .bottom-console{background:rgba(15,3,3,.65);border-color:rgba(231,76,60,.08)}
+body.red-alert .left-panel,body.red-alert .right-panel{border-color:rgba(231,76,60,.06)}
+body.red-alert .sys-bar .sb-fill{background:linear-gradient(90deg,rgba(231,76,60,.15),rgba(231,76,60,.35))}
+body.red-alert .sys-bar .sb-label,body.red-alert .readout .ro-val,body.red-alert .hud-val,body.red-alert .console-btn{color:#a03030}
+body.red-alert .sys-bar .sb-val{color:#c04040}
+body.red-alert .readout .ro-label,body.red-alert .hud-label{color:#502020}
+body.red-alert .toggle-btn{border-color:rgba(231,76,60,.08);color:#803030}
+body.red-alert .toggle-btn.on .tb-led{background:#c04040;box-shadow:0 0 4px rgba(231,76,60,.3)}
+body.red-alert .toggle-btn .tb-led{background:#301515}
+body.red-alert .nav-compass{border-color:rgba(231,76,60,.1)}
+body.red-alert .nc-needle{background:linear-gradient(180deg,#c04040,transparent)}
+body.red-alert #c{filter:saturate(.2) brightness(.85)}
+body.red-alert .sg-dot.ok{background:#803030}
+body.red-alert .sg-label{color:#502020}
+body.red-alert .console-btn{border-color:rgba(231,76,60,.1)}
+body.red-alert .scan-ring{border-color:rgba(231,76,60,.3)}
+body.red-alert .mouse-glow{background:radial-gradient(circle,rgba(231,76,60,.015),transparent)}
+body.red-alert .vignette{background:radial-gradient(ellipse at center,transparent 50%,rgba(30,5,5,.6))}
+body.red-alert .scr-btn{border-color:rgba(231,76,60,.1);color:#803030}
+body.red-alert .scr-btn.active{border-color:rgba(231,76,60,.3);color:#c04040}
+body.red-alert .weather-label{color:#502020}
+body.red-alert .crew-entry{color:#703030}
+body.red-alert .radio-el{border-color:rgba(231,76,60,.08);background:rgba(15,3,3,.7)}
+body.red-alert .radio-el .re-src{color:#c04040}
+body.red-alert .radio-el .re-msg{color:#803030}
+body.red-alert #radar{border-color:rgba(231,76,60,.1)}
+body.red-alert #scope{border-color:rgba(231,76,60,.1)}
 </style>
 </head>
 <body>
@@ -1363,9 +1394,21 @@ canvas#c{position:fixed;inset:0;z-index:0}
 
 <!-- NAV PLANNER -->
 <div class="screen-overlay" id="scr-navplan"><button class="s-close" data-close>Close</button>
-<div class="s-title">Navigation Planner</div>
-<canvas id="navplan-canvas" width="1200" height="900" style="width:100%;max-width:1050px;display:block;margin:0 auto;border:1px solid rgba(94,196,212,.08);border-radius:3px;cursor:crosshair"></canvas>
-<div id="navplan-info" style="text-align:center;margin-top:8px;font-size:clamp(10px,.95vw,14px);color:#3a6a7a"></div>
+<div class="s-title">Navigation Planner — Sector 7</div>
+<div style="display:flex;gap:12px;height:calc(100% - 60px)">
+  <div style="flex:1;display:flex;flex-direction:column">
+    <canvas id="navplan-canvas" style="flex:1;width:100%;border:1px solid rgba(94,196,212,.08);border-radius:3px;cursor:crosshair"></canvas>
+    <div id="navplan-info" style="text-align:center;margin-top:6px;font-size:clamp(10px,.95vw,14px);color:#3a6a7a;min-height:20px"></div>
+  </div>
+  <div style="width:clamp(200px,20vw,280px);display:flex;flex-direction:column;gap:8px;overflow-y:auto">
+    <div id="np-detail" style="border:1px solid rgba(94,196,212,.08);border-radius:3px;padding:8px;background:rgba(4,8,12,.4);display:none"></div>
+    <div id="np-route-legs" style="border:1px solid rgba(94,196,212,.08);border-radius:3px;background:rgba(4,8,12,.4);flex:1;overflow-y:auto;min-height:80px">
+      <div style="font-size:clamp(9px,.8vw,11px);color:#2a4a5a;letter-spacing:2px;padding:6px 8px;border-bottom:1px solid rgba(94,196,212,.04);text-transform:uppercase">Route Legs</div>
+      <div id="np-legs-body" style="font-size:clamp(8px,.7vw,10px);color:#3a6a7a;padding:4px 8px"></div>
+    </div>
+    <button id="np-clear-route" style="background:none;border:1px solid rgba(212,160,60,.2);color:#d4a03c;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:4px 8px;cursor:pointer;border-radius:2px;letter-spacing:1px">Clear Route</button>
+  </div>
+</div>
 </div>
 
 <!-- CAMERAS -->
@@ -1545,6 +1588,7 @@ canvas#c{position:fixed;inset:0;z-index:0}
     <button id="probe-btn">Probe</button>
     <button id="tractor-btn">Tractor</button>
     <button id="warp-btn">Warp</button>
+    <button id="emer-light-btn" style="background:none;border:1px solid rgba(231,76,60,.2);color:#e74c3c;padding:clamp(3px,.4vh,6px) clamp(8px,1vw,16px);font-family:inherit;font-size:clamp(8px,.8vw,10px);letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .3s;border-radius:3px">Red Alert</button>
   </div>
 </div>
 
@@ -1934,7 +1978,7 @@ function applyShipName(name){
   // Update database
   if(dbEntries.ship)dbEntries.ship.content=dbEntries.ship.content.replace(/ISS Artemis/g,shipName);
   // Update starmap waypoint
-  navWaypoints.forEach(wp=>{if(wp.name==='Artemis')wp.name=shipName});
+  navWaypoints.forEach(wp=>{if(wp.current)wp.name=shipName});
   waypoints.forEach(wp=>{if(wp.name==='Artemis')wp.name=shipName});
   // Update known contacts
   knownContacts.forEach(c=>{c.name=c.name.replace(/Artemis/g,shipName);c.detail=c.detail.replace(/Artemis/g,shipName)});
@@ -2071,6 +2115,35 @@ document.getElementById('eng-mute').addEventListener('click',()=>{
 document.getElementById('warp-btn').addEventListener('click',()=>{
   if(!engaged)return;warping=!warping;
   document.getElementById('warp-btn').classList.toggle('active',warping);warpSound(warping);
+});
+// Emergency Lighting
+let redAlertActive=false;
+document.getElementById('emer-light-btn').addEventListener('click',()=>{
+  if(!engaged)return;
+  redAlertActive=!redAlertActive;
+  document.body.classList.toggle('red-alert',redAlertActive);
+  const btn=document.getElementById('emer-light-btn');
+  if(redAlertActive){
+    btn.style.borderColor='rgba(231,76,60,.5)';btn.style.background='rgba(231,76,60,.1)';btn.textContent='Red Alert ◉';
+    logComms('Security','⚠ RED ALERT — Emergency lighting engaged. All stations report.');
+    addCrewEntry('Red alert activated. Emergency lighting on all decks.');
+    // Alert sound
+    if(audioCtx){
+      const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+      o.type='square';o.frequency.value=350;
+      o.frequency.setValueAtTime(350,audioCtx.currentTime);
+      o.frequency.setValueAtTime(450,audioCtx.currentTime+.3);
+      o.frequency.setValueAtTime(350,audioCtx.currentTime+.6);
+      g.gain.setValueAtTime(.05,audioCtx.currentTime);
+      g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+1);
+      o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+1.1);
+    }
+  } else {
+    btn.style.borderColor='rgba(231,76,60,.2)';btn.style.background='none';btn.textContent='Red Alert';
+    logComms('Security','Red alert cancelled. Returning to standard lighting.');
+    addCrewEntry('Red alert stood down. Normal operations resumed.');
+  }
+  if(engaged)clickSound();
 });
 canvas.addEventListener('click',e=>{
   if(!engaged)return;
@@ -3481,52 +3554,314 @@ function renderMixer(){
 // === NAV PLANNER ===
 const npCanvas=document.getElementById('navplan-canvas');
 const npCtx=npCanvas.getContext('2d');
+const starTypes=['G2V Yellow Dwarf','K1V Orange Dwarf','M4V Red Dwarf','F5V White','A2V Blue-White','B8V Blue Giant','G8V Yellow','K5V Orange'];
+const factions=['UESA Core','UESA Frontier','Independent Zone','Colonial Territory','Uncharted'];
+const hazards=['None','Asteroid Belt','Radiation Zone','Debris Field','Unstable Orbit','Magnetic Storms'];
 const navWaypoints=[
-  {name:'Artemis',x:.48,y:.48,current:true},{name:'Kepler-442b',x:.3,y:.35},
-  {name:'Proxima Cen',x:.55,y:.25},{name:'Trappist-1',x:.7,y:.45},
-  {name:'Wolf 1061',x:.45,y:.65},{name:'Ross 128',x:.2,y:.6},
-  {name:'HD 40307',x:.8,y:.3},{name:'Gliese 667',x:.65,y:.7},
-  {name:'Waypoint Echo',x:.38,y:.42},
+  {name:shipName,x:.48,y:.48,z:0,current:true,type:'G2V Yellow Dwarf',planets:0,fuel:false,faction:'UESA Core',hazard:'None',visited:true,relay:false},
+  {name:'Kepler-442b',x:.3,y:.35,z:-.02,current:false,type:'G8V Yellow',planets:4,fuel:true,faction:'UESA Frontier',hazard:'None',visited:false,relay:true},
+  {name:'Proxima Cen',x:.55,y:.22,z:.03,current:false,type:'M4V Red Dwarf',planets:2,fuel:true,faction:'UESA Core',hazard:'Radiation Zone',visited:false,relay:true},
+  {name:'Trappist-1',x:.72,y:.45,z:-.01,current:false,type:'M4V Red Dwarf',planets:7,fuel:false,faction:'Colonial Territory',hazard:'Unstable Orbit',visited:false,relay:false},
+  {name:'Wolf 1061',x:.42,y:.68,z:.02,current:false,type:'M4V Red Dwarf',planets:3,fuel:false,faction:'Independent Zone',hazard:'Asteroid Belt',visited:false,relay:false},
+  {name:'Ross 128',x:.18,y:.58,z:-.03,current:false,type:'M4V Red Dwarf',planets:1,fuel:true,faction:'UESA Frontier',hazard:'None',visited:false,relay:true},
+  {name:'HD 40307',x:.82,y:.28,z:.01,current:false,type:'K1V Orange Dwarf',planets:6,fuel:true,faction:'Independent Zone',hazard:'Magnetic Storms',visited:false,relay:false},
+  {name:'Gliese 667',x:.65,y:.72,z:-.02,current:false,type:'K5V Orange',planets:5,fuel:false,faction:'Uncharted',hazard:'Debris Field',visited:false,relay:false},
+  {name:'Waypoint Echo',x:.38,y:.42,z:0,current:false,type:'Station',planets:0,fuel:true,faction:'UESA Core',hazard:'None',visited:false,relay:true},
+  {name:'Tau Ceti',x:.6,y:.15,z:.04,current:false,type:'G8V Yellow',planets:5,fuel:true,faction:'UESA Core',hazard:'None',visited:false,relay:true},
+  {name:'Luyten b',x:.12,y:.35,z:-.01,current:false,type:'M4V Red Dwarf',planets:2,fuel:false,faction:'Uncharted',hazard:'Asteroid Belt',visited:false,relay:false},
+  {name:'Barnard\'s',x:.85,y:.6,z:.03,current:false,type:'M4V Red Dwarf',planets:1,fuel:false,faction:'Colonial Territory',hazard:'None',visited:false,relay:false},
 ];
-let navRoute=[];
+// Hyperspace lanes
+const hyperLanes=[[0,8],[8,1],[1,5],[0,2],[2,9],[2,3],[3,7],[5,10],[6,9],[3,11]];
+// Territorial boundary zones
+const territories=[
+  {name:'UESA Core',color:'rgba(94,196,212,.04)',cx:.5,cy:.38,rx:.2,ry:.18},
+  {name:'Colonial',color:'rgba(212,160,60,.03)',cx:.75,cy:.52,rx:.15,ry:.2},
+  {name:'Independent',color:'rgba(46,204,113,.03)',cx:.3,cy:.6,rx:.18,ry:.15},
+  {name:'Uncharted',color:'rgba(150,100,200,.03)',cx:.15,cy:.4,rx:.12,ry:.15},
+];
+// Fog of war - cleared positions
+const fogCleared=new Set();fogCleared.add('0.48,0.48');
+const customWaypoints=[];
+let navRoute=[],npZoom=1,npPanX=0,npPanY=0,npDragging=false,npDragStartX=0,npDragStartY=0,npSelectedWp=null;
+let npShipProgress=0,npAnimFrame=0;
+
+function npWorldToScreen(wx,wy,w,h){
+  return{x:(wx-npPanX)*npZoom*w+w/2,y:(wy-npPanY)*npZoom*h+h/2};
+}
+function npScreenToWorld(sx,sy,w,h){
+  return{x:(sx-w/2)/(npZoom*w)+npPanX,y:(sy-h/2)/(npZoom*h)+npPanY};
+}
+
 function drawNavPlan(){
-  const w=npCanvas.width=npCanvas.offsetWidth*2||800,h=npCanvas.height=npCanvas.offsetHeight*2||600;
-  npCtx.fillStyle='rgba(4,8,12,.95)';npCtx.fillRect(0,0,w,h);
-  npCtx.strokeStyle='rgba(94,196,212,.04)';npCtx.lineWidth=1;
-  for(let i=0;i<20;i++){const x=i/20*w;npCtx.beginPath();npCtx.moveTo(x,0);npCtx.lineTo(x,h);npCtx.stroke()}
-  for(let i=0;i<15;i++){const y=i/15*h;npCtx.beginPath();npCtx.moveTo(0,y);npCtx.lineTo(w,y);npCtx.stroke()}
+  const w=npCanvas.width=npCanvas.offsetWidth*2||1200;
+  const h=npCanvas.height=npCanvas.offsetHeight*2||900;
+  const now=performance.now()*.001;
+
+  // Nebula background
+  npCtx.fillStyle='rgba(4,8,12,.97)';npCtx.fillRect(0,0,w,h);
+  const nebulas=[{cx:.2,cy:.3,r:.15,h:240},{cx:.7,cy:.6,r:.2,h:280},{cx:.5,cy:.8,r:.12,h:200},{cx:.85,cy:.2,r:.1,h:320}];
+  nebulas.forEach(n=>{
+    const p=npWorldToScreen(n.cx,n.cy,w,h);
+    const nr=n.r*npZoom*w;
+    const ng=npCtx.createRadialGradient(p.x,p.y,0,p.x,p.y,nr);
+    ng.addColorStop(0,`hsla(${n.h},40%,15%,.08)`);ng.addColorStop(.5,`hsla(${n.h},30%,10%,.04)`);ng.addColorStop(1,'transparent');
+    npCtx.fillStyle=ng;npCtx.beginPath();npCtx.arc(p.x,p.y,nr,0,6.283);npCtx.fill();
+  });
+
+  // Grid
+  npCtx.strokeStyle='rgba(94,196,212,.03)';npCtx.lineWidth=1;
+  const gridStep=.05*npZoom;
+  for(let gx=0;gx<1;gx+=.05){const p=npWorldToScreen(gx,0,w,h);npCtx.beginPath();npCtx.moveTo(p.x,0);npCtx.lineTo(p.x,h);npCtx.stroke()}
+  for(let gy=0;gy<1;gy+=.05){const p=npWorldToScreen(0,gy,w,h);npCtx.beginPath();npCtx.moveTo(0,p.y);npCtx.lineTo(w,p.y);npCtx.stroke()}
+
+  // Territorial boundaries
+  territories.forEach(t=>{
+    const p=npWorldToScreen(t.cx,t.cy,w,h);
+    npCtx.fillStyle=t.color;npCtx.beginPath();npCtx.ellipse(p.x,p.y,t.rx*npZoom*w,t.ry*npZoom*h,0,0,6.283);npCtx.fill();
+    npCtx.strokeStyle=t.color.replace(/[\d.]+\)$/,'.08)');npCtx.lineWidth=1;npCtx.setLineDash([6,6]);npCtx.beginPath();npCtx.ellipse(p.x,p.y,t.rx*npZoom*w,t.ry*npZoom*h,0,0,6.283);npCtx.stroke();npCtx.setLineDash([]);
+    if(npZoom<1.5){npCtx.fillStyle=t.color.replace(/[\d.]+\)$/,'.15)');npCtx.font=`${Math.max(10,w*.01)}px 'Courier New'`;npCtx.fillText(t.name,p.x-20,p.y)}
+  });
+
+  // Fog of war
+  for(let fx=0;fx<1;fx+=.02){for(let fy=0;fy<1;fy+=.02){
+    const key=fx.toFixed(2)+','+fy.toFixed(2);
+    let cleared=false;
+    fogCleared.forEach(ck=>{const[cx,cy]=ck.split(',').map(Number);if(Math.abs(fx-cx)<.08&&Math.abs(fy-cy)<.08)cleared=true});
+    if(!cleared){
+      const p=npWorldToScreen(fx,fy,w,h);
+      npCtx.fillStyle='rgba(4,8,12,.4)';npCtx.fillRect(p.x,p.y,.02*npZoom*w,.02*npZoom*h);
+    }
+  }}
+
+  // Comm relay coverage
+  navWaypoints.forEach(wp=>{
+    if(!wp.relay)return;
+    const p=npWorldToScreen(wp.x,wp.y,w,h);
+    const cr=.08*npZoom*w;
+    npCtx.strokeStyle='rgba(94,196,212,.04)';npCtx.lineWidth=1;npCtx.setLineDash([3,5]);
+    npCtx.beginPath();npCtx.arc(p.x,p.y,cr,0,6.283);npCtx.stroke();npCtx.setLineDash([]);
+  });
+
+  // Hyperspace lanes
+  hyperLanes.forEach(([a,b])=>{
+    const pa=npWorldToScreen(navWaypoints[a].x,navWaypoints[a].y,w,h);
+    const pb=npWorldToScreen(navWaypoints[b].x,navWaypoints[b].y,w,h);
+    npCtx.strokeStyle='rgba(94,196,212,.06)';npCtx.lineWidth=2;npCtx.beginPath();npCtx.moveTo(pa.x,pa.y);npCtx.lineTo(pb.x,pb.y);npCtx.stroke();
+    // Flowing dots
+    const dots=5;for(let d=0;d<dots;d++){
+      const t=((now*.1+d/dots)%1);
+      const dx=pa.x+(pb.x-pa.x)*t,dy=pa.y+(pb.y-pa.y)*t;
+      npCtx.fillStyle=`rgba(94,196,212,${.08+Math.sin(t*3.14)*.06})`;npCtx.beginPath();npCtx.arc(dx,dy,1.5,0,6.283);npCtx.fill();
+    }
+  });
+
   // Route
   if(navRoute.length>1){
-    npCtx.strokeStyle='rgba(212,160,60,.3)';npCtx.lineWidth=2;npCtx.setLineDash([8,6]);npCtx.beginPath();
-    navRoute.forEach((idx,i)=>{const wp=navWaypoints[idx];i===0?npCtx.moveTo(wp.x*w,wp.y*h):npCtx.lineTo(wp.x*w,wp.y*h)});
-    npCtx.stroke();npCtx.setLineDash([]);
+    // Animated route line
+    for(let i=1;i<navRoute.length;i++){
+      const a=navWaypoints[navRoute[i-1]],b=navWaypoints[navRoute[i]];
+      const pa=npWorldToScreen(a.x,a.y,w,h),pb=npWorldToScreen(b.x,b.y,w,h);
+      // Glow
+      npCtx.strokeStyle='rgba(212,160,60,.08)';npCtx.lineWidth=6;npCtx.beginPath();npCtx.moveTo(pa.x,pa.y);npCtx.lineTo(pb.x,pb.y);npCtx.stroke();
+      // Line
+      npCtx.strokeStyle='rgba(212,160,60,.35)';npCtx.lineWidth=2;npCtx.beginPath();npCtx.moveTo(pa.x,pa.y);npCtx.lineTo(pb.x,pb.y);npCtx.stroke();
+      // Flowing energy dots
+      for(let d=0;d<8;d++){
+        const t=((now*.3+d/8)%1);
+        const dx=pa.x+(pb.x-pa.x)*t,dy=pa.y+(pb.y-pa.y)*t;
+        npCtx.fillStyle=`rgba(212,160,60,${.2+Math.sin(t*3.14)*.2})`;npCtx.beginPath();npCtx.arc(dx,dy,2,0,6.283);npCtx.fill();
+      }
+      // Leg label
+      const dist=Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2)*40;
+      const midx=(pa.x+pb.x)/2,midy=(pa.y+pb.y)/2;
+      npCtx.fillStyle='rgba(212,160,60,.25)';npCtx.font=`${Math.max(10,w*.01)}px 'Courier New'`;
+      npCtx.fillText(dist.toFixed(1)+'ly',midx+5,midy-5);
+    }
   }
+
   // Waypoints
-  navWaypoints.forEach((wp,i)=>{
-    const wx=wp.x*w,wy=wp.y*h,sel=navRoute.includes(i);
-    npCtx.fillStyle=wp.current?'rgba(94,196,212,.9)':sel?'rgba(212,160,60,.8)':'rgba(94,196,212,.4)';
-    npCtx.beginPath();npCtx.arc(wx,wy,wp.current?6:sel?5:3.5,0,6.283);npCtx.fill();
-    if(wp.current){npCtx.strokeStyle='rgba(94,196,212,.25)';npCtx.lineWidth=1;npCtx.beginPath();npCtx.arc(wx,wy,14,0,6.283);npCtx.stroke()}
-    npCtx.fillStyle=wp.current?'#5ec4d4':sel?'#d4a03c':'rgba(94,196,212,.4)';
-    npCtx.font=`${Math.max(14,w*.018)}px 'Courier New'`;npCtx.fillText(wp.name,wx+12,wy+5);
+  const allWps=[...navWaypoints,...customWaypoints];
+  allWps.forEach((wp,i)=>{
+    const p=npWorldToScreen(wp.x,wp.y,w,h);
+    if(p.x<-50||p.x>w+50||p.y<-50||p.y>h+50)return;
+    const isNav=i<navWaypoints.length;
+    const sel=isNav&&navRoute.includes(i);
+    const isSel=npSelectedWp===wp;
+    // 3D depth indicator
+    if(wp.z&&wp.z!==0){
+      const lineH=wp.z*npZoom*w*2;
+      npCtx.strokeStyle='rgba(94,196,212,.1)';npCtx.lineWidth=1;
+      npCtx.beginPath();npCtx.moveTo(p.x,p.y);npCtx.lineTo(p.x,p.y-lineH);npCtx.stroke();
+    }
+    // Star size based on depth
+    const depthSize=wp.z?3+(1-Math.abs(wp.z)*10):4;
+    const dotSize=wp.current?7:sel?5.5:isSel?5:depthSize;
+    const brightness=wp.z?(.5+.5*(1-Math.abs(wp.z)*10)):1;
+    // Color
+    let color=wp.current?'rgba(94,196,212,.9)':sel?'rgba(212,160,60,.8)':wp.custom?'rgba(46,204,113,.5)':`rgba(94,196,212,${.3*brightness+.1})`;
+    if(wp.fuel&&!wp.current)color='rgba(46,204,113,.5)';
+    npCtx.fillStyle=color;npCtx.beginPath();npCtx.arc(p.x,p.y,dotSize,0,6.283);npCtx.fill();
+    // Current ship pulse
+    if(wp.current){npCtx.strokeStyle='rgba(94,196,212,.2)';npCtx.lineWidth=1;npCtx.beginPath();npCtx.arc(p.x,p.y,12+Math.sin(now*2)*2,0,6.283);npCtx.stroke()}
+    // Selected highlight
+    if(isSel){npCtx.strokeStyle='rgba(212,160,60,.4)';npCtx.lineWidth=1.5;npCtx.beginPath();npCtx.arc(p.x,p.y,dotSize+5,0,6.283);npCtx.stroke()}
+    // Fuel indicator
+    if(wp.fuel&&!wp.current){npCtx.fillStyle='rgba(46,204,113,.25)';npCtx.font=`${Math.max(10,w*.009)}px 'Courier New'`;npCtx.fillText('⛽',p.x-12,p.y-8)}
+    // Label
+    npCtx.fillStyle=wp.current?'#5ec4d4':sel?'#d4a03c':wp.custom?'#2ecc71':`rgba(94,196,212,${.3*brightness+.15})`;
+    npCtx.font=`${Math.max(12,w*.013)}px 'Courier New'`;npCtx.fillText(wp.name,p.x+dotSize+6,p.y+4);
+    // Visited indicator
+    if(wp.visited&&!wp.current){npCtx.fillStyle='rgba(94,196,212,.15)';npCtx.fillText('✓',p.x+dotSize+6,p.y+14)}
+    // Planets at high zoom
+    if(npZoom>1.8&&wp.planets>0){
+      for(let pi=0;pi<Math.min(wp.planets,5);pi++){
+        const pa2=pi/wp.planets*6.283+now*.2;
+        const pr=dotSize+10+pi*5;
+        const px2=p.x+Math.cos(pa2)*pr,py2=p.y+Math.sin(pa2)*pr;
+        npCtx.fillStyle='rgba(94,196,212,.15)';npCtx.beginPath();npCtx.arc(px2,py2,1.5,0,6.283);npCtx.fill();
+      }
+    }
   });
-  // Info
+
+  // Custom waypoints
+  customWaypoints.forEach(wp=>{
+    const p=npWorldToScreen(wp.x,wp.y,w,h);
+    if(p.x<-50||p.x>w+50||p.y<-50||p.y>h+50)return;
+    npCtx.fillStyle='rgba(46,204,113,.4)';npCtx.beginPath();npCtx.arc(p.x,p.y,3,0,6.283);npCtx.fill();
+    npCtx.fillStyle='rgba(46,204,113,.3)';npCtx.font=`${Math.max(10,w*.01)}px 'Courier New'`;npCtx.fillText(wp.name,p.x+8,p.y+4);
+  });
+
+  // Ship position on route
   if(navRoute.length>1){
-    let totalDist=0;
-    for(let i=1;i<navRoute.length;i++){const a=navWaypoints[navRoute[i-1]],b=navWaypoints[navRoute[i]];totalDist+=Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2)*40}
-    document.getElementById('navplan-info').innerHTML=`Route: ${navRoute.length} waypoints — Est. distance: ${totalDist.toFixed(1)} ly — Est. fuel cost: ${(totalDist*2.3).toFixed(0)}% — <span style="color:#d4a03c">⚠ ${totalDist>15?'Exceeds single-tank range':'Route feasible'}</span>`;
+    const shipWp=navWaypoints[navRoute[0]];
+    const nextWp=navWaypoints[navRoute[1]];
+    npShipProgress=Math.min(1,npShipProgress+hudSpeed*.00005);
+    const sx=shipWp.x+(nextWp.x-shipWp.x)*npShipProgress;
+    const sy=shipWp.y+(nextWp.y-shipWp.y)*npShipProgress;
+    const sp=npWorldToScreen(sx,sy,w,h);
+    npCtx.fillStyle='rgba(94,196,212,.9)';npCtx.beginPath();
+    // Ship triangle
+    npCtx.moveTo(sp.x,sp.y-6);npCtx.lineTo(sp.x-4,sp.y+4);npCtx.lineTo(sp.x+4,sp.y+4);npCtx.closePath();npCtx.fill();
+    // Progress readout
+    npCtx.fillStyle='rgba(94,196,212,.3)';npCtx.font=`${Math.max(9,w*.008)}px 'Courier New'`;
+    npCtx.fillText(Math.round(npShipProgress*100)+'%',sp.x+8,sp.y);
+    // Clear fog along path
+    fogCleared.add(sx.toFixed(2)+','+sy.toFixed(2));
+  }
+
+  // Zoom indicator
+  npCtx.fillStyle='rgba(94,196,212,.15)';npCtx.font=`${Math.max(11,w*.01)}px 'Courier New'`;
+  npCtx.fillText('Zoom: '+npZoom.toFixed(1)+'x',10,h-10);
+
+  // Route info
+  updateRouteInfo();
+
+  if(activeScreen==='navplan')npAnimFrame=requestAnimationFrame(drawNavPlan);
+}
+
+function updateRouteInfo(){
+  if(navRoute.length>1){
+    let totalDist=0;const legs=[];
+    for(let i=1;i<navRoute.length;i++){
+      const a=navWaypoints[navRoute[i-1]],b=navWaypoints[navRoute[i]];
+      const dist=Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2)*40;
+      const isLane=hyperLanes.some(([la,lb])=>(la===navRoute[i-1]&&lb===navRoute[i])||(lb===navRoute[i-1]&&la===navRoute[i]));
+      const speed=isLane?1.4:1;const days=Math.round(dist/(hudSpeed*.0042*speed)*365);
+      const fuel=(dist*2.3/speed);
+      totalDist+=dist;
+      legs.push({from:a.name,to:b.name,dist,days,fuel,isLane});
+    }
+    const totalFuel=legs.reduce((s,l)=>s+l.fuel,0);
+    document.getElementById('navplan-info').innerHTML=`Route: ${navRoute.length} wp — ${totalDist.toFixed(1)} ly — Fuel: ${totalFuel.toFixed(0)}% — <span style="color:${totalFuel>hudFuel?'#e74c3c':'#2ecc71'}">${totalFuel>hudFuel?'⚠ Exceeds fuel':'Feasible'}</span>`;
+    document.getElementById('np-legs-body').innerHTML=legs.map((l,i)=>`<div style="padding:3px 0;border-bottom:1px solid rgba(94,196,212,.03)"><span style="color:#5ec4d4">${i+1}.</span> ${l.from} → ${l.to}<br><span style="color:#4a6a6a">${l.dist.toFixed(1)}ly · ${l.days}d · ${l.fuel.toFixed(0)}%${l.isLane?' · <span style="color:#2ecc71">LANE ×1.4</span>':''}</span></div>`).join('');
+  } else {
+    document.getElementById('navplan-info').textContent='Click waypoints to plot route';
+    document.getElementById('np-legs-body').innerHTML='<div style="color:#2a4a5a;padding:4px;font-style:italic">No route plotted</div>';
   }
 }
+
+function showWpDetail(wp){
+  npSelectedWp=wp;
+  const det=document.getElementById('np-detail');
+  const hasDiscoveries=discoveries.filter(d=>d.text&&d.text.includes(wp.name)).length;
+  det.innerHTML=`<div style="font-size:clamp(11px,1vw,14px);color:#5ec4d4;letter-spacing:2px;margin-bottom:6px">${wp.name}</div>
+    ${wp.visited||wp.current?`<div style="font-size:clamp(8px,.7vw,10px);margin-bottom:3px"><span style="color:#2a4a5a">Type:</span> <span style="color:#5ec4d4">${wp.type}</span></div>
+    <div style="font-size:clamp(8px,.7vw,10px);margin-bottom:3px"><span style="color:#2a4a5a">Planets:</span> <span style="color:#5ec4d4">${wp.planets}</span></div>
+    <div style="font-size:clamp(8px,.7vw,10px);margin-bottom:3px"><span style="color:#2a4a5a">Faction:</span> <span style="color:#5ec4d4">${wp.faction}</span></div>
+    <div style="font-size:clamp(8px,.7vw,10px);margin-bottom:3px"><span style="color:#2a4a5a">Hazard:</span> <span style="color:${wp.hazard==='None'?'#2ecc71':'#d4a03c'}">${wp.hazard}</span></div>
+    <div style="font-size:clamp(8px,.7vw,10px);margin-bottom:3px"><span style="color:#2a4a5a">Fuel:</span> <span style="color:${wp.fuel?'#2ecc71':'#4a5a5a'}">${wp.fuel?'Available':'None'}</span></div>
+    <div style="font-size:clamp(8px,.7vw,10px);margin-bottom:3px"><span style="color:#2a4a5a">Relay:</span> <span style="color:${wp.relay?'#5ec4d4':'#4a5a5a'}">${wp.relay?'Active':'No coverage'}</span></div>
+    ${hasDiscoveries?`<div style="font-size:clamp(8px,.7vw,10px);color:#d4a03c;margin-top:4px">${hasDiscoveries} discovery(s) logged</div>`:''}`
+    :`<div style="font-size:clamp(9px,.8vw,11px);color:#3a5a6a;font-style:italic;margin-top:8px">NO DATA<br>Survey required</div>`}`;
+  det.style.display='block';
+}
+
+// Click to select/add to route
 npCanvas.addEventListener('click',e=>{
   const rect=npCanvas.getBoundingClientRect();
-  const mx=(e.clientX-rect.left)/rect.width,my=(e.clientY-rect.top)/rect.height;
+  const sx=(e.clientX-rect.left)*2,sy=(e.clientY-rect.top)*2;
+  const w=npCanvas.width,h=npCanvas.height;
+  const world=npScreenToWorld(sx,sy,w,h);
   let closest=-1,closestD=Infinity;
-  navWaypoints.forEach((wp,i)=>{const d=Math.sqrt((wp.x-mx)**2+(wp.y-my)**2);if(d<.05&&d<closestD){closestD=d;closest=i}});
+  navWaypoints.forEach((wp,i)=>{const d=Math.sqrt((wp.x-world.x)**2+(wp.y-world.y)**2);if(d<.03/npZoom&&d<closestD){closestD=d;closest=i}});
   if(closest>=0){
+    showWpDetail(navWaypoints[closest]);
     const idx=navRoute.indexOf(closest);
     if(idx>=0)navRoute.splice(idx,1);else navRoute.push(closest);
-    drawNavPlan();if(engaged)clickSound();
+    npShipProgress=0;
+    // Comm message on territory crossing
+    if(navRoute.length>1){
+      const lastWp=navWaypoints[navRoute[navRoute.length-1]];
+      const prevWp=navWaypoints[navRoute[navRoute.length-2]];
+      if(lastWp.faction!==prevWp.faction)logComms('Nav','Route crosses into '+lastWp.faction+' space. Jurisdiction protocols may apply.');
+      // Comm relay check
+      if(!lastWp.relay)logComms('Nav','⚠ '+lastWp.name+' has no comm relay. You will be out of contact.');
+    }
+    if(engaged)clickSound();
+  } else {
+    npSelectedWp=null;document.getElementById('np-detail').style.display='none';
   }
+});
+
+// Right-click to add custom waypoint
+npCanvas.addEventListener('contextmenu',e=>{
+  e.preventDefault();
+  const rect=npCanvas.getBoundingClientRect();
+  const sx=(e.clientX-rect.left)*2,sy=(e.clientY-rect.top)*2;
+  const world=npScreenToWorld(sx,sy,npCanvas.width,npCanvas.height);
+  const name=prompt('Name this waypoint:');
+  if(!name)return;
+  customWaypoints.push({name,x:world.x,y:world.y,z:0,custom:true,visited:false,fuel:false,relay:false,type:'Custom Marker',planets:0,faction:'Unknown',hazard:'Unknown'});
+  logComms('Nav','Custom waypoint "'+name+'" placed at bearing '+(Math.round(world.x*360))+'°.');
+  if(engaged)clickSound();
+});
+
+// Zoom
+npCanvas.addEventListener('wheel',e=>{
+  e.preventDefault();
+  npZoom=Math.max(.5,Math.min(4,npZoom+(e.deltaY>0?-.15:.15)));
+},{passive:false});
+
+// Pan
+npCanvas.addEventListener('mousedown',e=>{
+  if(e.button===0){npDragging=true;npDragStartX=e.clientX;npDragStartY=e.clientY}
+});
+npCanvas.addEventListener('mousemove',e=>{
+  if(!npDragging)return;
+  const dx=(e.clientX-npDragStartX)/npCanvas.offsetWidth/npZoom;
+  const dy=(e.clientY-npDragStartY)/npCanvas.offsetHeight/npZoom;
+  npPanX-=dx;npPanY-=dy;
+  npDragStartX=e.clientX;npDragStartY=e.clientY;
+});
+npCanvas.addEventListener('mouseup',()=>{npDragging=false});
+npCanvas.addEventListener('mouseleave',()=>{npDragging=false});
+
+// Clear route
+document.getElementById('np-clear-route').addEventListener('click',()=>{
+  navRoute=[];npShipProgress=0;npSelectedWp=null;
+  document.getElementById('np-detail').style.display='none';
+  if(engaged)clickSound();
 });
 
 // === EXTERIOR CAMERAS ===
@@ -5924,6 +6259,45 @@ function scheduleGravAnomaly(){
 }
 scheduleGravAnomaly();
 
+// === DISTANT SUPERNOVA ===
+let supernova=null;
+function triggerSupernova(){
+  const x=.15+Math.random()*.7,y=.15+Math.random()*.7;
+  const starNames=['Betelgeuse-7','Rigel-4','Antares-9','Vega-12','Altair-3','Deneb-6','Sirius-8','Arcturus-2','Polaris-11','Canopus-5'];
+  const name=starNames[Math.floor(Math.random()*starNames.length)];
+  const dist=(200+Math.floor(Math.random()*1800));
+  const mass=(8+Math.random()*40).toFixed(1);
+  supernova={x,y,phase:0,maxPhase:300,name,dist,mass,flashDone:false,ringRadius:0};
+  logComms('Science','◈ SUPERNOVA DETECTED — Massive stellar detonation at bearing '+(Math.floor(x*360))+'°, distance '+dist+' ly!');
+  addCrewEntry('Dr. Tanaka: "Supernova! Recording spectral data — this is extraordinary."');
+  setTimeout(()=>addCrewEntry('Lt. Park: "…I\'ve never seen anything like that."'),4000);
+  setTimeout(()=>addCrewEntry('Cpt. Vasquez: "Log everything. This is one for the records."'),8000);
+  // Flash sound — deep boom
+  if(audioCtx){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';o.frequency.value=60;
+    o.frequency.linearRampToValueAtTime(30,audioCtx.currentTime+2);
+    g.gain.setValueAtTime(0,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(.06,audioCtx.currentTime+.3);
+    g.gain.linearRampToValueAtTime(.03,audioCtx.currentTime+1);
+    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+3);
+    const f=audioCtx.createBiquadFilter();f.type='lowpass';f.frequency.value=100;
+    o.connect(f);f.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+3.5);
+    // High shimmer
+    const o2=audioCtx.createOscillator(),g2=audioCtx.createGain();
+    o2.type='sine';o2.frequency.value=2000;o2.frequency.linearRampToValueAtTime(800,audioCtx.currentTime+2);
+    g2.gain.setValueAtTime(0,audioCtx.currentTime);g2.gain.linearRampToValueAtTime(.02,audioCtx.currentTime+.2);
+    g2.gain.linearRampToValueAtTime(0,audioCtx.currentTime+3);
+    o2.connect(g2);g2.connect(masterGain);o2.start();o2.stop(audioCtx.currentTime+3.5);
+  }
+}
+
+function scheduleSupernova(){
+  const delay=(600000+Math.random()*900000)/getDifficultyMultiplier('eventFreq');// 10-25 min
+  setTimeout(()=>{if(engaged)triggerSupernova();scheduleSupernova()},delay);
+}
+scheduleSupernova();
+
 // RENDER
 let t=0;
 function draw(now){
@@ -6080,6 +6454,67 @@ function draw(now){
         const intensity=(1-dist/(W*.15))*a*.8;
         if(intensity>flareTarget){flareTarget=intensity;flareEl.style.left=(sx-60)+'px';flareEl.style.top=(sy-60)+'px'}
       }
+    }
+  }
+
+  // Distant supernova
+  if(supernova){
+    const sn=supernova;sn.phase++;
+    const snx=cx+panX+(sn.x-.5)*W*.6,sny=cy+panY+(sn.y-.5)*H*.6;
+    const progress=sn.phase/sn.maxPhase;
+    if(progress<.1){
+      // Initial flash — bright white expanding circle
+      const flashSize=progress/.1;
+      const flashAlpha=(1-flashSize)*.8+.2;
+      const flashR=10+flashSize*60;
+      const fg=ctx.createRadialGradient(snx,sny,0,snx,sny,flashR);
+      fg.addColorStop(0,`rgba(255,255,240,${flashAlpha})`);
+      fg.addColorStop(.3,`rgba(255,220,180,${flashAlpha*.6})`);
+      fg.addColorStop(.7,`rgba(255,160,80,${flashAlpha*.2})`);
+      fg.addColorStop(1,'transparent');
+      ctx.fillStyle=fg;ctx.beginPath();ctx.arc(snx,sny,flashR,0,6.283);ctx.fill();
+      // Screen flash on first frames
+      if(sn.phase<5){
+        ctx.fillStyle=`rgba(255,255,220,${.15-sn.phase*.03})`;ctx.fillRect(0,0,W,H);
+      }
+    } else if(progress<.5){
+      // Fading core + expanding ring
+      const fadeProgress=(progress-.1)/.4;
+      const coreAlpha=(.6-fadeProgress*.5);
+      const coreR=15+fadeProgress*10;
+      // Glowing core
+      const cg=ctx.createRadialGradient(snx,sny,0,snx,sny,coreR);
+      cg.addColorStop(0,`rgba(255,200,120,${coreAlpha})`);
+      cg.addColorStop(.5,`rgba(255,140,60,${coreAlpha*.4})`);
+      cg.addColorStop(1,'transparent');
+      ctx.fillStyle=cg;ctx.beginPath();ctx.arc(snx,sny,coreR,0,6.283);ctx.fill();
+      // Expanding ring
+      sn.ringRadius=30+fadeProgress*200;
+      const ringAlpha=(.3-fadeProgress*.25);
+      ctx.strokeStyle=`rgba(255,200,150,${ringAlpha})`;ctx.lineWidth=2-fadeProgress*1.5;
+      ctx.beginPath();ctx.arc(snx,sny,sn.ringRadius,0,6.283);ctx.stroke();
+      // Outer glow ring
+      ctx.strokeStyle=`rgba(255,150,80,${ringAlpha*.3})`;ctx.lineWidth=6;
+      ctx.beginPath();ctx.arc(snx,sny,sn.ringRadius,0,6.283);ctx.stroke();
+    } else {
+      // Final fade — just the ring getting bigger and dimmer
+      const fadeProgress=(progress-.5)/.5;
+      sn.ringRadius=230+fadeProgress*150;
+      const ringAlpha=(.1-fadeProgress*.1);
+      if(ringAlpha>0){
+        ctx.strokeStyle=`rgba(255,180,120,${ringAlpha})`;ctx.lineWidth=1;
+        ctx.beginPath();ctx.arc(snx,sny,sn.ringRadius,0,6.283);ctx.stroke();
+      }
+      // Tiny remnant dot
+      const dotAlpha=.15-fadeProgress*.15;
+      if(dotAlpha>0){
+        ctx.fillStyle=`rgba(255,200,150,${dotAlpha})`;
+        ctx.beginPath();ctx.arc(snx,sny,3,0,6.283);ctx.fill();
+      }
+    }
+    if(sn.phase>=sn.maxPhase){
+      addDiscovery('supernova','Supernova '+sn.name+' — '+sn.dist+' ly — Mass: '+sn.mass+' M☉ — Spectral data archived');
+      supernova=null;
     }
   }
 
