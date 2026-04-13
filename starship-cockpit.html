@@ -111,29 +111,6 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .probe-card .pc-finding{margin-top:10px;padding:8px;border:1px solid rgba(94,196,212,.1);border-radius:3px;font-size:clamp(8px,.7vw,10px);color:#4a7a8a;line-height:1.6;font-style:italic}
 .probe-card .pc-finding.alien{border-color:rgba(212,160,60,.3);color:#d4a03c}
 
-/* === SIGNAL DECRYPTION === */
-.decrypt-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:16;width:clamp(360px,40vw,520px);background:rgba(6,10,14,.95);border:1px solid rgba(212,160,60,.2);border-radius:5px;display:none;pointer-events:auto}
-.decrypt-modal.show{display:block}
-.decrypt-header{padding:10px 14px;border-bottom:1px solid rgba(212,160,60,.08);display:flex;justify-content:space-between;align-items:center}
-.decrypt-header .dh-title{font-size:clamp(10px,.95vw,14px);color:#d4a03c;letter-spacing:3px;text-transform:uppercase}
-.decrypt-body{padding:14px;text-align:center}
-.decrypt-waveform{width:100%;height:60px;border:1px solid rgba(212,160,60,.1);border-radius:3px;margin-bottom:12px;background:rgba(4,8,12,.5)}
-.decrypt-dials{display:flex;justify-content:center;gap:clamp(12px,2vw,24px);margin-bottom:12px}
-.dial-group{display:flex;flex-direction:column;align-items:center;gap:4px}
-.dial-group .dial-label{font-size:clamp(6px,.55vw,8px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase}
-.dial-group input[type=range]{-webkit-appearance:none;appearance:none;width:clamp(60px,8vw,100px);height:4px;background:#1a2a20;outline:none;border-radius:2px;cursor:pointer}
-.dial-group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:#d4a03c;border-radius:50%;cursor:pointer;box-shadow:0 0 6px rgba(212,160,60,.3)}
-.dial-val{font-size:clamp(8px,.7vw,10px);color:#d4a03c;font-variant-numeric:tabular-nums}
-.decrypt-match{font-size:clamp(8px,.7vw,10px);color:#3a5a3a;letter-spacing:1px;margin-bottom:8px;min-height:16px}
-.decrypt-match.close{color:#d4a03c}
-.decrypt-match.locked{color:#2ecc71}
-.decrypt-btn{background:none;border:1px solid rgba(212,160,60,.25);color:#d4a03c;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:6px 14px;cursor:pointer;border-radius:3px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;width:100%}
-.decrypt-btn:hover{border-color:#d4a03c;background:rgba(212,160,60,.08)}
-.decrypt-btn:disabled{opacity:.4;pointer-events:none}
-.decrypt-result{margin-top:10px;padding:10px;border:1px solid rgba(212,160,60,.15);border-radius:3px;font-size:clamp(8px,.75vw,11px);color:#d4a03c;line-height:1.7;text-align:left;font-style:italic;display:none}
-.decrypt-result.show{display:block}
-.decrypt-fragments{margin-top:8px;font-size:clamp(7px,.6vw,9px);color:#3a5a6a;text-align:left}
-
 /* === NEBULA COLLECTOR === */
 #nebula-collect{position:fixed;bottom:clamp(240px,36vh,380px);left:50%;transform:translateX(-50%);z-index:10;display:none;pointer-events:auto}
 #nebula-collect.show{display:block}
@@ -1031,6 +1008,28 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .crew-assist .ca-text{font-size:clamp(8px,.7vw,10px);color:#4a7a8a;margin-bottom:6px;font-style:italic}
 .crew-assist .ca-btn{background:none;border:1px solid rgba(46,204,113,.2);color:#2ecc71;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:4px 12px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s}
 .crew-assist .ca-btn:hover{border-color:#2ecc71;background:rgba(46,204,113,.06)}
+
+/* === SIGNAL DECRYPTION === */
+.decrypt-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:16;width:clamp(360px,38vw,500px);background:rgba(6,10,14,.95);border:1px solid rgba(212,160,60,.2);border-radius:5px;display:none;pointer-events:auto}
+.decrypt-panel.show{display:block}
+.decrypt-header{padding:10px 14px;border-bottom:1px solid rgba(212,160,60,.1);display:flex;justify-content:space-between;align-items:center}
+.decrypt-header .dh-title{font-size:clamp(10px,.9vw,13px);color:#d4a03c;letter-spacing:3px;text-transform:uppercase}
+.decrypt-body{padding:12px 14px}
+.decrypt-scope{width:100%;height:clamp(50px,6vh,70px);border:1px solid rgba(94,196,212,.08);border-radius:3px;background:rgba(4,8,12,.5);margin-bottom:10px}
+.decrypt-dials{display:flex;gap:clamp(10px,1.5vw,18px);justify-content:center;margin-bottom:10px}
+.decrypt-dial{display:flex;flex-direction:column;align-items:center;gap:3px}
+.decrypt-dial label{font-size:clamp(7px,.65vw,9px);color:#3a5a6a;letter-spacing:1px}
+.decrypt-dial input{-webkit-appearance:none;appearance:none;width:clamp(60px,7vw,90px);height:4px;background:#1a2a32;outline:none;border-radius:2px;cursor:pointer}
+.decrypt-dial input::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:#d4a03c;border-radius:50%;cursor:pointer;box-shadow:0 0 6px rgba(212,160,60,.3)}
+.decrypt-dial .dd-val{font-size:clamp(8px,.7vw,10px);color:#d4a03c;font-variant-numeric:tabular-nums}
+.decrypt-match{font-size:clamp(9px,.8vw,11px);text-align:center;letter-spacing:2px;margin:8px 0;min-height:18px}
+.decrypt-fragment{font-size:clamp(8px,.7vw,10px);color:#5ec4d4;background:rgba(94,196,212,.04);border:1px solid rgba(94,196,212,.08);border-radius:3px;padding:8px;margin-top:8px;font-style:italic;display:none}
+.decrypt-fragment.show{display:block}
+.decrypt-log{max-height:80px;overflow-y:auto;margin-top:6px;font-size:clamp(7px,.6vw,9px);color:#3a5a6a}
+.flare-warning{position:fixed;top:clamp(60px,8vh,100px);left:50%;transform:translateX(-50%);z-index:12;display:none;text-align:center;pointer-events:none}
+.flare-warning.show{display:block}
+.flare-warning .fw-text{font-size:clamp(11px,1vw,14px);color:#e74c3c;letter-spacing:4px;text-transform:uppercase;animation:blink-crit 1s infinite}
+.flare-warning .fw-timer{font-size:clamp(16px,1.5vw,22px);color:#d4a03c;font-variant-numeric:tabular-nums;margin-top:4px}
 </style>
 </head>
 <body>
@@ -1419,23 +1418,6 @@ canvas#c{position:fixed;inset:0;z-index:0}
 <div id="probe-status">Probe in transit… <span id="probe-timer"></span></div>
 <div class="probe-card" id="probe-card"><div class="pc-header"><div class="pc-title" id="pc-title">Probe Data</div><button class="sgp-close" id="pc-close">×</button></div><div class="pc-body" id="pc-body"></div></div>
 
-<!-- Signal Decryption -->
-<div class="decrypt-modal" id="decrypt-modal">
-  <div class="decrypt-header"><div class="dh-title">⟐ Signal Decryption</div><button class="sgp-close" id="decrypt-close">×</button></div>
-  <div class="decrypt-body">
-    <canvas class="decrypt-waveform" id="decrypt-wave" width="400" height="60"></canvas>
-    <div class="decrypt-dials">
-      <div class="dial-group"><div class="dial-label">Freq α</div><input type="range" id="dial-a" min="0" max="100" value="50"><div class="dial-val" id="dial-a-val">50</div></div>
-      <div class="dial-group"><div class="dial-label">Freq β</div><input type="range" id="dial-b" min="0" max="100" value="50"><div class="dial-val" id="dial-b-val">50</div></div>
-      <div class="dial-group"><div class="dial-label">Phase</div><input type="range" id="dial-c" min="0" max="100" value="50"><div class="dial-val" id="dial-c-val">50</div></div>
-    </div>
-    <div class="decrypt-match" id="decrypt-match">Adjust dials to match the target waveform</div>
-    <button class="decrypt-btn" id="decrypt-lock" disabled>Lock Signal</button>
-    <div class="decrypt-result" id="decrypt-result"></div>
-    <div class="decrypt-fragments" id="decrypt-fragments"></div>
-  </div>
-</div>
-
 <!-- Nebula Collector -->
 <div id="nebula-collect"><button id="nebula-collect-btn">◈ Deploy Collector</button></div>
 <div id="collect-progress"><div class="cp-bar"><div class="cp-fill" id="cp-fill"></div></div><div class="cp-text">Collecting nebula sample…</div></div>
@@ -1449,6 +1431,28 @@ canvas#c{position:fixed;inset:0;z-index:0}
 
 <!-- Tractor Beam Status -->
 <div id="tractor-status"></div>
+
+<!-- Signal Decryption -->
+<div class="decrypt-panel" id="decrypt-panel">
+  <div class="decrypt-header"><span class="dh-title">◈ Signal Decrypt</span><button class="pwr-close" id="decrypt-close">×</button></div>
+  <div class="decrypt-body">
+    <canvas class="decrypt-scope" id="decrypt-cv" width="400" height="50"></canvas>
+    <div class="decrypt-dials">
+      <div class="decrypt-dial"><label>Carrier</label><input type="range" id="dc-a" min="0" max="100" value="50"><div class="dd-val" id="dc-a-v">50</div></div>
+      <div class="decrypt-dial"><label>Harmonic</label><input type="range" id="dc-b" min="0" max="100" value="50"><div class="dd-val" id="dc-b-v">50</div></div>
+      <div class="decrypt-dial"><label>Phase</label><input type="range" id="dc-c" min="0" max="100" value="50"><div class="dd-val" id="dc-c-v">50</div></div>
+    </div>
+    <div class="decrypt-match" id="decrypt-match">Adjust dials to lock signal</div>
+    <div class="decrypt-fragment" id="decrypt-fragment"></div>
+    <div class="decrypt-log" id="decrypt-log"></div>
+  </div>
+</div>
+
+<!-- Solar Flare Warning -->
+<div class="flare-warning" id="flare-warning">
+  <div class="fw-text">⚠ Solar Flare Incoming ⚠</div>
+  <div class="fw-timer" id="flare-timer">30</div>
+</div>
 
 <!-- DISCOVERY LOG -->
 <div class="screen-overlay" id="scr-discovery"><button class="s-close" data-close>Close</button>
@@ -1870,7 +1874,7 @@ function scheduleRadio(){
       replyEl.innerHTML=existingHTML+'<button class="reply-btn" id="decrypt-trigger" style="border-color:rgba(212,160,60,.4);color:#d4a03c">◈ Attempt Decrypt</button>';
       document.getElementById('decrypt-trigger').addEventListener('click',()=>{
         replyEl.classList.remove('show');
-        openDecryptModal();
+        triggerDecrypt();
         if(engaged)clickSound();
       });
     }
@@ -4045,7 +4049,7 @@ function openRepairModal(sys){
           el.className='leak-cell tested';el.textContent=dist<=2?'◉':'○';
           document.getElementById('leak-ind').textContent='Pressure '+(dist<=2?'fluctuating':'stable')+' — leak is '+dir;
           puzzleSound(300+dist*50,.1);
-          if(tests>=maxTests){repairFailCount++;document.getElementById('leak-ind').textContent='⚠ Tests exhausted — resetting';document.getElementById('leak-ind').style.color='#e74c3c';setTimeout(()=>renderLeak(step,stepNum),1500);showCrewAssist()}
+          if(tests>=maxTests){repairFailCount++;document.getElementById('leak-ind').textContent='⚠ Tests exhausted — resetting';document.getElementById('leak-ind').style.color='#e74c3c';setTimeout(()=>{renderLeak(step,stepNum);showCrewAssist()},1500)}
         }
       });
       grid.appendChild(el);
@@ -4084,7 +4088,7 @@ function openRepairModal(sys){
       } else {
         puzzleSound(150,.2);document.getElementById('bolt-status').textContent='⚠ Stripped! Retrying…';document.getElementById('bolt-status').style.color='#e74c3c';
         repairFailCount++;failed=true;cancelAnimationFrame(animId);
-        setTimeout(()=>{failed=false;renderBolt(step,stepNum)},1500);showCrewAssist();
+        setTimeout(()=>{failed=false;renderBolt(step,stepNum);showCrewAssist()},1500);
       }
     });
   }
@@ -4137,7 +4141,7 @@ function openRepairModal(sys){
         if(playerIdx>=seqLen){document.getElementById('seq-st').textContent='✓ Sequence correct!';document.getElementById('seq-st').className='pressure-status solved';puzzleSound(600,.3);logComms('Engineering','Step '+stepNum+': frequency sequence entered.');setTimeout(nextStep,1000)}
       } else {btn.classList.add('wrong');puzzleSound(150,.2);repairFailCount++;
         document.getElementById('seq-st').textContent='⚠ Wrong — watch again';document.getElementById('seq-st').style.color='#e74c3c';
-        setTimeout(()=>{btn.classList.remove('wrong');renderSequence(step,stepNum)},1200);showCrewAssist();
+        setTimeout(()=>{btn.classList.remove('wrong');renderSequence(step,stepNum);showCrewAssist()},1200);
       }
     }));
   }
@@ -4197,7 +4201,7 @@ function openRepairModal(sys){
       cells.forEach(c=>{if(c.heat>=3){overheated++;c.heat=0}});
       document.getElementById('th-ovh').textContent='Overheated: '+overheated+'/'+maxHot;
       ticks++;renderCells();
-      if(overheated>=maxHot){clearInterval(interval);document.getElementById('th-st').textContent='⚠ Too many overheats — resetting';document.getElementById('th-st').style.color='#e74c3c';repairFailCount++;setTimeout(()=>renderThermal(step,stepNum),1500);showCrewAssist()}
+      if(overheated>=maxHot){clearInterval(interval);document.getElementById('th-st').textContent='⚠ Too many overheats — resetting';document.getElementById('th-st').style.color='#e74c3c';repairFailCount++;setTimeout(()=>{renderThermal(step,stepNum);showCrewAssist()},1500)}
       if(ticks>=targetTicks&&overheated<maxHot){clearInterval(interval);document.getElementById('th-st').textContent='✓ Thermal stabilized!';document.getElementById('th-st').className='pressure-status solved';puzzleSound(600,.3);logComms('Engineering','Step '+stepNum+': thermal management complete.');setTimeout(nextStep,1000)}
     },1000);
   }
@@ -5001,123 +5005,6 @@ document.getElementById('probe-btn').addEventListener('click',()=>{
 });
 document.getElementById('pc-close').addEventListener('click',()=>{document.getElementById('probe-card').classList.remove('show');if(engaged)clickSound()});
 
-// === SIGNAL DECRYPTION ===
-const decryptFragments=[];
-const messageFragments=[
-  '...we are... not alone in this corridor...',
-  '...coordinates locked... waiting... for response...',
-  '...the builders left... long before we arrived...',
-  '...do not approach... the structure... at bearing 215...',
-  '...signal repeats every... 4,722 years... origin predates...',
-  '...translation matrix incomplete... language unknown... mathematical base-12...',
-  '...they knew we would come... the beacon was meant... to be found...',
-  '...subsurface ocean confirmed... thermal signatures suggest... active biology...',
-];
-let decryptTargetA=0,decryptTargetB=0,decryptTargetC=0,decryptAnimFrame=0;
-
-function openDecryptModal(){
-  // Generate random target values
-  decryptTargetA=15+Math.floor(Math.random()*70);
-  decryptTargetB=15+Math.floor(Math.random()*70);
-  decryptTargetC=15+Math.floor(Math.random()*70);
-  // Reset dials
-  document.getElementById('dial-a').value=50;document.getElementById('dial-a-val').textContent='50';
-  document.getElementById('dial-b').value=50;document.getElementById('dial-b-val').textContent='50';
-  document.getElementById('dial-c').value=50;document.getElementById('dial-c-val').textContent='50';
-  document.getElementById('decrypt-match').textContent='Adjust dials to match the target waveform';
-  document.getElementById('decrypt-match').className='decrypt-match';
-  document.getElementById('decrypt-lock').disabled=true;
-  document.getElementById('decrypt-result').classList.remove('show');
-  document.getElementById('decrypt-modal').classList.add('show');
-  drawDecryptWave();
-}
-document.getElementById('decrypt-close').addEventListener('click',()=>{
-  document.getElementById('decrypt-modal').classList.remove('show');
-  cancelAnimationFrame(decryptAnimFrame);
-  if(engaged)clickSound();
-});
-
-function drawDecryptWave(){
-  const cv=document.getElementById('decrypt-wave');
-  const cx=cv.getContext('2d');
-  const w=cv.width,h=cv.height;
-  cx.fillStyle='rgba(4,8,12,.4)';cx.fillRect(0,0,w,h);
-  const now=performance.now()*.001;
-  const a=parseFloat(document.getElementById('dial-a').value);
-  const b=parseFloat(document.getElementById('dial-b').value);
-  const c=parseFloat(document.getElementById('dial-c').value);
-  // Target waveform (dim)
-  cx.strokeStyle='rgba(212,160,60,.2)';cx.lineWidth=2;cx.beginPath();
-  for(let x=0;x<w;x++){
-    const v=Math.sin(x*.02*decryptTargetA/50+now)+Math.sin(x*.04*decryptTargetB/50+now*1.3)*.5+Math.sin(x*.01*decryptTargetC/50)*.3;
-    const y=h/2+v*h*.2;x===0?cx.moveTo(x,y):cx.lineTo(x,y);
-  }
-  cx.stroke();
-  // Player waveform
-  cx.strokeStyle='rgba(94,196,212,.7)';cx.lineWidth=1.5;cx.beginPath();
-  for(let x=0;x<w;x++){
-    const v=Math.sin(x*.02*a/50+now)+Math.sin(x*.04*b/50+now*1.3)*.5+Math.sin(x*.01*c/50)*.3;
-    const y=h/2+v*h*.2;x===0?cx.moveTo(x,y):cx.lineTo(x,y);
-  }
-  cx.stroke();
-  decryptAnimFrame=requestAnimationFrame(drawDecryptWave);
-}
-
-['dial-a','dial-b','dial-c'].forEach(id=>{
-  document.getElementById(id).addEventListener('input',e=>{
-    document.getElementById(id+'-val').textContent=e.target.value;
-    checkDecryptMatch();
-  });
-});
-
-function checkDecryptMatch(){
-  const a=parseFloat(document.getElementById('dial-a').value);
-  const b=parseFloat(document.getElementById('dial-b').value);
-  const c=parseFloat(document.getElementById('dial-c').value);
-  const diffA=Math.abs(a-decryptTargetA);
-  const diffB=Math.abs(b-decryptTargetB);
-  const diffC=Math.abs(c-decryptTargetC);
-  const totalDiff=diffA+diffB+diffC;
-  const match=document.getElementById('decrypt-match');
-  const lockBtn=document.getElementById('decrypt-lock');
-  if(totalDiff<10){
-    match.textContent='◉ SIGNAL LOCKED — Waveforms aligned';
-    match.className='decrypt-match locked';
-    lockBtn.disabled=false;
-  } else if(totalDiff<30){
-    match.textContent='◎ Close — Fine-tune frequency dials';
-    match.className='decrypt-match close';
-    lockBtn.disabled=true;
-  } else {
-    match.textContent='○ Searching — Adjust dials to match target';
-    match.className='decrypt-match';
-    lockBtn.disabled=true;
-  }
-}
-
-document.getElementById('decrypt-lock').addEventListener('click',()=>{
-  const fragment=messageFragments[decryptFragments.length%messageFragments.length];
-  decryptFragments.push(fragment);
-  sessionStats.signalsDecrypted++;
-  document.getElementById('decrypt-result').textContent='DECRYPTED: "'+fragment+'"';
-  document.getElementById('decrypt-result').classList.add('show');
-  document.getElementById('decrypt-lock').disabled=true;
-  document.getElementById('decrypt-match').textContent='✓ Fragment decoded and archived';
-  // Show all fragments
-  document.getElementById('decrypt-fragments').innerHTML='<strong>Archived Fragments ('+decryptFragments.length+'):</strong><br>'+decryptFragments.map((f,i)=>'['+(i+1)+'] '+f).join('<br>');
-  logComms('Sensors','Signal fragment decoded: "'+fragment+'"');
-  addDiscovery('signal','Decrypted fragment #'+decryptFragments.length+': "'+fragment+'"');
-  if(audioCtx){
-    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
-    o.type='sine';o.frequency.value=1000;
-    o.frequency.linearRampToValueAtTime(1400,audioCtx.currentTime+.2);
-    g.gain.setValueAtTime(.04,audioCtx.currentTime);
-    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.5);
-    o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.6);
-  }
-  if(engaged)clickSound();
-});
-
 // === NEBULA COLLECTOR ===
 let nebulaCollecting=false,nearNebula=false;
 const nebulaElements=['Hydrogen','Helium','Carbon','Nitrogen','Oxygen','Neon','Silicon','Iron','Lithium','Phosphorus'];
@@ -5358,12 +5245,13 @@ let flightYaw=0,flightPitch=0,flightRoll=0,courseMark=0;
 document.getElementById('fc-yaw').addEventListener('input',e=>{
   flightYaw=e.target.value/100*30;
   document.getElementById('fc-yaw-val').textContent=flightYaw.toFixed(1)+'°';
-  panTargetX=flightYaw*5;
+  panTargetX=flightYaw*12;
+  hudHeading=(hudHeading+flightYaw*.02+360)%360;
 });
 document.getElementById('fc-pitch').addEventListener('input',e=>{
   flightPitch=e.target.value/100*20;
   document.getElementById('fc-pitch-val').textContent=flightPitch.toFixed(1)+'°';
-  panTargetY=flightPitch*5;
+  panTargetY=flightPitch*10;
 });
 document.getElementById('fc-roll').addEventListener('input',e=>{
   flightRoll=e.target.value/100*45;
@@ -5848,6 +5736,194 @@ function releaseTractor(){
 // Hook tractor into canvas click
 const origCanvasClick=canvas.onclick;
 
+// === SIGNAL DECRYPTION ===
+const decryptFragments=[];
+const decryptLore=[
+  'FRAGMENT: "...the Kepler Array has detected non-natural structures in the outer belt..."',
+  'FRAGMENT: "...trade embargo on Sector 9 effective immediately per UESA Directive 44-C..."',
+  'FRAGMENT: "...colonial transport Meridian reports unknown vessel shadowing at 0.4 ly..."',
+  'FRAGMENT: "...Dr. Halcyon\'s research confirms baryonic readings are of artificial origin..."',
+  'FRAGMENT: "...all patrols redirected to the Trappist corridor. Something has changed..."',
+  'FRAGMENT: "...first contact protocols activated. This is not a drill. Repeat: not a drill..."',
+  'FRAGMENT: "...mining guild disputes threaten supply lines to outer rim installations..."',
+  'FRAGMENT: "...ancient beacon network pre-dates human expansion by an estimated 40,000 years..."',
+  'FRAGMENT: "...gravitational lensing data suggests a massive structure beyond the Oort boundary..."',
+  'FRAGMENT: "...classified communiqué: Operation Lighthouse is greenlit. Deploy to coordinates..."',
+  'FRAGMENT: "...crew of the CSV Magellan report auditory anomalies near the relay station..."',
+  'FRAGMENT: "...spectral analysis of Nebula KX-7 reveals organic compounds inconsistent with known chemistry..."',
+];
+let decryptTargetA=0,decryptTargetB=0,decryptTargetC=0,decryptActive=false,decryptAnim=0;
+
+function triggerDecrypt(){
+  if(decryptActive)return;
+  decryptActive=true;
+  decryptTargetA=10+Math.floor(Math.random()*80);
+  decryptTargetB=10+Math.floor(Math.random()*80);
+  decryptTargetC=10+Math.floor(Math.random()*80);
+  document.getElementById('dc-a').value=50;document.getElementById('dc-b').value=50;document.getElementById('dc-c').value=50;
+  document.getElementById('dc-a-v').textContent='50';document.getElementById('dc-b-v').textContent='50';document.getElementById('dc-c-v').textContent='50';
+  document.getElementById('decrypt-match').textContent='Adjust dials to lock signal';document.getElementById('decrypt-match').className='decrypt-match';
+  document.getElementById('decrypt-fragment').classList.remove('show');
+  document.getElementById('decrypt-panel').classList.add('show');
+  logComms('Comms','Encrypted transmission intercepted. Attempting to isolate frequency.');
+  drawDecryptScope();
+}
+
+function drawDecryptScope(){
+  if(!decryptActive)return;
+  const cv=document.getElementById('decrypt-cv');if(!cv)return;
+  const cx=cv.getContext('2d'),w=cv.width,h=cv.height,n=performance.now()*.001;
+  cx.fillStyle='rgba(4,8,12,.2)';cx.fillRect(0,0,w,h);
+  const a=parseFloat(document.getElementById('dc-a').value),b=parseFloat(document.getElementById('dc-b').value),c=parseFloat(document.getElementById('dc-c').value);
+  // Target waveform (gold)
+  cx.strokeStyle='rgba(212,160,60,.2)';cx.lineWidth=2;cx.beginPath();
+  for(let x=0;x<w;x++){const v=Math.sin(x*.03*decryptTargetA/50+n)+Math.sin(x*.05*decryptTargetB/50+n*1.5)*.5+Math.sin(x*.02*decryptTargetC/50)*.3;const y=h/2+v*h*.18;x===0?cx.moveTo(x,y):cx.lineTo(x,y)}cx.stroke();
+  // User waveform (cyan)
+  cx.strokeStyle='rgba(94,196,212,.7)';cx.lineWidth=1.5;cx.beginPath();
+  for(let x=0;x<w;x++){const v=Math.sin(x*.03*a/50+n)+Math.sin(x*.05*b/50+n*1.5)*.5+Math.sin(x*.02*c/50)*.3;const y=h/2+v*h*.18;x===0?cx.moveTo(x,y):cx.lineTo(x,y)}cx.stroke();
+  decryptAnim=requestAnimationFrame(drawDecryptScope);
+}
+
+['dc-a','dc-b','dc-c'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',e=>{
+    document.getElementById(id+'-v').textContent=e.target.value;
+    const a=parseFloat(document.getElementById('dc-a').value),b=parseFloat(document.getElementById('dc-b').value),c=parseFloat(document.getElementById('dc-c').value);
+    const diff=Math.abs(a-decryptTargetA)+Math.abs(b-decryptTargetB)+Math.abs(c-decryptTargetC);
+    const el=document.getElementById('decrypt-match');
+    if(diff<8){
+      el.textContent='◉ SIGNAL LOCKED';el.className='decrypt-match locked';
+      cancelAnimationFrame(decryptAnim);decryptActive=false;
+      const frag=decryptLore[decryptFragments.length%decryptLore.length];
+      decryptFragments.push(frag);
+      document.getElementById('decrypt-fragment').textContent=frag;
+      document.getElementById('decrypt-fragment').classList.add('show');
+      sessionStats.signalsDecrypted++;
+      addDiscovery('signal','Decrypted fragment #'+decryptFragments.length+': '+frag.substring(0,60)+'…');
+      logComms('Comms','Signal decoded! Fragment recovered: '+frag.substring(0,50)+'…');
+      if(audioCtx){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=600;o.frequency.linearRampToValueAtTime(900,audioCtx.currentTime+.2);g.gain.setValueAtTime(.04,audioCtx.currentTime);g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.4);o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.5)}
+    } else if(diff<20){el.textContent='◎ Almost… fine-tune';el.className='decrypt-match close'}
+    else if(diff<40){el.textContent='Signal detected…';el.className='decrypt-match close'}
+    else{el.textContent='Adjust dials to lock signal';el.className='decrypt-match'}
+  });
+});
+document.getElementById('decrypt-close').addEventListener('click',()=>{
+  document.getElementById('decrypt-panel').classList.remove('show');
+  decryptActive=false;cancelAnimationFrame(decryptAnim);if(engaged)clickSound();
+});
+
+// Trigger encrypted transmissions periodically
+function scheduleDecryptEvent(){
+  const delay=(180000+Math.random()*300000)/getDifficultyMultiplier('eventFreq');// 3-8 min
+  setTimeout(()=>{
+    if(engaged&&!decryptActive){
+      logComms('Comms','◈ Encrypted transmission detected on subspace band. Attempting intercept…');
+      addCrewEntry('Comms: Encrypted signal intercepted. Decryption available.');
+      setTimeout(()=>{if(!decryptActive)triggerDecrypt()},3000);
+    }
+    scheduleDecryptEvent();
+  },delay);
+}
+scheduleDecryptEvent();
+
+// === SOLAR FLARE EVENT ===
+let solarFlareActive=false;
+function triggerSolarFlare(){
+  if(solarFlareActive||difficulty==='peaceful')return;
+  solarFlareActive=true;
+  solarWind=.9+Math.random()*.1;// spike weather
+  const warning=document.getElementById('flare-warning');
+  warning.classList.add('show');
+  logComms('Science','⚠ SOLAR FLARE WARNING — Massive coronal ejection detected. Impact in 30 seconds!');
+  addCrewEntry('Dr. Tanaka: "Solar flare incoming! Recommend boosting shields immediately!"');
+  // Alarm
+  if(audioCtx){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='square';o.frequency.value=400;g.gain.setValueAtTime(.05,audioCtx.currentTime);g.gain.linearRampToValueAtTime(.02,audioCtx.currentTime+1);g.gain.linearRampToValueAtTime(.05,audioCtx.currentTime+1.5);g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+2.5);o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+3)}
+  let countdown=30;
+  const cInt=setInterval(()=>{
+    countdown--;document.getElementById('flare-timer').textContent=countdown;
+    if(countdown<=10)document.getElementById('flare-timer').style.color='#e74c3c';
+    if(countdown<=0){
+      clearInterval(cInt);warning.classList.remove('show');
+      // Impact!
+      const shieldPct=shieldsVal;
+      if(shieldPct>60){
+        shieldsVal=Math.max(40,shieldsVal-20);
+        logComms('Science','Solar flare impact. Shields absorbed majority of radiation. Minor shield drain.');
+        addCrewEntry('Dr. Tanaka: "Flare passed. Shields held. Minimal radiation exposure."');
+      } else {
+        shieldsVal=Math.max(10,shieldsVal-40);
+        radVal=Math.min(.09,radVal+.03);
+        o2Val=Math.max(70,o2Val-5);
+        logComms('Science','⚠ Solar flare impact — shields insufficient! Elevated crew radiation exposure!');
+        logComms('Med Bay','Dr. Okafor reporting to Med Bay. Crew radiation levels elevated. Administering treatment.');
+        addCrewEntry('Dr. Okafor: "All crew report for radiation screening. This is mandatory."');
+        addCrewEntry('Cpt. Vasquez: "Noted. Everyone get checked out."');
+      }
+      // Screen flash
+      const flashEl=document.createElement('div');flashEl.style.cssText='position:fixed;inset:0;background:rgba(255,200,50,.15);z-index:3;pointer-events:none';
+      document.body.appendChild(flashEl);setTimeout(()=>flashEl.remove(),500);
+      document.getElementById('flare-timer').style.color='#d4a03c';
+      solarFlareActive=false;
+      solarWind=.3+Math.random()*.2;// normalize
+    }
+  },1000);
+}
+
+function scheduleSolarFlare(){
+  const delay=(300000+Math.random()*600000)/getDifficultyMultiplier('eventFreq');// 5-15 min
+  setTimeout(()=>{if(engaged)triggerSolarFlare();scheduleSolarFlare()},delay);
+}
+scheduleSolarFlare();
+
+// === GRAVITATIONAL ANOMALY ===
+let gravAnomalyActive=false;
+function triggerGravAnomaly(){
+  if(gravAnomalyActive)return;
+  gravAnomalyActive=true;
+  logComms('Science','◈ Gravitational anomaly detected! Instruments fluctuating.');
+  addCrewEntry('Dr. Tanaka: "Fascinating — gravitational lensing! Recording everything."');
+  addCrewEntry('Lt. Park: "Helm is sluggish — compensating."');
+  // Save original values
+  const origHeading=hudHeading,origDrift=driftVal;
+  const duration=30000;const startTime=Date.now();
+  // Apply warp filter to canvas
+  const canvasEl=document.getElementById('c');
+  canvasEl.style.transition='filter .5s';
+  canvasEl.style.filter='hue-rotate(5deg)';
+  // Instrument haywire
+  const haywireInt=setInterval(()=>{
+    const elapsed=Date.now()-startTime;
+    if(elapsed>=duration){
+      clearInterval(haywireInt);
+      gravAnomalyActive=false;
+      canvasEl.style.filter='';
+      driftVal=origDrift;
+      logComms('Science','Gravitational anomaly passed. All instruments returning to normal.');
+      addCrewEntry('Dr. Tanaka: "Data recorded! This could be a new class of gravitational object."');
+      addDiscovery('anomaly','Gravitational anomaly — spacetime curvature '+(.01+Math.random()*.05).toFixed(3)+' — data logged for analysis');
+      return;
+    }
+    // Random fluctuations
+    hudHeading=(origHeading+Math.sin(elapsed*.001)*15+Math.random()*5)%360;
+    driftVal=.003+Math.sin(elapsed*.002)*.02;
+    shieldsVal=Math.max(50,Math.min(100,shieldsVal+(Math.random()-.5)*3));
+    o2Val=Math.max(80,Math.min(100,o2Val+(Math.random()-.5)*2));
+    // Viewport warp
+    const warpAmount=Math.sin(elapsed*.0015)*8;
+    canvasEl.style.filter=`hue-rotate(${warpAmount}deg)`;
+  },200);
+  // Add screen shake
+  const shakeInt=setInterval(()=>{
+    if(!gravAnomalyActive){clearInterval(shakeInt);panTargetX=0;panTargetY=0;return}
+    panTargetX=(Math.random()-.5)*15;panTargetY=(Math.random()-.5)*10;
+  },150);
+}
+
+function scheduleGravAnomaly(){
+  const delay=(420000+Math.random()*480000)/getDifficultyMultiplier('eventFreq');// 7-15 min
+  setTimeout(()=>{if(engaged)triggerGravAnomaly();scheduleGravAnomaly()},delay);
+}
+scheduleGravAnomaly();
+
 // RENDER
 let t=0;
 function draw(now){
@@ -5862,7 +5938,7 @@ function draw(now){
   }
 
   // Pan rubber-band interpolation
-  panX+=(panTargetX-panX)*.05;
+  panX+=(panTargetX-panX)*.08;
   panY+=(panTargetY-panY)*.05;
   // Update heading from pan offset
   const panHeadingOffset=panX*.05;
@@ -5977,6 +6053,7 @@ function draw(now){
   for(let si=0;si<stars.length;si++){
     const s=stars[si];
     s.z-=speed;
+    s.x-=flightYaw*.0003;s.y-=flightPitch*.0003;
     if(s.z<=.001){s.z=1;s.x=(Math.random()-.5)*2;s.y=(Math.random()-.5)*2}
     if(si>=activeCount)continue;
     const invZ=1/s.z;
