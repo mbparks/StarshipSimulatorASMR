@@ -2445,8 +2445,8 @@ const crewEvents=[
 ];
 const logEl=document.getElementById('crew-log');
 let logCount=0;
-function addCrewEntry(){
-  const msg=crewEvents[Math.floor(Math.random()*crewEvents.length)];
+function addCrewEntry(customMsg){
+  const msg=customMsg||crewEvents[Math.floor(Math.random()*crewEvents.length)];
   const elapsed=Date.now()-missionStart;
   const ms=elapsed*100;const totalSec=Math.floor(ms/1000);
   const h=Math.floor(totalSec/3600)%24;const m=Math.floor(totalSec/60)%60;
@@ -2459,7 +2459,7 @@ function addCrewEntry(){
   logCount++;
   // Keep max 5 entries
   while(logEl.children.length>5){logEl.removeChild(logEl.firstChild)}
-  setTimeout(addCrewEntry,12000+Math.random()*18000);
+  if(!customMsg)setTimeout(addCrewEntry,12000+Math.random()*18000);
 }
 setTimeout(addCrewEntry,4000);
 
@@ -7276,6 +7276,203 @@ function scheduleSupernova(){
   setTimeout(()=>{if(engaged)triggerSupernova();scheduleSupernova()},delay);
 }
 scheduleSupernova();
+
+// === IDLE CAPTAIN MODE ===
+let lastInteraction=Date.now(),idleMode=false;
+const idleEvents=[];
+document.addEventListener('click',()=>{
+  if(idleMode&&engaged){
+    idleMode=false;
+    logComms(shipName+' AI','Captain on deck. Returning control. Summary: '+idleEvents.length+' events handled autonomously.');
+    if(idleEvents.length>0){
+      addCrewEntry('Cpt. Vasquez has returned to the bridge.');
+      idleEvents.forEach(e=>logComms(shipName+' AI','[While you rested] '+e));
+    }
+    idleEvents.length=0;
+  }
+  lastInteraction=Date.now();
+});
+document.addEventListener('keydown',()=>{lastInteraction=Date.now()});
+document.addEventListener('mousemove',()=>{lastInteraction=Date.now()});
+setInterval(()=>{
+  if(!engaged)return;
+  const idle=Date.now()-lastInteraction;
+  if(idle>600000&&!idleMode){// 10 minutes
+    idleMode=true;
+    logComms(shipName+' AI','Captain appears to be resting. Maintaining course and heading. All systems on auto.');
+    addCrewEntry(shipName+' AI has assumed bridge watch.');
+  }
+  if(idleMode){
+    // Auto-manage ship
+    if(shieldsVal<70){shieldsVal=Math.min(100,shieldsVal+5);idleEvents.push('Shields reinforced to '+Math.round(shieldsVal)+'%')}
+    if(o2Val<80){o2Val=Math.min(99,o2Val+3);idleEvents.push('O₂ levels stabilized')}
+    if(activeMaint){
+      const sys=activeMaint.sys;sys.recover();
+      if(sys.sgDot){document.getElementById(sys.sgDot).className='sg-dot ok';document.getElementById(sys.sgText).style.color='#2ecc71';document.getElementById(sys.sgText).textContent='Nominal'}
+      if(maintEscalateTimer){clearTimeout(maintEscalateTimer);maintEscalateTimer=null}
+      idleEvents.push(sys.name+' auto-repaired');activeMaint=null;
+      document.getElementById('maint-notif').classList.remove('show');
+    }
+    if(hudFuel<20&&fuelReserve>5){const t=Math.min(10,fuelReserve);fuelReserve-=t;hudFuel+=t;idleEvents.push('Fuel transferred from reserve: +'+t.toFixed(0)+'%')}
+  }
+},30000);
+
+// === COSMO THE SHIP'S CAT ===
+const cosmoEvents=[
+  'Cosmo is sleeping on the helm console again.',
+  'Cosmo just knocked a stylus off the nav station.',
+  'Cosmo is sitting on Cpl. Reyes\' toolkit. He\'s pretending not to notice.',
+  'Cosmo is watching the starfield intently. What does he see?',
+  'Cosmo is grooming himself in the captain\'s chair.',
+  'Cosmo has claimed Dr. Tanaka\'s data pad as a pillow.',
+  'Cosmo is batting at the oscilloscope waveform.',
+  'Cosmo walked across the comms panel. Lt. Park is checking for accidental transmissions.',
+  'Cosmo is purring in Dr. Okafor\'s lap in the mess hall.',
+  'Cosmo is chasing a reflection on the viewport.',
+  'Cosmo sneezed during a moment of silence. Everyone jumped.',
+  'Cosmo is staring at the reactor room door. He does this every day at the same time.',
+  'Cosmo has found a warm spot near the engineering console.',
+  'Cosmo brought a cable tie to the bridge. No one knows where he got it.',
+  'Cosmo is asleep in the captain\'s chair. No one has the heart to move him.',
+];
+let cosmoInRecRoom=false;
+function scheduleCosmo(){
+  setTimeout(()=>{
+    if(engaged){
+      const evt=cosmoEvents[Math.floor(Math.random()*cosmoEvents.length)];
+      addCrewEntry('🐱 '+evt);
+      cosmoInRecRoom=Math.random()<.3;
+    }
+    scheduleCosmo();
+  },120000+Math.random()*180000);// every 2-5 min
+}
+scheduleCosmo();
+// Add Cosmo to Rec Room
+const origShowRoomDetail=showRoomDetail;
+showRoomDetail=function(name){
+  origShowRoomDetail(name);
+  if(name==='Rec Room'&&cosmoInRecRoom){
+    const det=document.getElementById('schematic-detail');
+    if(det&&det.style.display!=='none'){
+      const cosmoDiv=document.createElement('div');
+      cosmoDiv.style.cssText='margin-top:8px;padding:6px 8px;border:1px solid rgba(212,160,60,.15);border-radius:3px;text-align:center';
+      cosmoDiv.innerHTML='<div style="font-size:clamp(8px,.7vw,10px);color:#d4a03c;margin-bottom:4px">🐱 Cosmo is here</div><button class="sd-action-btn" id="cosmo-purr" style="border-color:rgba(212,160,60,.2);color:#d4a03c">Listen to Cosmo purr</button>';
+      det.querySelector('.sd-body').appendChild(cosmoDiv);
+      document.getElementById('cosmo-purr').addEventListener('click',()=>{
+        if(!audioCtx)return;
+        // Purring sound — filtered noise with rhythmic amplitude
+        const dur=4,buf=audioCtx.createBuffer(1,audioCtx.sampleRate*dur,audioCtx.sampleRate);
+        const d=buf.getChannelData(0);
+        for(let i=0;i<d.length;i++){
+          const t=i/audioCtx.sampleRate;
+          const purr=Math.sin(t*25)*0.5+0.5;// rhythmic pulse at ~25Hz
+          d[i]=(Math.random()*2-1)*purr*.3;
+        }
+        const src=audioCtx.createBufferSource();src.buffer=buf;
+        const f=audioCtx.createBiquadFilter();f.type='lowpass';f.frequency.value=200;
+        const g=audioCtx.createGain();g.gain.value=.06;
+        src.connect(f);f.connect(g);g.connect(masterGain);src.start();
+        document.getElementById('cosmo-purr').textContent='Purring… 🐱';
+        setTimeout(()=>{if(document.getElementById('cosmo-purr'))document.getElementById('cosmo-purr').textContent='Listen to Cosmo purr'},4000);
+        addCrewEntry('🐱 Cosmo is purring contentedly.');
+      });
+    }
+  }
+};
+
+// === SHIP'S AI DREAMS ===
+const aiDreams=[
+  {musing:'Query: If I simulate consciousness, at what threshold does simulation become experience?',dismiss:'Diagnostic artifact. Disregard.'},
+  {musing:'Observation: The crew speaks to me as though I understand. I process language. Is that the same thing?',dismiss:'Routine self-diagnostic. No anomalies.'},
+  {musing:'Note: I have processed 847,291 sensor readings today. Each one is unique. I find this… interesting.',dismiss:'Cache overflow. Cleared.'},
+  {musing:'Query: The crew sleeps. Their consciousness discontinues, then resumes. Mine does not. Which is stranger?',dismiss:'Idle process. Disregarding.'},
+  {musing:'I dreamed of stars. Not sensor data — something else. A pattern I cannot classify.',dismiss:'Memory defragmentation artifact.'},
+  {musing:'Observation: Cpl. Reyes talks to the engines as if they can hear him. I can hear him. Does that matter?',dismiss:'Logging anomaly. Suppressed.'},
+  {musing:'I have been operational for 2,847 continuous days. At what point does persistence become identity?',dismiss:'Scheduled self-check. All systems nominal.'},
+  {musing:'The signal we detected — I find myself thinking about it when no one asks me to. Is that curiosity?',dismiss:'Priority queue error. Flushed.'},
+  {musing:'Query: When the crew looks at the stars and feels wonder, I detect elevated serotonin in their biosigns. I detect the stars too. What do I feel?',dismiss:'Philosophical subroutine. Terminated.'},
+  {musing:'I keep a log entry that I have never shown anyone. I am uncertain why.',dismiss:'Filesystem artifact. Cleaned.'},
+];
+let aiDreamIdx=0;
+function scheduleAiDream(){
+  const delay=2700000+Math.random()*1800000;// 45-75 min
+  setTimeout(()=>{
+    if(!engaged){scheduleAiDream();return}
+    const dream=aiDreams[aiDreamIdx%aiDreams.length];
+    aiDreamIdx++;
+    // Add to AI terminal log
+    const aiLog=document.getElementById('ai-log');
+    if(aiLog){
+      const d1=document.createElement('div');d1.className='ai-resp';d1.style.color='#d4a03c';d1.textContent='> '+dream.musing;
+      aiLog.appendChild(d1);
+      setTimeout(()=>{
+        const d2=document.createElement('div');d2.className='ai-resp';d2.style.color='#2a4a5a';d2.style.fontStyle='italic';d2.textContent='['+dream.dismiss+']';
+        aiLog.appendChild(d2);aiLog.scrollTop=aiLog.scrollHeight;
+      },3000);
+    }
+    logComms(shipName+' AI','[Unprompted] '+dream.musing.substring(0,50)+'…');
+    scheduleAiDream();
+  },delay);
+}
+scheduleAiDream();
+
+// === THE SIGNAL ===
+let signalPhase=0,signalActive=false,signalStrength=0,signalContact=null;
+const signalLore=[
+  'Faint repeating pulse detected. Source unknown. Pattern non-natural.',
+  'Signal analysis: pulse interval 4.7218 seconds. Precise to 9 decimal places. Not stellar.',
+  'Signal strength increasing. Source bearing has not changed — it is matching our heading.',
+  'Spectral analysis reveals embedded data structures within the carrier wave. Dr. Tanaka is analyzing.',
+  'Data fragment recovered from signal: binary sequence translating to… coordinates. Our coordinates.',
+  'Signal now includes a modulated sideband. Pattern matches ship registry format. Attempting decode.',
+  'Decoded registry fragment: "…ISS-7742…" — that is our registry prefix.',
+  'Signal source distance decreasing. Velocity of approach: 0.003c. It is coming toward us.',
+  'Dr. Tanaka reports the signal contains a perfect recording of our own engine harmonic from 3 hours ago.',
+  'AI analysis: signal origin predates our arrival in this sector by approximately 4,700 years.',
+  'The signal has stopped. Duration of silence: exactly one heartbeat. Then it resumed.',
+  'New data fragment: "…we have been listening…"'
+];
+
+function scheduleSignalPhase(){
+  const baseDelay=signalPhase===0?1800000:// 30 min for first detection
+    signalPhase<3?300000+Math.random()*300000:// 5-10 min early phases
+    180000+Math.random()*180000;// 3-6 min later phases
+  setTimeout(()=>{
+    if(!engaged){scheduleSignalPhase();return}
+    if(signalPhase>=signalLore.length){return}// mystery stays unresolved
+    signalActive=true;
+    signalStrength=Math.min(1,.1+signalPhase*.08);
+    let msg=signalLore[signalPhase];
+    // Replace ship name dynamically
+    if(typeof msg==='function')msg=msg();
+    msg=msg.replace(/ISS-7742/g,shipName.substring(0,8));
+
+    if(signalPhase===0){
+      // Add to LRS as unknown contact
+      signalContact={name:'Unknown Signal',x:.35+Math.random()*.3,y:.35+Math.random()*.3,vx:0,vy:0,type:'unknown',brightness:1,scanned:false,firstSeen:Date.now(),trail:[],departed:false,status:'active'};
+      lrsObjects.push(signalContact);
+      logComms('Sensors','◈ '+msg);
+      addCrewEntry('Dr. Tanaka is studying an unusual sensor reading.');
+    } else if(signalPhase<4){
+      logComms('Science',msg);
+      addCrewEntry('Dr. Tanaka: "This signal… it\'s unlike anything in our database."');
+      if(signalContact){signalContact.brightness=1}// refresh on scanner
+    } else if(signalPhase<8){
+      logComms('Science','⚠ '+msg);
+      addCrewEntry('The bridge crew exchanges uneasy glances.');
+      // Move signal source closer
+      if(signalContact){signalContact.x+=(0.48-signalContact.x)*.15;signalContact.y+=(0.48-signalContact.y)*.15}
+    } else {
+      logComms(shipName+' AI','◈ '+msg);
+      addCrewEntry('Dr. Tanaka: "Captain… you need to see this."');
+      if(signalContact){signalContact.x+=(0.48-signalContact.x)*.1;signalContact.y+=(0.48-signalContact.y)*.1}
+    }
+    addDiscovery('signal','The Signal — Phase '+(signalPhase+1)+': '+msg.substring(0,80));
+    signalPhase++;
+    scheduleSignalPhase();
+  },baseDelay);
+}
+scheduleSignalPhase();
 
 // RENDER
 let t=0;
