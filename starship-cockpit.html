@@ -491,6 +491,25 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .db-content h3{color:#5ec4d4;font-size:clamp(9px,.85vw,12px);margin:12px 0 4px;letter-spacing:2px}
 .db-content p{margin-bottom:8px}
 .db-content .spec{color:#2a4a5a;margin-right:10px;display:inline-block;width:120px}
+/* Captain's notes & mission objectives */
+.db-notes-area{width:100%;min-height:80px;max-height:200px;background:rgba(10,18,24,.6);border:1px solid rgba(94,196,212,.12);color:#5ec4d4;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:8px;outline:none;border-radius:3px;resize:vertical;line-height:1.6;margin-top:8px}
+.db-notes-area:focus{border-color:rgba(94,196,212,.3)}
+.db-notes-area::placeholder{color:#1a3a4a}
+.db-obj-list{margin-top:8px}
+.db-obj{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(94,196,212,.04);font-size:clamp(9px,.8vw,11px)}
+.db-obj-check{width:14px;height:14px;border:1px solid rgba(94,196,212,.2);border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#2ecc71;transition:all .2s;flex-shrink:0}
+.db-obj-check:hover{border-color:rgba(94,196,212,.4)}
+.db-obj-check.done{background:rgba(46,204,113,.08);border-color:rgba(46,204,113,.3)}
+.db-obj-text{flex:1;color:#4a7a8a}
+.db-obj-text.done{text-decoration:line-through;color:#2a4a5a}
+.db-obj-del{color:#2a3a3a;cursor:pointer;font-size:clamp(10px,.9vw,14px);transition:color .2s;flex-shrink:0}
+.db-obj-del:hover{color:#e74c3c}
+.db-obj-add{display:flex;gap:4px;margin-top:8px}
+.db-obj-input{flex:1;background:rgba(10,18,24,.6);border:1px solid rgba(94,196,212,.12);color:#5ec4d4;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:5px 8px;outline:none;border-radius:2px}
+.db-obj-input:focus{border-color:rgba(94,196,212,.3)}
+.db-obj-input::placeholder{color:#1a3a4a}
+.db-obj-btn{background:none;border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:4px 10px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s}
+.db-obj-btn:hover{border-color:#5ec4d4;background:rgba(94,196,212,.06)}
 
 /* Engineering */
 .eng-graph{width:100%;height:60px;border:1px solid rgba(94,196,212,.08);border-radius:2px;margin:4px 0;background:rgba(4,8,12,.5);cursor:pointer}
@@ -667,10 +686,75 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .ai-input-row span{color:#5ec4d4;padding:4px 6px;font-size:clamp(8px,.7vw,10px)}
 #ai-input{flex:1;background:none;border:none;color:#5ec4d4;font-family:inherit;font-size:clamp(8px,.7vw,10px);outline:none;padding:4px 0}
 
-/* Fuel graph */
-#fuel-graph{position:fixed;z-index:11;width:clamp(140px,14vw,200px);height:clamp(50px,6vh,70px);border:1px solid rgba(94,196,212,.1);border-radius:2px;background:rgba(4,8,12,.6);bottom:clamp(40px,7vh,80px);left:clamp(10px,1.5vw,20px);display:none}
-#fuel-graph.show{display:block}
-.fg-label{position:absolute;top:2px;left:4px;font-size:clamp(5px,.45vw,6px);color:#2a4a5a;letter-spacing:1px;text-transform:uppercase}
+/* Fuel Management */
+.fuel-screen{position:fixed;inset:0;z-index:14;display:none;background:rgba(4,8,12,.88);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);pointer-events:auto}
+.fuel-screen.show{display:flex}
+.fuel-layout{display:flex;width:100%;height:100%;padding:clamp(10px,1.5vh,16px)}
+.fuel-main{flex:1;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.fuel-sidebar{width:clamp(220px,20vw,300px);display:flex;flex-direction:column;gap:8px;margin-left:12px;overflow-y:auto}
+.fuel-row{display:flex;gap:8px}
+.fuel-card{border:1px solid rgba(94,196,212,.08);border-radius:3px;padding:8px 10px;background:rgba(4,8,12,.4)}
+.fuel-card-title{font-size:clamp(9px,.8vw,11px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.fuel-big-val{font-size:clamp(20px,2vw,30px);color:#5ec4d4;font-variant-numeric:tabular-nums;letter-spacing:2px}
+.fuel-big-val.warn{color:#d4a03c}.fuel-big-val.crit{color:#e74c3c}
+.fuel-sub{font-size:clamp(8px,.7vw,10px);color:#3a5a6a;margin-top:2px}
+.fuel-tank{width:100%;height:clamp(30px,3.5vh,45px);border:1px solid rgba(94,196,212,.12);border-radius:3px;background:rgba(4,8,12,.5);position:relative;overflow:hidden}
+.fuel-tank-fill{height:100%;border-radius:2px;transition:width .5s;position:relative}
+.fuel-tank-fill.primary{background:linear-gradient(90deg,rgba(46,204,113,.15),rgba(46,204,113,.3))}
+.fuel-tank-fill.reserve{background:linear-gradient(90deg,rgba(212,160,60,.15),rgba(212,160,60,.3))}
+.fuel-tank-label{position:absolute;top:50%;right:8px;transform:translateY(-50%);font-size:clamp(9px,.8vw,11px);color:#5ec4d4;font-variant-numeric:tabular-nums}
+.fuel-sm-btn{background:none;border:1px solid rgba(94,196,212,.2);color:#4a7a8a;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:3px 8px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s}
+.fuel-sm-btn:hover{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.05)}
+.fuel-sm-btn.active{border-color:#2ecc71;color:#2ecc71}
+.fuel-grade{font-size:clamp(20px,2vw,28px);font-weight:bold;text-align:center;margin:4px 0}
+.fuel-preset-row{display:flex;gap:4px}
+.fuel-preset{flex:1;padding:6px 4px;border:1px solid rgba(94,196,212,.1);border-radius:2px;cursor:pointer;text-align:center;font-family:inherit;font-size:clamp(8px,.7vw,10px);color:#3a6a7a;background:none;transition:all .2s;letter-spacing:1px}
+.fuel-preset:hover{border-color:rgba(94,196,212,.3);color:#5ec4d4}
+.fuel-preset.active{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.06)}
+.fuel-log{flex:1;border:1px solid rgba(94,196,212,.06);border-radius:3px;overflow-y:auto;background:rgba(4,8,12,.4);min-height:60px}
+.fuel-log-title{font-size:clamp(9px,.8vw,11px);color:#2a4a5a;letter-spacing:2px;padding:6px 8px;border-bottom:1px solid rgba(94,196,212,.04);text-transform:uppercase}
+.fuel-log-entry{font-size:clamp(8px,.7vw,10px);padding:3px 8px;border-bottom:1px solid rgba(94,196,212,.02);color:#3a6a7a}
+.fuel-time-btns{display:flex;gap:3px;margin-bottom:4px}
+
+/* === SHUTTLE BAY === */
+.shuttle-panel{position:fixed;inset:0;z-index:14;display:none;background:rgba(4,8,12,.9);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);pointer-events:auto}
+.shuttle-panel.show{display:flex}
+.shuttle-layout{display:flex;width:100%;height:100%;padding:clamp(10px,1.5vh,16px);gap:12px}
+.shuttle-viewport{flex:1;position:relative;border:1px solid rgba(94,196,212,.08);border-radius:3px;overflow:hidden}
+.shuttle-viewport canvas{width:100%;height:100%}
+.shuttle-controls{width:clamp(280px,24vw,380px);display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.shuttle-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:1px solid rgba(94,196,212,.06)}
+.shuttle-header .sh-title{font-size:clamp(12px,1.1vw,16px);color:#5ec4d4;letter-spacing:4px;text-transform:uppercase}
+.shuttle-card{border:1px solid rgba(94,196,212,.08);border-radius:3px;padding:8px 10px;background:rgba(4,8,12,.4)}
+.shuttle-card-title{font-size:clamp(9px,.85vw,12px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.shuttle-status-big{font-size:clamp(14px,1.3vw,20px);letter-spacing:3px;text-align:center;margin:6px 0}
+.shuttle-checklist{list-style:none;padding:0;margin:0}
+.shuttle-check{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(94,196,212,.03);font-size:clamp(9px,.8vw,11px)}
+.shuttle-check .sc-dot{width:8px;height:8px;border-radius:50%;border:1px solid rgba(94,196,212,.15);flex-shrink:0;transition:all .3s}
+.shuttle-check .sc-dot.done{background:#2ecc71;border-color:#2ecc71;box-shadow:0 0 4px rgba(46,204,113,.3)}
+.shuttle-check .sc-dot.active{border-color:#d4a03c;animation:blink-crit 1.5s infinite}
+.shuttle-check .sc-dot.fail{background:#e74c3c;border-color:#e74c3c}
+.shuttle-check .sc-label{color:#4a7a8a;flex:1}
+.shuttle-check .sc-label.done{color:#2ecc71}
+.shuttle-check .sc-label.active{color:#d4a03c}
+.shuttle-check-btn{width:100%;background:none;border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:6px;cursor:pointer;border-radius:3px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;margin-top:6px}
+.shuttle-check-btn:hover{border-color:#5ec4d4;background:rgba(94,196,212,.06)}
+.shuttle-check-btn:disabled{opacity:.3;pointer-events:none}
+.shuttle-check-btn.launch{border-color:rgba(46,204,113,.3);color:#2ecc71;font-size:clamp(11px,1vw,14px)}
+.shuttle-check-btn.launch:hover{border-color:#2ecc71;background:rgba(46,204,113,.06)}
+.shuttle-check-btn.recovery{border-color:rgba(212,160,60,.3);color:#d4a03c}
+.shuttle-check-btn.abort{border-color:rgba(231,76,60,.3);color:#e74c3c}
+.shuttle-approach{margin-top:6px}
+.shuttle-approach-bar{width:100%;height:clamp(24px,3vh,36px);border:1px solid rgba(94,196,212,.1);border-radius:3px;position:relative;background:rgba(4,8,12,.5);overflow:hidden}
+.shuttle-approach-zone{position:absolute;height:100%;background:rgba(46,204,113,.08);border-left:1px solid rgba(46,204,113,.2);border-right:1px solid rgba(46,204,113,.2)}
+.shuttle-approach-dot{position:absolute;top:50%;width:6px;height:6px;border-radius:50%;background:#5ec4d4;transform:translate(-50%,-50%);transition:left .3s;box-shadow:0 0 6px rgba(94,196,212,.4)}
+.shuttle-comms{flex:1;border:1px solid rgba(94,196,212,.06);border-radius:3px;overflow-y:auto;background:rgba(4,8,12,.4);min-height:80px}
+.shuttle-comms-title{font-size:clamp(9px,.8vw,11px);color:#2a4a5a;letter-spacing:2px;padding:6px 8px;border-bottom:1px solid rgba(94,196,212,.04);text-transform:uppercase}
+.shuttle-comm{font-size:clamp(8px,.75vw,10px);padding:4px 8px;border-bottom:1px solid rgba(94,196,212,.02)}
+.shuttle-comm .sc-src{color:#5ec4d4;margin-right:4px}
+.shuttle-comm .sc-msg{color:#4a7a8a}
+.shuttle-comm.lso .sc-src{color:#2ecc71}
+.shuttle-comm.pilot .sc-src{color:#d4a03c}
 
 /* === RADIO REPLY === */
 #radio-reply{position:fixed;bottom:clamp(228px,34vh,360px);left:50%;transform:translateX(-50%);z-index:7;display:none;gap:6px;justify-content:center;margin-top:6px}
@@ -1030,6 +1114,37 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .flare-warning.show{display:block}
 .flare-warning .fw-text{font-size:clamp(11px,1vw,14px);color:#e74c3c;letter-spacing:4px;text-transform:uppercase;animation:blink-crit 1s infinite}
 .flare-warning .fw-timer{font-size:clamp(16px,1.5vw,22px);color:#d4a03c;font-variant-numeric:tabular-nums;margin-top:4px}
+
+/* === EMERGENCY LIGHTING === */
+body.red-alert{background:#0a0000}
+body.red-alert .bezel{background:linear-gradient(180deg,rgba(20,4,4,.85),rgba(10,2,2,.9));border-color:rgba(231,76,60,.06)}
+body.red-alert .top-panel,body.red-alert .bottom-console{background:rgba(15,3,3,.65);border-color:rgba(231,76,60,.08)}
+body.red-alert .left-panel,body.red-alert .right-panel{border-color:rgba(231,76,60,.06)}
+body.red-alert .sys-bar .sb-fill{background:linear-gradient(90deg,rgba(231,76,60,.15),rgba(231,76,60,.35))}
+body.red-alert .sys-bar .sb-label,body.red-alert .readout .ro-val,body.red-alert .hud-val,body.red-alert .console-btn{color:#a03030}
+body.red-alert .sys-bar .sb-val{color:#c04040}
+body.red-alert .readout .ro-label,body.red-alert .hud-label{color:#502020}
+body.red-alert .toggle-btn{border-color:rgba(231,76,60,.08);color:#803030}
+body.red-alert .toggle-btn.on .tb-led{background:#c04040;box-shadow:0 0 4px rgba(231,76,60,.3)}
+body.red-alert .toggle-btn .tb-led{background:#301515}
+body.red-alert .nav-compass{border-color:rgba(231,76,60,.1)}
+body.red-alert .nc-needle{background:linear-gradient(180deg,#c04040,transparent)}
+body.red-alert #c{filter:saturate(.2) brightness(.85)}
+body.red-alert .sg-dot.ok{background:#803030}
+body.red-alert .sg-label{color:#502020}
+body.red-alert .console-btn{border-color:rgba(231,76,60,.1)}
+body.red-alert .scan-ring{border-color:rgba(231,76,60,.3)}
+body.red-alert .mouse-glow{background:radial-gradient(circle,rgba(231,76,60,.015),transparent)}
+body.red-alert .vignette{background:radial-gradient(ellipse at center,transparent 50%,rgba(30,5,5,.6))}
+body.red-alert .scr-btn{border-color:rgba(231,76,60,.1);color:#803030}
+body.red-alert .scr-btn.active{border-color:rgba(231,76,60,.3);color:#c04040}
+body.red-alert .weather-label{color:#502020}
+body.red-alert .crew-entry{color:#703030}
+body.red-alert .radio-el{border-color:rgba(231,76,60,.08);background:rgba(15,3,3,.7)}
+body.red-alert .radio-el .re-src{color:#c04040}
+body.red-alert .radio-el .re-msg{color:#803030}
+body.red-alert #radar{border-color:rgba(231,76,60,.1)}
+body.red-alert #scope{border-color:rgba(231,76,60,.1)}
 </style>
 </head>
 <body>
@@ -1198,6 +1313,7 @@ canvas#c{position:fixed;inset:0;z-index:0}
   <button class="scr-btn" data-screen="power">Power</button>
   <button class="scr-btn" data-screen="watch" style="border-color:rgba(212,160,60,.2);color:#d4a03c">Watch</button>
   <button class="scr-btn" data-screen="weapons" style="border-color:rgba(231,76,60,.2);color:#e74c3c">Wpns</button>
+  <button class="scr-btn" data-screen="shuttle" style="border-color:rgba(94,196,212,.25)">Bay</button>
 </div>
 
 <!-- WATCH SUMMARY -->
@@ -1218,6 +1334,42 @@ canvas#c{position:fixed;inset:0;z-index:0}
 </div>
 
 <!-- POWER ALLOCATION -->
+
+<!-- SHUTTLE BAY -->
+<div class="shuttle-panel" id="shuttle-panel">
+<div class="shuttle-layout">
+  <div class="shuttle-viewport"><canvas id="shuttle-cv"></canvas></div>
+  <div class="shuttle-controls">
+    <div class="shuttle-header"><span class="sh-title">◈ Shuttle Bay</span><button class="pwr-close" id="shuttle-close">Close</button></div>
+    <div class="shuttle-card"><div class="shuttle-card-title">Shuttle Status</div><div class="shuttle-status-big" id="shuttle-status" style="color:#2ecc71">READY</div></div>
+    <div class="shuttle-card" id="shuttle-mission-card"><div class="shuttle-card-title">Mission Select</div>
+      <button class="shuttle-check-btn" data-smission="recon" style="margin-bottom:4px">Recon Sweep</button>
+      <button class="shuttle-check-btn" data-smission="salvage" style="margin-bottom:4px">Salvage Run</button>
+      <button class="shuttle-check-btn" data-smission="repair" style="margin-bottom:4px">Hull Repair EVA</button>
+      <button class="shuttle-check-btn" data-smission="sar">Search & Rescue</button>
+    </div>
+    <div class="shuttle-card" id="shuttle-checklist-card" style="display:none"><div class="shuttle-card-title">Pre-Launch Checklist</div><div id="shuttle-checklist"></div><button class="shuttle-check-btn" id="shuttle-next-check">Execute Next Step</button></div>
+    <div class="shuttle-card" id="shuttle-launch-card" style="display:none"><button class="shuttle-check-btn launch" id="shuttle-launch-btn">◈ Catapult Launch</button></div>
+    <div class="shuttle-card" id="shuttle-tracking-card" style="display:none">
+      <div class="shuttle-card-title">Tracking — Shuttle One</div>
+      <div style="display:flex;justify-content:space-between;font-size:clamp(9px,.85vw,12px);margin-bottom:4px"><span style="color:#2a4a5a">Range</span><span style="color:#5ec4d4" id="shuttle-range">0.0 km</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:clamp(9px,.85vw,12px);margin-bottom:4px"><span style="color:#2a4a5a">Velocity</span><span style="color:#5ec4d4" id="shuttle-vel">0 m/s</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:clamp(9px,.85vw,12px);margin-bottom:4px"><span style="color:#2a4a5a">Fuel</span><span style="color:#5ec4d4" id="shuttle-fuel">100%</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:clamp(9px,.85vw,12px)"><span style="color:#2a4a5a">Mission</span><span style="color:#d4a03c" id="shuttle-mission-type">--</span></div>
+    </div>
+    <div class="shuttle-card" id="shuttle-recovery-card" style="display:none">
+      <div class="shuttle-card-title">Recovery Approach</div>
+      <div class="shuttle-approach"><div class="shuttle-approach-bar"><div class="shuttle-approach-zone" id="shuttle-zone" style="left:42%;width:16%"></div><div class="shuttle-approach-dot" id="shuttle-dot" style="left:10%"></div></div></div>
+      <div style="font-size:clamp(9px,.8vw,11px);text-align:center;margin:6px 0;color:#3a6a7a" id="shuttle-lso-call">Standing by…</div>
+      <div style="display:flex;gap:4px">
+        <button class="shuttle-check-btn recovery" id="shuttle-call-ball">Call the Ball</button>
+        <button class="shuttle-check-btn abort" id="shuttle-wave-off">Wave Off</button>
+      </div>
+    </div>
+    <div class="shuttle-comms"><div class="shuttle-comms-title">Bay Comms</div><div id="shuttle-comms-body"></div></div>
+  </div>
+</div>
+</div>
 
 <!-- WEAPONS SYSTEM -->
 <div class="weapons-panel" id="weapons-panel">
@@ -1363,9 +1515,29 @@ canvas#c{position:fixed;inset:0;z-index:0}
 
 <!-- NAV PLANNER -->
 <div class="screen-overlay" id="scr-navplan"><button class="s-close" data-close>Close</button>
-<div class="s-title">Navigation Planner</div>
-<canvas id="navplan-canvas" width="1200" height="900" style="width:100%;max-width:1050px;display:block;margin:0 auto;border:1px solid rgba(94,196,212,.08);border-radius:3px;cursor:crosshair"></canvas>
-<div id="navplan-info" style="text-align:center;margin-top:8px;font-size:clamp(10px,.95vw,14px);color:#3a6a7a"></div>
+<div class="s-title">Navigation Planner — Sector 7</div>
+<div style="display:flex;gap:12px;height:calc(100% - 60px)">
+  <div style="flex:1;display:flex;flex-direction:column">
+    <canvas id="navplan-canvas" style="flex:1;width:100%;border:1px solid rgba(94,196,212,.08);border-radius:3px;cursor:crosshair"></canvas>
+    <div id="navplan-info" style="text-align:center;margin-top:6px;font-size:clamp(10px,.95vw,14px);color:#3a6a7a;min-height:20px"></div>
+  </div>
+  <div style="width:clamp(200px,20vw,280px);display:flex;flex-direction:column;gap:8px;overflow-y:auto">
+    <div id="np-detail" style="border:1px solid rgba(94,196,212,.08);border-radius:3px;padding:8px;background:rgba(4,8,12,.4);display:none"></div>
+    <div id="np-route-legs" style="border:1px solid rgba(94,196,212,.08);border-radius:3px;background:rgba(4,8,12,.4);flex:1;overflow-y:auto;min-height:80px">
+      <div style="font-size:clamp(9px,.8vw,11px);color:#2a4a5a;letter-spacing:2px;padding:6px 8px;border-bottom:1px solid rgba(94,196,212,.04);text-transform:uppercase">Route Legs</div>
+      <div id="np-legs-body" style="font-size:clamp(8px,.7vw,10px);color:#3a6a7a;padding:4px 8px"></div>
+    </div>
+    <button id="np-clear-route" style="background:none;border:1px solid rgba(212,160,60,.2);color:#d4a03c;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:4px 8px;cursor:pointer;border-radius:2px;letter-spacing:1px">Clear Route</button>
+    <div id="np-wp-input" style="display:none;border:1px solid rgba(46,204,113,.2);border-radius:3px;padding:8px;background:rgba(4,8,12,.6)">
+      <div style="font-size:clamp(8px,.7vw,10px);color:#2ecc71;letter-spacing:1px;margin-bottom:4px">Name this waypoint</div>
+      <input type="text" id="np-wp-name" maxlength="24" style="width:100%;background:rgba(10,18,24,.8);border:1px solid rgba(46,204,113,.2);color:#2ecc71;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:4px 8px;outline:none;border-radius:2px;box-sizing:border-box" placeholder="Enter name…">
+      <div style="display:flex;gap:4px;margin-top:4px">
+        <button id="np-wp-confirm" style="flex:1;background:none;border:1px solid rgba(46,204,113,.25);color:#2ecc71;font-family:inherit;font-size:clamp(7px,.6vw,9px);padding:3px;cursor:pointer;border-radius:2px">Place</button>
+        <button id="np-wp-cancel" style="flex:1;background:none;border:1px solid rgba(94,196,212,.15);color:#3a6a7a;font-family:inherit;font-size:clamp(7px,.6vw,9px);padding:3px;cursor:pointer;border-radius:2px">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 
 <!-- CAMERAS -->
@@ -1398,7 +1570,86 @@ canvas#c{position:fixed;inset:0;z-index:0}
 <div id="ai-terminal"><div class="ai-header"><span>Artemis AI — v4.2.1</span><button id="ai-close">×</button></div><div class="ai-log" id="ai-log"><div class="ai-resp">ARTEMIS AI online. Type a command.</div></div><div class="ai-input-row"><span>›</span><input type="text" id="ai-input" placeholder="status, scan, crew, eta, help…"></div></div>
 
 <!-- Fuel Graph -->
-<div id="fuel-graph"><div class="fg-label">Fuel Cell</div><canvas id="fg-canvas" width="200" height="70"></canvas></div>
+<div class="fuel-screen" id="fuel-screen">
+<div class="fuel-layout">
+  <div class="fuel-main">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:clamp(12px,1.1vw,16px);color:#5ec4d4;letter-spacing:4px;text-transform:uppercase">Fuel Management</span>
+      <button class="pwr-close" id="fuel-close">Close</button>
+    </div>
+    <div class="fuel-row">
+      <div class="fuel-card" style="flex:2">
+        <div class="fuel-card-title">Primary Fuel Cell</div>
+        <div class="fuel-tank"><div class="fuel-tank-fill primary" id="fuel-fill-pri"></div><div class="fuel-tank-label" id="fuel-val-pri"></div></div>
+      </div>
+      <div class="fuel-card" style="flex:1">
+        <div class="fuel-card-title">Reserve Tank</div>
+        <div class="fuel-tank"><div class="fuel-tank-fill reserve" id="fuel-fill-res"></div><div class="fuel-tank-label" id="fuel-val-res"></div></div>
+        <button class="fuel-sm-btn" id="fuel-transfer" style="width:100%;margin-top:4px">Transfer to Primary</button>
+      </div>
+    </div>
+    <div class="fuel-row">
+      <div class="fuel-card"><div class="fuel-card-title">Burn Rate</div><div class="fuel-big-val" id="fuel-burn">0.00</div><div class="fuel-sub">units/hr</div></div>
+      <div class="fuel-card"><div class="fuel-card-title">Projected Range</div><div class="fuel-big-val" id="fuel-range">0.0</div><div class="fuel-sub">light-years</div></div>
+      <div class="fuel-card"><div class="fuel-card-title">Bingo Fuel</div><div class="fuel-big-val" id="fuel-bingo">--</div><div class="fuel-sub">point of no return</div></div>
+    </div>
+    <div class="fuel-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="fuel-card-title">Consumption History</div>
+        <div class="fuel-time-btns">
+          <button class="eng-time-btn active" data-ftw="60">1m</button>
+          <button class="eng-time-btn" data-ftw="300">5m</button>
+          <button class="eng-time-btn" data-ftw="9999">All</button>
+        </div>
+      </div>
+      <canvas id="fuel-graph-cv" style="width:100%;height:clamp(80px,10vh,120px);border:1px solid rgba(94,196,212,.06);border-radius:2px;background:rgba(4,8,12,.3)"></canvas>
+    </div>
+    <div class="fuel-row">
+      <div class="fuel-card">
+        <div class="fuel-card-title">Fuel Quality</div>
+        <canvas id="fuel-quality-cv" style="width:100%;height:clamp(40px,5vh,60px);border:1px solid rgba(94,196,212,.06);border-radius:2px"></canvas>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+          <span style="font-size:clamp(8px,.7vw,10px);color:#3a6a7a" id="fuel-purity">Purity: 100%</span>
+          <button class="fuel-sm-btn" id="fuel-filter">Run Filter Cycle</button>
+        </div>
+      </div>
+      <div class="fuel-card">
+        <div class="fuel-card-title">T-P Diagram</div>
+        <canvas id="fuel-tp-cv" style="width:100%;height:clamp(40px,5vh,60px);border:1px solid rgba(94,196,212,.06);border-radius:2px"></canvas>
+        <div style="font-size:clamp(8px,.7vw,10px);color:#3a6a7a;text-align:center;margin-top:4px" id="fuel-tp-status">Optimal</div>
+      </div>
+    </div>
+  </div>
+  <div class="fuel-sidebar">
+    <div class="fuel-card"><div class="fuel-card-title">Efficiency</div><div class="fuel-grade" id="fuel-grade" style="color:#2ecc71">A</div><div class="fuel-sub" style="text-align:center" id="fuel-grade-desc">Excellent fuel discipline</div></div>
+    <div class="fuel-card">
+      <div class="fuel-card-title">Rationing Mode</div>
+      <div class="fuel-preset-row">
+        <button class="fuel-preset active" data-ration="standard">Standard</button>
+        <button class="fuel-preset" data-ration="conserve">Conserve</button>
+        <button class="fuel-preset" data-ration="emergency">Emergency</button>
+      </div>
+    </div>
+    <div class="fuel-card">
+      <div class="fuel-card-title">Controls</div>
+      <button class="fuel-sm-btn" id="fuel-eco-toggle" style="width:100%;margin-bottom:4px">Eco Throttle: OFF</button>
+      <button class="fuel-sm-btn danger" id="fuel-jettison" style="width:100%">⚠ Jettison Fuel</button>
+    </div>
+    <div class="fuel-card">
+      <div class="fuel-card-title">Route Fuel Cost</div>
+      <div style="font-size:clamp(9px,.8vw,11px);color:#5ec4d4" id="fuel-route-cost">No route plotted</div>
+    </div>
+    <div class="fuel-card">
+      <div class="fuel-card-title">Budget</div>
+      <div id="fuel-budget" style="font-size:clamp(8px,.7vw,10px);color:#3a6a7a"></div>
+    </div>
+    <div class="fuel-log">
+      <div class="fuel-log-title">Fuel Log</div>
+      <div id="fuel-log-body"></div>
+    </div>
+  </div>
+</div>
+</div>
 
 <!-- Radio Reply -->
 <div id="radio-reply"></div>
@@ -1545,6 +1796,7 @@ canvas#c{position:fixed;inset:0;z-index:0}
     <button id="probe-btn">Probe</button>
     <button id="tractor-btn">Tractor</button>
     <button id="warp-btn">Warp</button>
+    <button id="emer-light-btn" style="background:none;border:1px solid rgba(231,76,60,.2);color:#e74c3c;padding:clamp(3px,.4vh,6px) clamp(8px,1vw,16px);font-family:inherit;font-size:clamp(8px,.8vw,10px);letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .3s;border-radius:3px">Red Alert</button>
   </div>
 </div>
 
@@ -1587,7 +1839,6 @@ let distVal=4.243,radVal=.04,driftVal=.003;
 
 function tickHUD(){
   hudHeading+=(Math.random()-.5)*.03;if(hudHeading>360)hudHeading-=360;if(hudHeading<0)hudHeading+=360;
-  hudFuel-=Math.random()*.001;if(hudFuel<60)hudFuel=92+Math.random()*6;
   hudTemp+=(Math.random()-.5)*.04;
   hudPress+=(Math.random()-.5)*.0005;
   shieldsVal+=(Math.random()-.5)*.3;shieldsVal=Math.max(80,Math.min(100,shieldsVal));
@@ -1934,7 +2185,7 @@ function applyShipName(name){
   // Update database
   if(dbEntries.ship)dbEntries.ship.content=dbEntries.ship.content.replace(/ISS Artemis/g,shipName);
   // Update starmap waypoint
-  navWaypoints.forEach(wp=>{if(wp.name==='Artemis')wp.name=shipName});
+  navWaypoints.forEach(wp=>{if(wp.current)wp.name=shipName});
   waypoints.forEach(wp=>{if(wp.name==='Artemis')wp.name=shipName});
   // Update known contacts
   knownContacts.forEach(c=>{c.name=c.name.replace(/Artemis/g,shipName);c.detail=c.detail.replace(/Artemis/g,shipName)});
@@ -2071,6 +2322,35 @@ document.getElementById('eng-mute').addEventListener('click',()=>{
 document.getElementById('warp-btn').addEventListener('click',()=>{
   if(!engaged)return;warping=!warping;
   document.getElementById('warp-btn').classList.toggle('active',warping);warpSound(warping);
+});
+// Emergency Lighting
+let redAlertActive=false;
+document.getElementById('emer-light-btn').addEventListener('click',()=>{
+  if(!engaged)return;
+  redAlertActive=!redAlertActive;
+  document.body.classList.toggle('red-alert',redAlertActive);
+  const btn=document.getElementById('emer-light-btn');
+  if(redAlertActive){
+    btn.style.borderColor='rgba(231,76,60,.5)';btn.style.background='rgba(231,76,60,.1)';btn.textContent='Red Alert ◉';
+    logComms('Security','⚠ RED ALERT — Emergency lighting engaged. All stations report.');
+    addCrewEntry('Red alert activated. Emergency lighting on all decks.');
+    // Alert sound
+    if(audioCtx){
+      const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+      o.type='square';o.frequency.value=350;
+      o.frequency.setValueAtTime(350,audioCtx.currentTime);
+      o.frequency.setValueAtTime(450,audioCtx.currentTime+.3);
+      o.frequency.setValueAtTime(350,audioCtx.currentTime+.6);
+      g.gain.setValueAtTime(.05,audioCtx.currentTime);
+      g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+1);
+      o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+1.1);
+    }
+  } else {
+    btn.style.borderColor='rgba(231,76,60,.2)';btn.style.background='none';btn.textContent='Red Alert';
+    logComms('Security','Red alert cancelled. Returning to standard lighting.');
+    addCrewEntry('Red alert stood down. Normal operations resumed.');
+  }
+  if(engaged)clickSound();
 });
 canvas.addEventListener('click',e=>{
   if(!engaged)return;
@@ -2591,11 +2871,22 @@ document.querySelectorAll('.scr-btn').forEach(btn=>{
     const id=btn.dataset.screen;
     if(id==='pip'){document.getElementById('pip').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
     if(id==='ai'){document.getElementById('ai-terminal').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
-    if(id==='fuelg'){document.getElementById('fuel-graph').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
+    if(id==='fuelg'){
+      const fs=document.getElementById('fuel-screen');
+      if(fs.classList.contains('show')){fs.classList.remove('show');btn.classList.remove('active')}
+      else{fs.classList.add('show');btn.classList.add('active');renderFuelScreen()}
+      if(engaged)clickSound();return
+    }
     if(id==='weapons'){
       const wp=document.getElementById('weapons-panel');
       if(wp.classList.contains('show')){wp.classList.remove('show');btn.classList.remove('active');cancelAnimationFrame(wpnAnimFrame)}
       else{wp.classList.add('show');btn.classList.add('active');initWeapons();drawWeaponsView()}
+      if(engaged)clickSound();return;
+    }
+    if(id==='shuttle'){
+      const sp=document.getElementById('shuttle-panel');
+      if(sp.classList.contains('show')){sp.classList.remove('show');btn.classList.remove('active')}
+      else{sp.classList.add('show');btn.classList.add('active');initShuttleBay();drawShuttleBay()}
       if(engaged)clickSound();return;
     }
     if(id==='power'){
@@ -3170,13 +3461,95 @@ setInterval(()=>{if(activeScreen==='lrs')updateContactLog()},3000);
 const dbEntries={
   ship:{title:'Ship Specifications',content:`<h3>ISS Artemis — Explorer Class</h3><p><span class="spec">Registry:</span>ISS-7742-A</p><p><span class="spec">Class:</span>Horizon Explorer</p><p><span class="spec">Length:</span>284 meters</p><p><span class="spec">Mass:</span>45,200 metric tons</p><p><span class="spec">Crew Capacity:</span>12 (6 active)</p><p><span class="spec">FTL Drive:</span>Alcubierre-Tanaka Mk IV</p><p><span class="spec">Max Velocity:</span>0.009c (sublight)</p><p><span class="spec">Reactor:</span>Dual Tokamak Fusion</p><p><span class="spec">Armament:</span>Point-defense array, mining lasers</p><p><span class="spec">Commissioned:</span>2347</p>`},
   systems:{title:'Star Systems',content:`<h3>Kepler-442</h3><p>G-type main sequence star, 1,206 ly from Sol. One confirmed habitable exoplanet (Kepler-442b) with 60% Earth Similarity Index. Targeted for long-range survey.</p><h3>Proxima Centauri</h3><p>M-type red dwarf, 4.24 ly from Sol. Proxima b orbits in habitable zone but tidally locked. Relay station established 2298.</p><h3>Trappist-1</h3><p>Ultra-cool red dwarf, 39 ly. Seven rocky planets, three in habitable zone. Active colonization survey in progress.</p>`},
-  mission:{title:'Mission Brief',content:`<h3>Operation Far Reach</h3><p>Objective: Long-range survey and relay deployment along the Kepler corridor. Secondary: spectral analysis of anomalous baryonic readings in Sector 7.</p><p>Duration: Estimated 2,847 days. Crew rotation at Waypoint Echo (Day 1,400).</p><p>Authorization: UESA Deep Space Command, Directive 7-Alpha.</p>`},
-  crew:{title:'Crew Bios',content:`<h3>Cpt. Elara Vasquez</h3><p>Commanding officer. 14 years deep-space experience. Previously commanded ISS Magellan on Trappist survey.</p><h3>Dr. Amara Okafor</h3><p>Chief Medical Officer. Specialist in long-duration spaceflight physiology and cryo-recovery.</p><h3>Lt. Jin Park</h3><p>Navigation & Helm. Top graduate, Orbital Academy class of '44. First deep-space posting.</p><h3>Cpl. Diego Reyes</h3><p>Engineering & EVA specialist. 8 years service. Hull repair and reactor maintenance certified.</p><h3>Dr. Yuki Tanaka</h3><p>Science Officer. Astrophysics PhD, focused on baryonic matter anomalies.</p><h3>Sgt. Kwame Mensah</h3><p>Security & Comms. Currently in scheduled cryo rotation. Wake date: Day 1,026.</p>`}
+  mission:{title:'Mission Brief',content:`<h3>Operation Far Reach</h3><p>Objective: Long-range survey and relay deployment along the Kepler corridor. Secondary: spectral analysis of anomalous baryonic readings in Sector 7.</p><p>Duration: Estimated 2,847 days. Crew rotation at Waypoint Echo (Day 1,400).</p><p>Authorization: UESA Deep Space Command, Directive 7-Alpha.</p>`,hasObjectives:true},
+  crew:{title:'Crew Bios',content:`<h3>Cpt. Elara Vasquez</h3><p>Commanding officer. 14 years deep-space experience. Previously commanded ISS Magellan on Trappist survey.</p><h3>Dr. Amara Okafor</h3><p>Chief Medical Officer. Specialist in long-duration spaceflight physiology and cryo-recovery.</p><h3>Lt. Jin Park</h3><p>Navigation & Helm. Top graduate, Orbital Academy class of '44. First deep-space posting.</p><h3>Cpl. Diego Reyes</h3><p>Engineering & EVA specialist. 8 years service. Hull repair and reactor maintenance certified.</p><h3>Dr. Yuki Tanaka</h3><p>Science Officer. Astrophysics PhD, focused on baryonic matter anomalies.</p><h3>Sgt. Kwame Mensah</h3><p>Security & Comms. Currently in scheduled cryo rotation. Wake date: Day 1,026.</p>`},
+  notes:{title:"Captain's Notes",hasNotes:true}
 };
+
+let captainNotes=localStorage.getItem('captainNotes')||'';
+const missionObjectives=[
+  {text:'Deploy relay beacon at Waypoint Echo',done:false,preset:true},
+  {text:'Complete spectral analysis of Sector 7 anomaly',done:false,preset:true},
+  {text:'Perform crew rotation at Day 1,400',done:false,preset:true},
+];
+
 function renderDatabase(tab){
   document.querySelectorAll('.db-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
   const entry=dbEntries[tab];
-  document.getElementById('db-content').innerHTML=entry?entry.content:'<p>No data.</p>';
+  if(!entry){document.getElementById('db-content').innerHTML='<p>No data.</p>';return}
+
+  let html=entry.content||'';
+
+  // Captain's Notes tab
+  if(entry.hasNotes){
+    html=`<h3>Captain's Notes</h3>
+      <p style="color:#3a5a6a;font-size:clamp(8px,.7vw,10px)">Personal observations, reminders, and mission notes. Saved automatically.</p>
+      <textarea class="db-notes-area" id="db-notes-input" placeholder="Type your notes here…">${captainNotes}</textarea>`;
+  }
+
+  // Mission tab with objectives
+  if(entry.hasObjectives){
+    html+=`<h3>Mission Objectives</h3><div class="db-obj-list" id="db-obj-list"></div>
+      <div class="db-obj-add"><input type="text" class="db-obj-input" id="db-obj-input" placeholder="Add new objective…" maxlength="120"><button class="db-obj-btn" id="db-obj-add-btn">Add</button></div>`;
+  }
+
+  document.getElementById('db-content').innerHTML=html;
+
+  // Attach notes handler
+  if(entry.hasNotes){
+    const textarea=document.getElementById('db-notes-input');
+    textarea.addEventListener('input',()=>{
+      captainNotes=textarea.value;
+      localStorage.setItem('captainNotes',captainNotes);
+    });
+    textarea.addEventListener('keydown',e=>e.stopPropagation());
+  }
+
+  // Attach objectives handlers
+  if(entry.hasObjectives){
+    renderObjectives();
+    document.getElementById('db-obj-add-btn').addEventListener('click',()=>{
+      const input=document.getElementById('db-obj-input');
+      const text=input.value.trim();
+      if(!text)return;
+      missionObjectives.push({text,done:false,preset:false});
+      input.value='';
+      renderObjectives();
+      logComms('Command','New objective added: '+text);
+      if(engaged)clickSound();
+    });
+    document.getElementById('db-obj-input').addEventListener('keydown',e=>{
+      if(e.key==='Enter')document.getElementById('db-obj-add-btn').click();
+      e.stopPropagation();
+    });
+  }
+}
+
+function renderObjectives(){
+  const list=document.getElementById('db-obj-list');
+  if(!list)return;
+  list.innerHTML=missionObjectives.map((obj,i)=>`<div class="db-obj">
+    <div class="db-obj-check${obj.done?' done':''}" data-oidx="${i}">${obj.done?'✓':''}</div>
+    <div class="db-obj-text${obj.done?' done':''}">${obj.text}</div>
+    ${!obj.preset?`<div class="db-obj-del" data-odel="${i}">×</div>`:''}
+  </div>`).join('');
+  list.querySelectorAll('.db-obj-check').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const idx=parseInt(el.dataset.oidx);
+      missionObjectives[idx].done=!missionObjectives[idx].done;
+      renderObjectives();
+      if(missionObjectives[idx].done)logComms('Command','Objective completed: '+missionObjectives[idx].text);
+      if(engaged)clickSound();
+    });
+  });
+  list.querySelectorAll('.db-obj-del').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const idx=parseInt(el.dataset.odel);
+      missionObjectives.splice(idx,1);
+      renderObjectives();
+      if(engaged)clickSound();
+    });
+  });
 }
 // Build nav tabs
 (function(){
@@ -3447,7 +3820,7 @@ function renderCrew(){
 
 // === MISSION OBJECTIVES ===
 function renderMission(){
-  const objs=[
+  const presetObjs=[
     {status:'done',title:'Launch from Waypoint Delta',desc:'Departed on schedule. All systems nominal at launch.'},
     {status:'done',title:'Deploy Relay Beacon 14',desc:'Beacon active. Signal relay confirmed.'},
     {status:'done',title:'Transit Oort Debris Field',desc:'Minor hull impacts. No structural damage.'},
@@ -3457,7 +3830,42 @@ function renderMission(){
     {status:'pending',title:'Deploy Relay Beacon 15',desc:'Pending. Components staged in Cargo Bay.'},
     {status:'pending',title:'Arrive Kepler-442 System',desc:'Final survey and report transmission to UESA.'},
   ];
-  document.getElementById('mission-body').innerHTML=objs.map(o=>`<div class="mission-obj"><div class="obj-check ${o.status}">${o.status==='done'?'✓':o.status==='active'?'►':''}</div><div class="obj-text ${o.status}"><div class="obj-title">${o.title}</div><div class="obj-desc">${o.desc}</div></div></div>`).join('');
+  let html=presetObjs.map(o=>`<div class="mission-obj"><div class="obj-check ${o.status}">${o.status==='done'?'✓':o.status==='active'?'►':''}</div><div class="obj-text ${o.status}"><div class="obj-title">${o.title}</div><div class="obj-desc">${o.desc}</div></div></div>`).join('');
+  // Custom objectives
+  if(missionObjectives.length>0){
+    html+='<div style="margin-top:12px;padding-top:8px;border-top:1px solid rgba(94,196,212,.06);font-size:clamp(9px,.8vw,11px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Captain\'s Objectives</div>';
+    html+=missionObjectives.map((obj,i)=>`<div class="mission-obj"><div class="obj-check ${obj.done?'done':'active'}" data-midx="${i}" style="cursor:pointer">${obj.done?'✓':'►'}</div><div class="obj-text ${obj.done?'done':'active'}"><div class="obj-title">${obj.text}</div></div>${!obj.preset?`<div class="db-obj-del" data-mdel="${i}" style="margin-left:auto;cursor:pointer;color:#2a3a3a;font-size:14px">×</div>`:''}</div>`).join('');
+  }
+  // Add objective input
+  html+='<div style="display:flex;gap:6px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(94,196,212,.04)"><input type="text" class="db-obj-input" id="misn-obj-input" placeholder="Add new objective…" maxlength="120" style="flex:1"><button class="db-obj-btn" id="misn-obj-add">Add</button></div>';
+  document.getElementById('mission-body').innerHTML=html;
+  // Attach handlers
+  document.querySelectorAll('[data-midx]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const idx=parseInt(el.dataset.midx);
+      missionObjectives[idx].done=!missionObjectives[idx].done;
+      if(missionObjectives[idx].done)logComms('Command','Objective completed: '+missionObjectives[idx].text);
+      renderMission();if(engaged)clickSound();
+    });
+  });
+  document.querySelectorAll('[data-mdel]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      missionObjectives.splice(parseInt(el.dataset.mdel),1);
+      renderMission();if(engaged)clickSound();
+    });
+  });
+  document.getElementById('misn-obj-add').addEventListener('click',()=>{
+    const input=document.getElementById('misn-obj-input');
+    const text=input.value.trim();if(!text)return;
+    missionObjectives.push({text,done:false,preset:false});
+    input.value='';renderMission();
+    logComms('Command','New objective added: '+text);
+    if(engaged)clickSound();
+  });
+  document.getElementById('misn-obj-input').addEventListener('keydown',e=>{
+    if(e.key==='Enter')document.getElementById('misn-obj-add').click();
+    e.stopPropagation();
+  });
 }
 
 // === AUDIO MIXER ===
@@ -3481,52 +3889,333 @@ function renderMixer(){
 // === NAV PLANNER ===
 const npCanvas=document.getElementById('navplan-canvas');
 const npCtx=npCanvas.getContext('2d');
+const starTypes=['G2V Yellow Dwarf','K1V Orange Dwarf','M4V Red Dwarf','F5V White','A2V Blue-White','B8V Blue Giant','G8V Yellow','K5V Orange'];
+const factions=['UESA Core','UESA Frontier','Independent Zone','Colonial Territory','Uncharted'];
+const hazards=['None','Asteroid Belt','Radiation Zone','Debris Field','Unstable Orbit','Magnetic Storms'];
 const navWaypoints=[
-  {name:'Artemis',x:.48,y:.48,current:true},{name:'Kepler-442b',x:.3,y:.35},
-  {name:'Proxima Cen',x:.55,y:.25},{name:'Trappist-1',x:.7,y:.45},
-  {name:'Wolf 1061',x:.45,y:.65},{name:'Ross 128',x:.2,y:.6},
-  {name:'HD 40307',x:.8,y:.3},{name:'Gliese 667',x:.65,y:.7},
-  {name:'Waypoint Echo',x:.38,y:.42},
+  {name:shipName,x:.48,y:.48,z:0,current:true,type:'G2V Yellow Dwarf',planets:0,fuel:false,faction:'UESA Core',hazard:'None',visited:true,relay:false},
+  {name:'Kepler-442b',x:.3,y:.35,z:-.02,current:false,type:'G8V Yellow',planets:4,fuel:true,faction:'UESA Frontier',hazard:'None',visited:false,relay:true},
+  {name:'Proxima Cen',x:.55,y:.22,z:.03,current:false,type:'M4V Red Dwarf',planets:2,fuel:true,faction:'UESA Core',hazard:'Radiation Zone',visited:false,relay:true},
+  {name:'Trappist-1',x:.72,y:.45,z:-.01,current:false,type:'M4V Red Dwarf',planets:7,fuel:false,faction:'Colonial Territory',hazard:'Unstable Orbit',visited:false,relay:false},
+  {name:'Wolf 1061',x:.42,y:.68,z:.02,current:false,type:'M4V Red Dwarf',planets:3,fuel:false,faction:'Independent Zone',hazard:'Asteroid Belt',visited:false,relay:false},
+  {name:'Ross 128',x:.18,y:.58,z:-.03,current:false,type:'M4V Red Dwarf',planets:1,fuel:true,faction:'UESA Frontier',hazard:'None',visited:false,relay:true},
+  {name:'HD 40307',x:.82,y:.28,z:.01,current:false,type:'K1V Orange Dwarf',planets:6,fuel:true,faction:'Independent Zone',hazard:'Magnetic Storms',visited:false,relay:false},
+  {name:'Gliese 667',x:.65,y:.72,z:-.02,current:false,type:'K5V Orange',planets:5,fuel:false,faction:'Uncharted',hazard:'Debris Field',visited:false,relay:false},
+  {name:'Waypoint Echo',x:.38,y:.42,z:0,current:false,type:'Station',planets:0,fuel:true,faction:'UESA Core',hazard:'None',visited:false,relay:true},
+  {name:'Tau Ceti',x:.6,y:.15,z:.04,current:false,type:'G8V Yellow',planets:5,fuel:true,faction:'UESA Core',hazard:'None',visited:false,relay:true},
+  {name:'Luyten b',x:.12,y:.35,z:-.01,current:false,type:'M4V Red Dwarf',planets:2,fuel:false,faction:'Uncharted',hazard:'Asteroid Belt',visited:false,relay:false},
+  {name:'Barnard\'s',x:.85,y:.6,z:.03,current:false,type:'M4V Red Dwarf',planets:1,fuel:false,faction:'Colonial Territory',hazard:'None',visited:false,relay:false},
 ];
-let navRoute=[];
+// Hyperspace lanes
+const hyperLanes=[[0,8],[8,1],[1,5],[0,2],[2,9],[2,3],[3,7],[5,10],[6,9],[3,11]];
+// Territorial boundary zones
+const territories=[
+  {name:'UESA Core',color:'rgba(94,196,212,.04)',cx:.5,cy:.38,rx:.2,ry:.18},
+  {name:'Colonial',color:'rgba(212,160,60,.03)',cx:.75,cy:.52,rx:.15,ry:.2},
+  {name:'Independent',color:'rgba(46,204,113,.03)',cx:.3,cy:.6,rx:.18,ry:.15},
+  {name:'Uncharted',color:'rgba(150,100,200,.03)',cx:.15,cy:.4,rx:.12,ry:.15},
+];
+// Fog of war - cleared positions
+const fogCleared=new Set();fogCleared.add('0.48,0.48');
+const customWaypoints=[];
+let navRoute=[],npZoom=1,npPanX=.48,npPanY=.48,npDragging=false,npDragStartX=0,npDragStartY=0,npSelectedWp=null;
+let npShipProgress=0,npAnimFrame=0;
+
+function npWorldToScreen(wx,wy,w,h){
+  return{x:(wx-npPanX)*npZoom*w+w/2,y:(wy-npPanY)*npZoom*h+h/2};
+}
+function npScreenToWorld(sx,sy,w,h){
+  return{x:(sx-w/2)/(npZoom*w)+npPanX,y:(sy-h/2)/(npZoom*h)+npPanY};
+}
+
 function drawNavPlan(){
-  const w=npCanvas.width=npCanvas.offsetWidth*2||800,h=npCanvas.height=npCanvas.offsetHeight*2||600;
-  npCtx.fillStyle='rgba(4,8,12,.95)';npCtx.fillRect(0,0,w,h);
-  npCtx.strokeStyle='rgba(94,196,212,.04)';npCtx.lineWidth=1;
-  for(let i=0;i<20;i++){const x=i/20*w;npCtx.beginPath();npCtx.moveTo(x,0);npCtx.lineTo(x,h);npCtx.stroke()}
-  for(let i=0;i<15;i++){const y=i/15*h;npCtx.beginPath();npCtx.moveTo(0,y);npCtx.lineTo(w,y);npCtx.stroke()}
+  const w=npCanvas.width=npCanvas.offsetWidth*2||1200;
+  const h=npCanvas.height=npCanvas.offsetHeight*2||900;
+  const now=performance.now()*.001;
+
+  // Nebula background
+  npCtx.fillStyle='rgba(4,8,12,.97)';npCtx.fillRect(0,0,w,h);
+  const nebulas=[{cx:.2,cy:.3,r:.15,h:240},{cx:.7,cy:.6,r:.2,h:280},{cx:.5,cy:.8,r:.12,h:200},{cx:.85,cy:.2,r:.1,h:320}];
+  nebulas.forEach(n=>{
+    const p=npWorldToScreen(n.cx,n.cy,w,h);
+    const nr=n.r*npZoom*w;
+    const ng=npCtx.createRadialGradient(p.x,p.y,0,p.x,p.y,nr);
+    ng.addColorStop(0,`hsla(${n.h},40%,15%,.08)`);ng.addColorStop(.5,`hsla(${n.h},30%,10%,.04)`);ng.addColorStop(1,'transparent');
+    npCtx.fillStyle=ng;npCtx.beginPath();npCtx.arc(p.x,p.y,nr,0,6.283);npCtx.fill();
+  });
+
+  // Grid
+  npCtx.strokeStyle='rgba(94,196,212,.03)';npCtx.lineWidth=1;
+  const gridStep=.05*npZoom;
+  for(let gx=0;gx<1;gx+=.05){const p=npWorldToScreen(gx,0,w,h);npCtx.beginPath();npCtx.moveTo(p.x,0);npCtx.lineTo(p.x,h);npCtx.stroke()}
+  for(let gy=0;gy<1;gy+=.05){const p=npWorldToScreen(0,gy,w,h);npCtx.beginPath();npCtx.moveTo(0,p.y);npCtx.lineTo(w,p.y);npCtx.stroke()}
+
+  // Territorial boundaries
+  territories.forEach(t=>{
+    const p=npWorldToScreen(t.cx,t.cy,w,h);
+    npCtx.fillStyle=t.color;npCtx.beginPath();npCtx.ellipse(p.x,p.y,t.rx*npZoom*w,t.ry*npZoom*h,0,0,6.283);npCtx.fill();
+    npCtx.strokeStyle=t.color.replace(/[\d.]+\)$/,'.08)');npCtx.lineWidth=1;npCtx.setLineDash([6,6]);npCtx.beginPath();npCtx.ellipse(p.x,p.y,t.rx*npZoom*w,t.ry*npZoom*h,0,0,6.283);npCtx.stroke();npCtx.setLineDash([]);
+    if(npZoom<1.5){npCtx.fillStyle=t.color.replace(/[\d.]+\)$/,'.15)');npCtx.font=`${Math.max(10,w*.01)}px 'Courier New'`;npCtx.fillText(t.name,p.x-20,p.y)}
+  });
+
+  // Fog of war
+  for(let fx=0;fx<1;fx+=.02){for(let fy=0;fy<1;fy+=.02){
+    const key=fx.toFixed(2)+','+fy.toFixed(2);
+    let cleared=false;
+    fogCleared.forEach(ck=>{const[cx,cy]=ck.split(',').map(Number);if(Math.abs(fx-cx)<.08&&Math.abs(fy-cy)<.08)cleared=true});
+    if(!cleared){
+      const p=npWorldToScreen(fx,fy,w,h);
+      npCtx.fillStyle='rgba(4,8,12,.4)';npCtx.fillRect(p.x,p.y,.02*npZoom*w,.02*npZoom*h);
+    }
+  }}
+
+  // Comm relay coverage
+  navWaypoints.forEach(wp=>{
+    if(!wp.relay)return;
+    const p=npWorldToScreen(wp.x,wp.y,w,h);
+    const cr=.08*npZoom*w;
+    npCtx.strokeStyle='rgba(94,196,212,.04)';npCtx.lineWidth=1;npCtx.setLineDash([3,5]);
+    npCtx.beginPath();npCtx.arc(p.x,p.y,cr,0,6.283);npCtx.stroke();npCtx.setLineDash([]);
+  });
+
+  // Hyperspace lanes
+  hyperLanes.forEach(([a,b])=>{
+    const pa=npWorldToScreen(navWaypoints[a].x,navWaypoints[a].y,w,h);
+    const pb=npWorldToScreen(navWaypoints[b].x,navWaypoints[b].y,w,h);
+    npCtx.strokeStyle='rgba(94,196,212,.06)';npCtx.lineWidth=2;npCtx.beginPath();npCtx.moveTo(pa.x,pa.y);npCtx.lineTo(pb.x,pb.y);npCtx.stroke();
+    // Flowing dots
+    const dots=5;for(let d=0;d<dots;d++){
+      const t=((now*.1+d/dots)%1);
+      const dx=pa.x+(pb.x-pa.x)*t,dy=pa.y+(pb.y-pa.y)*t;
+      npCtx.fillStyle=`rgba(94,196,212,${.08+Math.sin(t*3.14)*.06})`;npCtx.beginPath();npCtx.arc(dx,dy,1.5,0,6.283);npCtx.fill();
+    }
+  });
+
   // Route
   if(navRoute.length>1){
-    npCtx.strokeStyle='rgba(212,160,60,.3)';npCtx.lineWidth=2;npCtx.setLineDash([8,6]);npCtx.beginPath();
-    navRoute.forEach((idx,i)=>{const wp=navWaypoints[idx];i===0?npCtx.moveTo(wp.x*w,wp.y*h):npCtx.lineTo(wp.x*w,wp.y*h)});
-    npCtx.stroke();npCtx.setLineDash([]);
+    // Animated route line
+    for(let i=1;i<navRoute.length;i++){
+      const a=navWaypoints[navRoute[i-1]],b=navWaypoints[navRoute[i]];
+      const pa=npWorldToScreen(a.x,a.y,w,h),pb=npWorldToScreen(b.x,b.y,w,h);
+      // Glow
+      npCtx.strokeStyle='rgba(212,160,60,.08)';npCtx.lineWidth=6;npCtx.beginPath();npCtx.moveTo(pa.x,pa.y);npCtx.lineTo(pb.x,pb.y);npCtx.stroke();
+      // Line
+      npCtx.strokeStyle='rgba(212,160,60,.35)';npCtx.lineWidth=2;npCtx.beginPath();npCtx.moveTo(pa.x,pa.y);npCtx.lineTo(pb.x,pb.y);npCtx.stroke();
+      // Flowing energy dots
+      for(let d=0;d<8;d++){
+        const t=((now*.3+d/8)%1);
+        const dx=pa.x+(pb.x-pa.x)*t,dy=pa.y+(pb.y-pa.y)*t;
+        npCtx.fillStyle=`rgba(212,160,60,${.2+Math.sin(t*3.14)*.2})`;npCtx.beginPath();npCtx.arc(dx,dy,2,0,6.283);npCtx.fill();
+      }
+      // Leg label
+      const dist=Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2)*40;
+      const midx=(pa.x+pb.x)/2,midy=(pa.y+pb.y)/2;
+      npCtx.fillStyle='rgba(212,160,60,.25)';npCtx.font=`${Math.max(10,w*.01)}px 'Courier New'`;
+      npCtx.fillText(dist.toFixed(1)+'ly',midx+5,midy-5);
+    }
   }
+
   // Waypoints
-  navWaypoints.forEach((wp,i)=>{
-    const wx=wp.x*w,wy=wp.y*h,sel=navRoute.includes(i);
-    npCtx.fillStyle=wp.current?'rgba(94,196,212,.9)':sel?'rgba(212,160,60,.8)':'rgba(94,196,212,.4)';
-    npCtx.beginPath();npCtx.arc(wx,wy,wp.current?6:sel?5:3.5,0,6.283);npCtx.fill();
-    if(wp.current){npCtx.strokeStyle='rgba(94,196,212,.25)';npCtx.lineWidth=1;npCtx.beginPath();npCtx.arc(wx,wy,14,0,6.283);npCtx.stroke()}
-    npCtx.fillStyle=wp.current?'#5ec4d4':sel?'#d4a03c':'rgba(94,196,212,.4)';
-    npCtx.font=`${Math.max(14,w*.018)}px 'Courier New'`;npCtx.fillText(wp.name,wx+12,wy+5);
+  const allWps=[...navWaypoints,...customWaypoints];
+  allWps.forEach((wp,i)=>{
+    const p=npWorldToScreen(wp.x,wp.y,w,h);
+    if(p.x<-50||p.x>w+50||p.y<-50||p.y>h+50)return;
+    const isNav=i<navWaypoints.length;
+    const sel=isNav&&navRoute.includes(i);
+    const isSel=npSelectedWp===wp;
+    // 3D depth indicator
+    if(wp.z&&wp.z!==0){
+      const lineH=wp.z*npZoom*w*2;
+      npCtx.strokeStyle='rgba(94,196,212,.1)';npCtx.lineWidth=1;
+      npCtx.beginPath();npCtx.moveTo(p.x,p.y);npCtx.lineTo(p.x,p.y-lineH);npCtx.stroke();
+    }
+    // Star size based on depth
+    const depthSize=wp.z?3+(1-Math.abs(wp.z)*10):4;
+    const dotSize=wp.current?7:sel?5.5:isSel?5:depthSize;
+    const brightness=wp.z?(.5+.5*(1-Math.abs(wp.z)*10)):1;
+    // Color
+    let color=wp.current?'rgba(94,196,212,.9)':sel?'rgba(212,160,60,.8)':wp.custom?'rgba(46,204,113,.5)':`rgba(94,196,212,${.3*brightness+.1})`;
+    if(wp.fuel&&!wp.current)color='rgba(46,204,113,.5)';
+    npCtx.fillStyle=color;npCtx.beginPath();npCtx.arc(p.x,p.y,dotSize,0,6.283);npCtx.fill();
+    // Current ship pulse
+    if(wp.current){npCtx.strokeStyle='rgba(94,196,212,.2)';npCtx.lineWidth=1;npCtx.beginPath();npCtx.arc(p.x,p.y,12+Math.sin(now*2)*2,0,6.283);npCtx.stroke()}
+    // Selected highlight
+    if(isSel){npCtx.strokeStyle='rgba(212,160,60,.4)';npCtx.lineWidth=1.5;npCtx.beginPath();npCtx.arc(p.x,p.y,dotSize+5,0,6.283);npCtx.stroke()}
+    // Fuel indicator
+    if(wp.fuel&&!wp.current){npCtx.fillStyle='rgba(46,204,113,.25)';npCtx.font=`${Math.max(10,w*.009)}px 'Courier New'`;npCtx.fillText('⛽',p.x-12,p.y-8)}
+    // Label
+    npCtx.fillStyle=wp.current?'#5ec4d4':sel?'#d4a03c':wp.custom?'#2ecc71':`rgba(94,196,212,${.3*brightness+.15})`;
+    npCtx.font=`${Math.max(12,w*.013)}px 'Courier New'`;npCtx.fillText(wp.name,p.x+dotSize+6,p.y+4);
+    // Visited indicator
+    if(wp.visited&&!wp.current){npCtx.fillStyle='rgba(94,196,212,.15)';npCtx.fillText('✓',p.x+dotSize+6,p.y+14)}
+    // Planets at high zoom
+    if(npZoom>1.8&&wp.planets>0){
+      for(let pi=0;pi<Math.min(wp.planets,5);pi++){
+        const pa2=pi/wp.planets*6.283+now*.2;
+        const pr=dotSize+10+pi*5;
+        const px2=p.x+Math.cos(pa2)*pr,py2=p.y+Math.sin(pa2)*pr;
+        npCtx.fillStyle='rgba(94,196,212,.15)';npCtx.beginPath();npCtx.arc(px2,py2,1.5,0,6.283);npCtx.fill();
+      }
+    }
   });
-  // Info
+
+  // Custom waypoints
+  customWaypoints.forEach(wp=>{
+    const p=npWorldToScreen(wp.x,wp.y,w,h);
+    if(p.x<-50||p.x>w+50||p.y<-50||p.y>h+50)return;
+    npCtx.fillStyle='rgba(46,204,113,.4)';npCtx.beginPath();npCtx.arc(p.x,p.y,3,0,6.283);npCtx.fill();
+    npCtx.fillStyle='rgba(46,204,113,.3)';npCtx.font=`${Math.max(10,w*.01)}px 'Courier New'`;npCtx.fillText(wp.name,p.x+8,p.y+4);
+  });
+
+  // Ship position on route
   if(navRoute.length>1){
-    let totalDist=0;
-    for(let i=1;i<navRoute.length;i++){const a=navWaypoints[navRoute[i-1]],b=navWaypoints[navRoute[i]];totalDist+=Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2)*40}
-    document.getElementById('navplan-info').innerHTML=`Route: ${navRoute.length} waypoints — Est. distance: ${totalDist.toFixed(1)} ly — Est. fuel cost: ${(totalDist*2.3).toFixed(0)}% — <span style="color:#d4a03c">⚠ ${totalDist>15?'Exceeds single-tank range':'Route feasible'}</span>`;
+    const shipWp=navWaypoints[navRoute[0]];
+    const nextWp=navWaypoints[navRoute[1]];
+    npShipProgress=Math.min(1,npShipProgress+hudSpeed*.00005);
+    const sx=shipWp.x+(nextWp.x-shipWp.x)*npShipProgress;
+    const sy=shipWp.y+(nextWp.y-shipWp.y)*npShipProgress;
+    const sp=npWorldToScreen(sx,sy,w,h);
+    npCtx.fillStyle='rgba(94,196,212,.9)';npCtx.beginPath();
+    // Ship triangle
+    npCtx.moveTo(sp.x,sp.y-6);npCtx.lineTo(sp.x-4,sp.y+4);npCtx.lineTo(sp.x+4,sp.y+4);npCtx.closePath();npCtx.fill();
+    // Progress readout
+    npCtx.fillStyle='rgba(94,196,212,.3)';npCtx.font=`${Math.max(9,w*.008)}px 'Courier New'`;
+    npCtx.fillText(Math.round(npShipProgress*100)+'%',sp.x+8,sp.y);
+    // Clear fog along path
+    fogCleared.add(sx.toFixed(2)+','+sy.toFixed(2));
+  }
+
+  // Zoom indicator
+  npCtx.fillStyle='rgba(94,196,212,.15)';npCtx.font=`${Math.max(11,w*.01)}px 'Courier New'`;
+  npCtx.fillText('Zoom: '+npZoom.toFixed(1)+'x',10,h-10);
+
+  // Route info
+  updateRouteInfo();
+
+  if(activeScreen==='navplan')npAnimFrame=requestAnimationFrame(drawNavPlan);
+}
+
+function updateRouteInfo(){
+  if(navRoute.length>1){
+    let totalDist=0;const legs=[];
+    for(let i=1;i<navRoute.length;i++){
+      const a=navWaypoints[navRoute[i-1]],b=navWaypoints[navRoute[i]];
+      const dist=Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2)*40;
+      const isLane=hyperLanes.some(([la,lb])=>(la===navRoute[i-1]&&lb===navRoute[i])||(lb===navRoute[i-1]&&la===navRoute[i]));
+      const speed=isLane?1.4:1;const days=Math.round(dist/(hudSpeed*.0042*speed)*365);
+      const fuel=(dist*2.3/speed);
+      totalDist+=dist;
+      legs.push({from:a.name,to:b.name,dist,days,fuel,isLane});
+    }
+    const totalFuel=legs.reduce((s,l)=>s+l.fuel,0);
+    document.getElementById('navplan-info').innerHTML=`Route: ${navRoute.length} wp — ${totalDist.toFixed(1)} ly — Fuel: ${totalFuel.toFixed(0)}% — <span style="color:${totalFuel>hudFuel?'#e74c3c':'#2ecc71'}">${totalFuel>hudFuel?'⚠ Exceeds fuel':'Feasible'}</span>`;
+    document.getElementById('np-legs-body').innerHTML=legs.map((l,i)=>`<div style="padding:3px 0;border-bottom:1px solid rgba(94,196,212,.03)"><span style="color:#5ec4d4">${i+1}.</span> ${l.from} → ${l.to}<br><span style="color:#4a6a6a">${l.dist.toFixed(1)}ly · ${l.days}d · ${l.fuel.toFixed(0)}%${l.isLane?' · <span style="color:#2ecc71">LANE ×1.4</span>':''}</span></div>`).join('');
+  } else {
+    document.getElementById('navplan-info').textContent='Click waypoints to plot route';
+    document.getElementById('np-legs-body').innerHTML='<div style="color:#2a4a5a;padding:4px;font-style:italic">No route plotted</div>';
   }
 }
+
+function showWpDetail(wp){
+  npSelectedWp=wp;
+  const det=document.getElementById('np-detail');
+  const hasDiscoveries=discoveries.filter(d=>d.text&&d.text.includes(wp.name)).length;
+  det.innerHTML=`<div style="font-size:clamp(11px,1vw,14px);color:#5ec4d4;letter-spacing:2px;margin-bottom:6px">${wp.name}</div>
+    ${wp.visited||wp.current?`<div style="font-size:clamp(8px,.7vw,10px);margin-bottom:3px"><span style="color:#2a4a5a">Type:</span> <span style="color:#5ec4d4">${wp.type}</span></div>
+    <div style="font-size:clamp(8px,.7vw,10px);margin-bottom:3px"><span style="color:#2a4a5a">Planets:</span> <span style="color:#5ec4d4">${wp.planets}</span></div>
+    <div style="font-size:clamp(8px,.7vw,10px);margin-bottom:3px"><span style="color:#2a4a5a">Faction:</span> <span style="color:#5ec4d4">${wp.faction}</span></div>
+    <div style="font-size:clamp(8px,.7vw,10px);margin-bottom:3px"><span style="color:#2a4a5a">Hazard:</span> <span style="color:${wp.hazard==='None'?'#2ecc71':'#d4a03c'}">${wp.hazard}</span></div>
+    <div style="font-size:clamp(8px,.7vw,10px);margin-bottom:3px"><span style="color:#2a4a5a">Fuel:</span> <span style="color:${wp.fuel?'#2ecc71':'#4a5a5a'}">${wp.fuel?'Available':'None'}</span></div>
+    <div style="font-size:clamp(8px,.7vw,10px);margin-bottom:3px"><span style="color:#2a4a5a">Relay:</span> <span style="color:${wp.relay?'#5ec4d4':'#4a5a5a'}">${wp.relay?'Active':'No coverage'}</span></div>
+    ${hasDiscoveries?`<div style="font-size:clamp(8px,.7vw,10px);color:#d4a03c;margin-top:4px">${hasDiscoveries} discovery(s) logged</div>`:''}`
+    :`<div style="font-size:clamp(9px,.8vw,11px);color:#3a5a6a;font-style:italic;margin-top:8px">NO DATA<br>Survey required</div>`}`;
+  det.style.display='block';
+}
+
+// Click to select/add to route
 npCanvas.addEventListener('click',e=>{
   const rect=npCanvas.getBoundingClientRect();
-  const mx=(e.clientX-rect.left)/rect.width,my=(e.clientY-rect.top)/rect.height;
+  const sx=(e.clientX-rect.left)*2,sy=(e.clientY-rect.top)*2;
+  const w=npCanvas.width,h=npCanvas.height;
+  const world=npScreenToWorld(sx,sy,w,h);
   let closest=-1,closestD=Infinity;
-  navWaypoints.forEach((wp,i)=>{const d=Math.sqrt((wp.x-mx)**2+(wp.y-my)**2);if(d<.05&&d<closestD){closestD=d;closest=i}});
+  navWaypoints.forEach((wp,i)=>{const d=Math.sqrt((wp.x-world.x)**2+(wp.y-world.y)**2);if(d<.03/npZoom&&d<closestD){closestD=d;closest=i}});
   if(closest>=0){
+    showWpDetail(navWaypoints[closest]);
     const idx=navRoute.indexOf(closest);
     if(idx>=0)navRoute.splice(idx,1);else navRoute.push(closest);
-    drawNavPlan();if(engaged)clickSound();
+    npShipProgress=0;
+    // Comm message on territory crossing
+    if(navRoute.length>1){
+      const lastWp=navWaypoints[navRoute[navRoute.length-1]];
+      const prevWp=navWaypoints[navRoute[navRoute.length-2]];
+      if(lastWp.faction!==prevWp.faction)logComms('Nav','Route crosses into '+lastWp.faction+' space. Jurisdiction protocols may apply.');
+      // Comm relay check
+      if(!lastWp.relay)logComms('Nav','⚠ '+lastWp.name+' has no comm relay. You will be out of contact.');
+    }
+    if(engaged)clickSound();
+  } else {
+    npSelectedWp=null;document.getElementById('np-detail').style.display='none';
   }
+});
+
+// Right-click to add custom waypoint
+let npPendingWpWorld=null;
+npCanvas.addEventListener('contextmenu',e=>{
+  e.preventDefault();
+  const rect=npCanvas.getBoundingClientRect();
+  const sx=(e.clientX-rect.left)*2,sy=(e.clientY-rect.top)*2;
+  npPendingWpWorld=npScreenToWorld(sx,sy,npCanvas.width,npCanvas.height);
+  const inputPanel=document.getElementById('np-wp-input');
+  inputPanel.style.display='block';
+  const nameInput=document.getElementById('np-wp-name');
+  nameInput.value='';nameInput.focus();
+});
+document.getElementById('np-wp-confirm').addEventListener('click',()=>{
+  const name=document.getElementById('np-wp-name').value.trim();
+  if(!name||!npPendingWpWorld)return;
+  customWaypoints.push({name,x:npPendingWpWorld.x,y:npPendingWpWorld.y,z:0,custom:true,visited:false,fuel:false,relay:false,type:'Custom Marker',planets:0,faction:'Unknown',hazard:'Unknown'});
+  logComms('Nav','Custom waypoint "'+name+'" placed.');
+  document.getElementById('np-wp-input').style.display='none';
+  npPendingWpWorld=null;
+  if(engaged)clickSound();
+});
+document.getElementById('np-wp-cancel').addEventListener('click',()=>{
+  document.getElementById('np-wp-input').style.display='none';
+  npPendingWpWorld=null;
+  if(engaged)clickSound();
+});
+document.getElementById('np-wp-name').addEventListener('keydown',e=>{
+  if(e.key==='Enter')document.getElementById('np-wp-confirm').click();
+  if(e.key==='Escape')document.getElementById('np-wp-cancel').click();
+  e.stopPropagation();
+});
+
+// Zoom
+npCanvas.addEventListener('wheel',e=>{
+  e.preventDefault();
+  npZoom=Math.max(.5,Math.min(4,npZoom+(e.deltaY>0?-.15:.15)));
+},{passive:false});
+
+// Pan
+npCanvas.addEventListener('mousedown',e=>{
+  if(e.button===0){npDragging=true;npDragStartX=e.clientX;npDragStartY=e.clientY}
+});
+npCanvas.addEventListener('mousemove',e=>{
+  if(!npDragging)return;
+  const dx=(e.clientX-npDragStartX)/npCanvas.offsetWidth/npZoom;
+  const dy=(e.clientY-npDragStartY)/npCanvas.offsetHeight/npZoom;
+  npPanX-=dx;npPanY-=dy;
+  npDragStartX=e.clientX;npDragStartY=e.clientY;
+});
+npCanvas.addEventListener('mouseup',()=>{npDragging=false});
+npCanvas.addEventListener('mouseleave',()=>{npDragging=false});
+
+// Clear route
+document.getElementById('np-clear-route').addEventListener('click',()=>{
+  navRoute=[];npShipProgress=0;npSelectedWp=null;
+  document.getElementById('np-detail').style.display='none';
+  if(engaged)clickSound();
 });
 
 // === EXTERIOR CAMERAS ===
@@ -3624,24 +4313,245 @@ document.getElementById('ai-input').addEventListener('keydown',e=>{
 });
 
 // === FUEL GRAPH ===
-const fgCanvas=document.getElementById('fg-canvas');
-const fgCtx=fgCanvas.getContext('2d');
-const fuelHistory=[];
-setInterval(()=>{fuelHistory.push(hudFuel);if(fuelHistory.length>100)fuelHistory.shift()},3000);
-function drawFuelGraph(){
-  if(!document.getElementById('fuel-graph').classList.contains('show')){requestAnimationFrame(drawFuelGraph);return}
-  const w=fgCanvas.width,h=fgCanvas.height;
-  fgCtx.fillStyle='rgba(4,8,12,.3)';fgCtx.fillRect(0,0,w,h);
-  fgCtx.strokeStyle='rgba(94,196,212,.06)';fgCtx.lineWidth=.5;
-  for(let y=0;y<h;y+=14){fgCtx.beginPath();fgCtx.moveTo(0,y);fgCtx.lineTo(w,y);fgCtx.stroke()}
-  if(fuelHistory.length>1){
-    fgCtx.strokeStyle='rgba(46,204,113,.5)';fgCtx.lineWidth=1.5;fgCtx.beginPath();
-    fuelHistory.forEach((v,i)=>{const x=i/100*w,y=h-(v-50)/55*h;i===0?fgCtx.moveTo(x,y):fgCtx.lineTo(x,y)});
-    fgCtx.stroke();
+// === FUEL MANAGEMENT ===
+const fuelHistory=[],burnHistory=[],throttleHistory=[];
+let fuelReserve=25,fuelPurity=100,fuelEcoMode=false,fuelRationMode='standard';
+let fuelTransit=0,fuelManeuver=0,fuelWarp=0;
+const fuelLog=[];let fuelTimeWindow=60;
+let fuelJettisonConfirm=false;
+
+setInterval(()=>{
+  const burnMod=fuelRationMode==='conserve'?.6:fuelRationMode==='emergency'?.2:1;
+  const ecoBurnMod=fuelEcoMode?.8:1;
+  const burn=throttle*.01*burnMod*ecoBurnMod;
+  hudFuel-=burn;
+  if(warping){hudFuel-=.05*burnMod;fuelWarp+=.05*burnMod}
+  fuelTransit+=burn*.7;fuelManeuver+=burn*.3;
+  // Purity degrades
+  fuelPurity=Math.max(40,fuelPurity-.003);
+  // Low fuel auto-reserve
+  if(hudFuel<15&&fuelReserve>0&&fuelRationMode!=='standard'){
+    const transfer=Math.min(.5,fuelReserve);fuelReserve-=transfer;hudFuel+=transfer;
+    addFuelLog('Auto-transfer: '+transfer.toFixed(1)+'% from reserve');
   }
-  requestAnimationFrame(drawFuelGraph);
+  if(hudFuel<0)hudFuel=0;
+  fuelHistory.push(hudFuel);burnHistory.push(burn*60);throttleHistory.push(throttle*100);
+  if(fuelHistory.length>600){fuelHistory.shift();burnHistory.shift();throttleHistory.shift()}
+  // Contamination stutters
+  if(fuelPurity<60&&Math.random()<.02){throttle=Math.max(.05,throttle-.1);setTimeout(()=>{throttle=Math.min(1,throttle+.1)},500)}
+},1000);
+
+function addFuelLog(text){
+  const elapsed=Date.now()-missionStart;const ms=elapsed*100;const ts=Math.floor(ms/1000);
+  const h=Math.floor(ts/3600)%24,m=Math.floor(ts/60)%60;
+  fuelLog.unshift({time:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'),text});
+  if(fuelLog.length>40)fuelLog.pop();
 }
-drawFuelGraph();
+
+function fuelEfficiencyGrade(){
+  if(burnHistory.length<10)return{grade:'--',desc:'Collecting data…',color:'#3a6a7a'};
+  const avg=burnHistory.reduce((s,v)=>s+v,0)/burnHistory.length;
+  if(avg<.15)return{grade:'A+',desc:'Exceptional fuel discipline',color:'#2ecc71'};
+  if(avg<.25)return{grade:'A',desc:'Excellent efficiency',color:'#2ecc71'};
+  if(avg<.4)return{grade:'B',desc:'Good fuel management',color:'#5ec4d4'};
+  if(avg<.6)return{grade:'C',desc:'Average consumption',color:'#d4a03c'};
+  if(avg<.8)return{grade:'D',desc:'Heavy burn rate',color:'#d4a03c'};
+  return{grade:'F',desc:'Excessive fuel use',color:'#e74c3c'};
+}
+
+function renderFuelScreen(){
+  // Tanks
+  document.getElementById('fuel-fill-pri').style.width=Math.max(0,hudFuel)+'%';
+  document.getElementById('fuel-val-pri').textContent=hudFuel.toFixed(1)+'%';
+  document.getElementById('fuel-fill-res').style.width=Math.max(0,fuelReserve)+'%';
+  document.getElementById('fuel-val-res').textContent=fuelReserve.toFixed(1)+'%';
+  // Burn rate
+  const curBurn=burnHistory.length?burnHistory[burnHistory.length-1]:0;
+  const burnEl=document.getElementById('fuel-burn');
+  burnEl.textContent=curBurn.toFixed(2);
+  burnEl.className='fuel-big-val'+(curBurn>.5?' crit':curBurn>.25?' warn':'');
+  // Range
+  const hoursLeft=curBurn>0?(hudFuel+fuelReserve)/curBurn:Infinity;
+  const range=(hoursLeft*hudSpeed*.001*365).toFixed(1);
+  document.getElementById('fuel-range').textContent=range>999?'999+':range;
+  // Bingo
+  const nearestFuel=navWaypoints.filter(w=>w.fuel&&!w.current).sort((a,b)=>{
+    const da=Math.sqrt((a.x-.48)**2+(a.y-.48)**2),db=Math.sqrt((b.x-.48)**2+(b.y-.48)**2);return da-db;
+  })[0];
+  if(nearestFuel){
+    const dist=Math.sqrt((nearestFuel.x-.48)**2+(nearestFuel.y-.48)**2)*40;
+    const fuelNeeded=dist*2.3;
+    const bingoEl=document.getElementById('fuel-bingo');
+    bingoEl.textContent=fuelNeeded.toFixed(0)+'%';
+    bingoEl.className='fuel-big-val'+(hudFuel<fuelNeeded?' crit':'');
+  }
+  // Grade
+  const eff=fuelEfficiencyGrade();
+  document.getElementById('fuel-grade').textContent=eff.grade;
+  document.getElementById('fuel-grade').style.color=eff.color;
+  document.getElementById('fuel-grade-desc').textContent=eff.desc;
+  // Purity
+  document.getElementById('fuel-purity').textContent='Purity: '+Math.round(fuelPurity)+'%';
+  document.getElementById('fuel-purity').style.color=fuelPurity<60?'#e74c3c':fuelPurity<80?'#d4a03c':'#3a6a7a';
+  // Route cost
+  if(navRoute.length>1){
+    let totalDist=0;for(let i=1;i<navRoute.length;i++){const a=navWaypoints[navRoute[i-1]],b=navWaypoints[navRoute[i]];totalDist+=Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2)*40}
+    const cost=totalDist*2.3;const after=hudFuel-cost;
+    document.getElementById('fuel-route-cost').innerHTML=`Cost: ${cost.toFixed(0)}% · After: <span style="color:${after<0?'#e74c3c':'#2ecc71'}">${after.toFixed(0)}%</span>`;
+  } else document.getElementById('fuel-route-cost').textContent='No route plotted';
+  // Budget
+  const total=fuelTransit+fuelManeuver+fuelWarp+.001;
+  document.getElementById('fuel-budget').innerHTML=`Transit: ${(fuelTransit/total*100).toFixed(0)}% · Maneuver: ${(fuelManeuver/total*100).toFixed(0)}% · Warp: ${(fuelWarp/total*100).toFixed(0)}%`;
+  // Log
+  document.getElementById('fuel-log-body').innerHTML=fuelLog.length?fuelLog.map(e=>`<div class="fuel-log-entry"><span style="color:#2a4a5a;margin-right:4px">[${e.time}]</span>${e.text}</div>`).join(''):'<div class="fuel-log-entry" style="font-style:italic;color:#2a4a5a">No events</div>';
+  // Draw canvases
+  drawFuelGraph();drawFuelQuality();drawFuelTP();
+}
+
+function drawFuelGraph(){
+  const cv=document.getElementById('fuel-graph-cv');if(!cv)return;
+  const w=cv.width=cv.offsetWidth*2||600,h=cv.height=cv.offsetHeight*2||120;
+  const cx=cv.getContext('2d');
+  cx.fillStyle='rgba(4,8,12,.3)';cx.fillRect(0,0,w,h);
+  cx.strokeStyle='rgba(94,196,212,.04)';cx.lineWidth=.5;
+  for(let y=0;y<h;y+=h/5){cx.beginPath();cx.moveTo(0,y);cx.lineTo(w,y);cx.stroke()}
+  const showN=Math.min(fuelHistory.length,fuelTimeWindow);
+  const data=fuelHistory.slice(-showN),burn=burnHistory.slice(-showN),thr=throttleHistory.slice(-showN);
+  if(data.length>1){
+    // Throttle (dim)
+    cx.strokeStyle='rgba(94,196,212,.08)';cx.lineWidth=1;cx.beginPath();
+    thr.forEach((v,i)=>{const x=i/(showN-1)*w,y=h-v/100*h;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});cx.stroke();
+    // Burn rate (amber)
+    cx.strokeStyle='rgba(212,160,60,.4)';cx.lineWidth=1.5;cx.beginPath();
+    burn.forEach((v,i)=>{const x=i/(showN-1)*w,y=h-Math.min(v,1)*h;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});cx.stroke();
+    // Fuel level (cyan)
+    cx.strokeStyle='rgba(46,204,113,.6)';cx.lineWidth=2;cx.beginPath();
+    data.forEach((v,i)=>{const x=i/(showN-1)*w,y=h-(v/100)*h;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});cx.stroke();
+    // Glow
+    cx.strokeStyle='rgba(46,204,113,.1)';cx.lineWidth=5;cx.beginPath();
+    data.forEach((v,i)=>{const x=i/(showN-1)*w,y=h-(v/100)*h;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});cx.stroke();
+  }
+  // Legend
+  cx.fillStyle='rgba(46,204,113,.3)';cx.font=`${Math.max(9,w*.015)}px 'Courier New'`;cx.fillText('Fuel',4,12);
+  cx.fillStyle='rgba(212,160,60,.3)';cx.fillText('Burn',40,12);
+  cx.fillStyle='rgba(94,196,212,.15)';cx.fillText('Throttle',80,12);
+}
+
+function drawFuelQuality(){
+  const cv=document.getElementById('fuel-quality-cv');if(!cv)return;
+  const w=cv.width=cv.offsetWidth*2||300,h=cv.height=cv.offsetHeight*2||50;
+  const cx=cv.getContext('2d');const n=performance.now()*.001;
+  cx.fillStyle='rgba(4,8,12,.3)';cx.fillRect(0,0,w,h);
+  // Spectrograph lines
+  const sharpness=fuelPurity/100;
+  for(let i=0;i<12;i++){
+    const x=w*.08+i*(w*.07);
+    const lineH=(.3+Math.random()*.4*sharpness)*h;
+    const hue=200+i*12;
+    cx.fillStyle=`hsla(${hue},60%,50%,${.1+sharpness*.3})`;
+    cx.fillRect(x,h/2-lineH/2,2+sharpness*2,lineH);
+    // Noise (impurity)
+    if(fuelPurity<80){
+      for(let j=0;j<3;j++){
+        cx.fillStyle=`rgba(231,76,60,${(.8-sharpness)*.15})`;
+        cx.fillRect(x+Math.random()*10-5,Math.random()*h,1,2);
+      }
+    }
+  }
+}
+
+function drawFuelTP(){
+  const cv=document.getElementById('fuel-tp-cv');if(!cv)return;
+  const w=cv.width=cv.offsetWidth*2||300,h=cv.height=cv.offsetHeight*2||50;
+  const cx=cv.getContext('2d');
+  cx.fillStyle='rgba(4,8,12,.3)';cx.fillRect(0,0,w,h);
+  // Axes
+  cx.strokeStyle='rgba(94,196,212,.08)';cx.lineWidth=1;
+  cx.beginPath();cx.moveTo(20,h-10);cx.lineTo(w-10,h-10);cx.moveTo(20,h-10);cx.lineTo(20,10);cx.stroke();
+  cx.fillStyle='rgba(94,196,212,.15)';cx.font=`${Math.max(8,w*.015)}px 'Courier New'`;
+  cx.fillText('T',w-15,h-2);cx.fillText('P',12,12);
+  // Optimal zone
+  cx.fillStyle='rgba(46,204,113,.06)';cx.fillRect(w*.3,h*.2,w*.4,h*.5);
+  cx.strokeStyle='rgba(46,204,113,.12)';cx.lineWidth=1;cx.strokeRect(w*.3,h*.2,w*.4,h*.5);
+  // Current point based on throttle & reactor
+  const temp=.2+throttle*.6;const press=.3+hudPress*.3;
+  const px=20+(w-30)*temp,py=h-10-(h-20)*press;
+  const inZone=temp>.3&&temp<.7&&press>.3&&press<.7;
+  cx.fillStyle=inZone?'rgba(46,204,113,.7)':temp>.7?'rgba(231,76,60,.7)':'rgba(212,160,60,.7)';
+  cx.beginPath();cx.arc(px,py,4,0,6.283);cx.fill();
+  cx.fillStyle=inZone?'rgba(46,204,113,.2)':temp>.7?'rgba(231,76,60,.2)':'rgba(212,160,60,.2)';
+  cx.beginPath();cx.arc(px,py,8,0,6.283);cx.fill();
+  const status=document.getElementById('fuel-tp-status');
+  if(temp>.7){status.textContent='⚠ High temp — volatile';status.style.color='#e74c3c'}
+  else if(temp<.3){status.textContent='Cold — thickened flow';status.style.color='#d4a03c'}
+  else{status.textContent='Optimal';status.style.color='#2ecc71'}
+}
+
+// Controls
+document.getElementById('fuel-close').addEventListener('click',()=>{
+  document.getElementById('fuel-screen').classList.remove('show');
+  document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='fuelg')b.classList.remove('active')});
+  if(engaged)clickSound();
+});
+document.getElementById('fuel-transfer').addEventListener('click',()=>{
+  if(fuelReserve<=0)return;
+  const amt=Math.min(10,fuelReserve);fuelReserve-=amt;hudFuel=Math.min(100,hudFuel+amt);
+  addFuelLog('Manual transfer: +'+amt.toFixed(1)+'% from reserve');
+  logComms('Engineering','Fuel transfer: '+amt.toFixed(1)+'% moved from reserve to primary.');
+  if(engaged)clickSound();
+});
+document.getElementById('fuel-filter').addEventListener('click',()=>{
+  const btn=document.getElementById('fuel-filter');
+  btn.textContent='Filtering…';btn.disabled=true;
+  addFuelLog('Filter cycle initiated');
+  setTimeout(()=>{fuelPurity=Math.min(100,fuelPurity+30);btn.textContent='✓ Filtered';btn.disabled=false;
+    setTimeout(()=>{btn.textContent='Run Filter Cycle'},2000);
+    addFuelLog('Filter complete — purity restored to '+Math.round(fuelPurity)+'%');
+    logComms('Engineering','Fuel filter cycle complete. Purity: '+Math.round(fuelPurity)+'%.');
+  },3000);
+  if(engaged)clickSound();
+});
+document.getElementById('fuel-eco-toggle').addEventListener('click',()=>{
+  fuelEcoMode=!fuelEcoMode;
+  document.getElementById('fuel-eco-toggle').textContent='Eco Throttle: '+(fuelEcoMode?'ON':'OFF');
+  document.getElementById('fuel-eco-toggle').classList.toggle('active',fuelEcoMode);
+  addFuelLog('Eco throttle '+(fuelEcoMode?'engaged':'disengaged'));
+  if(engaged)clickSound();
+});
+document.getElementById('fuel-jettison').addEventListener('click',()=>{
+  const btn=document.getElementById('fuel-jettison');
+  if(!fuelJettisonConfirm){fuelJettisonConfirm=true;btn.textContent='⚠ Confirm Jettison — Irreversible';
+    setTimeout(()=>{fuelJettisonConfirm=false;btn.textContent='⚠ Jettison Fuel'},5000);
+  } else {
+    const dumped=hudFuel*.3;hudFuel-=dumped;fuelJettisonConfirm=false;btn.textContent='⚠ Jettison Fuel';
+    addFuelLog('JETTISON: '+dumped.toFixed(1)+'% fuel dumped');
+    logComms('Engineering','⚠ Fuel jettison! '+dumped.toFixed(1)+'% dumped to reduce mass.');
+  }
+  if(engaged)clickSound();
+});
+document.querySelectorAll('.fuel-preset').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    fuelRationMode=btn.dataset.ration;
+    document.querySelectorAll('.fuel-preset').forEach(b=>b.classList.toggle('active',b.dataset.ration===fuelRationMode));
+    addFuelLog('Ration mode: '+fuelRationMode);
+    logComms('Engineering','Fuel rationing set to '+fuelRationMode+'.');
+    if(engaged)clickSound();
+  });
+});
+document.querySelectorAll('[data-ftw]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    fuelTimeWindow=parseInt(btn.dataset.ftw);
+    document.querySelectorAll('[data-ftw]').forEach(b=>b.classList.toggle('active',b===btn));
+    if(engaged)clickSound();
+  });
+});
+
+// Animate fuel screen
+function animFuelScreen(){
+  if(document.getElementById('fuel-screen').classList.contains('show'))renderFuelScreen();
+  requestAnimationFrame(animFuelScreen);
+}
+animFuelScreen();
 
 // === HAIL SYSTEM ===
 const hailPrompt=document.getElementById('hail-prompt');
@@ -4209,6 +5119,399 @@ function openRepairModal(sys){
   modal.classList.add('show');
   renderPuzzle();
 }
+
+// === SHUTTLE BAY OPERATIONS ===
+const shuttleCv=document.getElementById('shuttle-cv');
+const shuttleCtx=shuttleCv.getContext('2d');
+const shuttleCommsLog=[];
+let shuttleState='ready';// ready,checklist,launching,deployed,returning,recovery,landed
+let shuttleCheckStep=0,shuttleMission='',shuttleFuel=100,shuttleRange=0,shuttleVel=0;
+let shuttleProgress=0,shuttleAnimFrame=0,shuttleApproachPos=10,shuttleWaveOffs=0;
+const shuttlePilots=['Lt. Park','Cpl. Reyes'];
+let shuttlePilot='';
+
+const checklistSteps=[
+  {label:'Pressurize launch tube',sound:200,dur:1500},
+  {label:'Retract fuel umbilicals',sound:300,dur:1200},
+  {label:'Spin up shuttle engines',sound:400,dur:2000},
+  {label:'Confirm pilot ready',sound:500,dur:800},
+  {label:'Open launch doors',sound:250,dur:1800},
+  {label:'Verify launch corridor clear',sound:350,dur:1000},
+];
+
+const lsoDialogue={
+  launch:[
+    'Shuttle One, you are cleared to launch tube two.',
+    'Board is green. All stations report ready.',
+    'Standby for catapult…',
+    'Three… two… one… LAUNCH!',
+  ],
+  deployed:[
+    (p)=>`${p}, ${shipName} reads you at {range}. Looking good.`,
+    (p)=>`Shuttle One, maintain current heading. You're on profile.`,
+    (p)=>`${shipName} Actual, shuttle telemetry nominal.`,
+  ],
+  recovery:[
+    (p)=>`Shuttle One, turn to recovery heading. Bay doors opening.`,
+    (p)=>`${p}, call the ball.`,
+    (p)=>`Roger ball. You're on glideslope.`,
+    (p)=>`Slightly high — correct down two.`,
+    (p)=>`Speed good. Keep it coming.`,
+    (p)=>`Trap! Trap! Trap! — Welcome home, ${p}.`,
+  ],
+  waveoff:[
+    (p)=>`Wave off! Wave off! Go around, ${p}!`,
+    (p)=>`Too fast — reset your approach.`,
+    (p)=>`${p}, take a breath and come back around.`,
+  ],
+  missionComplete:{
+    recon:(p)=>`${p}: Recon sweep complete. Transmitting sensor data now.`,
+    salvage:(p)=>`${p}: Salvage secured. Tow cables attached. Heading home.`,
+    repair:(p)=>`${p}: EVA complete. Hull patch holding. Pressure nominal.`,
+    sar:(p)=>`${p}: Survivors aboard. Two souls recovered. Returning to ship.`,
+  }
+};
+
+function shuttleComm(src,msg,type){
+  shuttleCommsLog.unshift({src,msg,type:type||''});
+  if(shuttleCommsLog.length>30)shuttleCommsLog.pop();
+  const el=document.getElementById('shuttle-comms-body');
+  el.innerHTML=shuttleCommsLog.map(c=>`<div class="shuttle-comm ${c.type}"><span class="sc-src">${c.src}:</span><span class="sc-msg">${c.msg}</span></div>`).join('');
+  logComms(src,msg);
+}
+
+function initShuttleBay(){
+  shuttleCv.width=shuttleCv.parentElement.offsetWidth*2;
+  shuttleCv.height=shuttleCv.parentElement.offsetHeight*2;
+  if(shuttleState==='ready'){
+    document.getElementById('shuttle-mission-card').style.display='block';
+    document.getElementById('shuttle-checklist-card').style.display='none';
+    document.getElementById('shuttle-launch-card').style.display='none';
+    document.getElementById('shuttle-tracking-card').style.display='none';
+    document.getElementById('shuttle-recovery-card').style.display='none';
+  }
+}
+
+function drawShuttleBay(){
+  if(!document.getElementById('shuttle-panel').classList.contains('show'))return;
+  const w=shuttleCv.width,h=shuttleCv.height,cx=w/2,cy=h/2;
+  const now=performance.now()*.001;
+  shuttleCtx.fillStyle='rgba(4,8,12,.15)';shuttleCtx.fillRect(0,0,w,h);
+
+  if(shuttleState==='ready'||shuttleState==='checklist'){
+    // Launch tube interior
+    shuttleCtx.fillStyle='rgba(4,8,12,.95)';shuttleCtx.fillRect(0,0,w,h);
+    // Tube walls — perspective lines
+    const vanX=cx,vanY=cy;
+    const tubeW=w*.35,tubeH=h*.35;
+    shuttleCtx.strokeStyle='rgba(94,196,212,.06)';shuttleCtx.lineWidth=1;
+    for(let i=0;i<12;i++){
+      const t=i/12;
+      const lx=t*tubeW,rx=w-t*tubeW,ty=t*tubeH,by=h-t*tubeH;
+      shuttleCtx.strokeRect(lx,ty,rx-lx,by-ty);
+    }
+    // Guide rails
+    shuttleCtx.strokeStyle='rgba(212,160,60,.08)';shuttleCtx.lineWidth=2;
+    shuttleCtx.beginPath();shuttleCtx.moveTo(0,h*.3);shuttleCtx.lineTo(vanX,vanY);shuttleCtx.moveTo(0,h*.7);shuttleCtx.lineTo(vanX,vanY);
+    shuttleCtx.moveTo(w,h*.3);shuttleCtx.lineTo(vanX,vanY);shuttleCtx.moveTo(w,h*.7);shuttleCtx.lineTo(vanX,vanY);shuttleCtx.stroke();
+    // Warning stripes
+    for(let i=0;i<8;i++){
+      const t=i/8;const sz=20+t*30;
+      shuttleCtx.fillStyle=i%2===0?'rgba(212,160,60,.04)':'rgba(4,8,12,.02)';
+      shuttleCtx.fillRect(w*.1+t*(cx-w*.1),h-sz,sz,sz);
+      shuttleCtx.fillRect(w*.9-t*(w*.9-cx)-sz,h-sz,sz,sz);
+    }
+    // Starfield at end of tube
+    const doorOpen=shuttleCheckStep>=5?1:0;
+    if(doorOpen){
+      const starRect=80+doorOpen*40;
+      shuttleCtx.fillStyle='rgba(4,8,16,.8)';shuttleCtx.fillRect(cx-starRect,cy-starRect*.6,starRect*2,starRect*1.2);
+      for(let i=0;i<30;i++){
+        const sx=cx-starRect+Math.random()*starRect*2;
+        const sy=cy-starRect*.6+Math.random()*starRect*1.2;
+        shuttleCtx.fillStyle=`rgba(200,220,255,${.1+Math.random()*.3})`;
+        shuttleCtx.beginPath();shuttleCtx.arc(sx,sy,.5+Math.random(),0,6.283);shuttleCtx.fill();
+      }
+    }
+    // Tube lights — color based on checklist progress
+    const lightColor=shuttleCheckStep>=checklistSteps.length?'rgba(46,204,113,':'rgba(231,76,60,';
+    const midColor=shuttleCheckStep>=3?'rgba(212,160,60,':'rgba(231,76,60,';
+    for(let i=0;i<6;i++){
+      const t=i/6;const lx=t*tubeW*.8,ly=h*.15+t*(cy-h*.15);
+      const col=i<shuttleCheckStep?(i<3?lightColor:midColor):'rgba(60,20,20,';
+      shuttleCtx.fillStyle=col+'.15)';shuttleCtx.fillRect(lx+10,ly,8,3);
+      shuttleCtx.fillRect(w-lx-18,ly,8,3);
+    }
+    // Shuttle silhouette
+    shuttleCtx.fillStyle='rgba(94,196,212,.05)';
+    shuttleCtx.beginPath();shuttleCtx.moveTo(cx,cy+40);shuttleCtx.lineTo(cx-60,cy+100);shuttleCtx.lineTo(cx+60,cy+100);shuttleCtx.closePath();shuttleCtx.fill();
+    // "TUBE 2" label
+    shuttleCtx.fillStyle='rgba(94,196,212,.1)';shuttleCtx.font=`${Math.max(14,w*.015)}px 'Courier New'`;
+    shuttleCtx.fillText('LAUNCH TUBE 2',cx-60,h-20);
+  }
+  else if(shuttleState==='launching'){
+    // Catapult acceleration effect
+    shuttleCtx.fillStyle='rgba(4,8,12,.3)';shuttleCtx.fillRect(0,0,w,h);
+    // Star streaks
+    for(let i=0;i<60;i++){
+      const sx=Math.random()*w,sy=Math.random()*h;
+      const len=20+Math.random()*80;
+      shuttleCtx.strokeStyle=`rgba(200,220,255,${.1+Math.random()*.3})`;shuttleCtx.lineWidth=1;
+      shuttleCtx.beginPath();shuttleCtx.moveTo(sx,sy);shuttleCtx.lineTo(sx,sy+len);shuttleCtx.stroke();
+    }
+    // Flash
+    shuttleCtx.fillStyle=`rgba(255,255,255,${Math.max(0,.2-shuttleProgress*.4)})`;shuttleCtx.fillRect(0,0,w,h);
+  }
+  else if(shuttleState==='deployed'){
+    // Tracking view — radar-like display of shuttle
+    shuttleCtx.fillStyle='rgba(4,8,12,.95)';shuttleCtx.fillRect(0,0,w,h);
+    // Grid
+    shuttleCtx.strokeStyle='rgba(94,196,212,.04)';shuttleCtx.lineWidth=1;
+    [.2,.4,.6,.8,1].forEach(s=>{shuttleCtx.beginPath();shuttleCtx.arc(cx,cy,Math.min(w,h)*.4*s,0,6.283);shuttleCtx.stroke()});
+    shuttleCtx.beginPath();shuttleCtx.moveTo(cx,0);shuttleCtx.lineTo(cx,h);shuttleCtx.moveTo(0,cy);shuttleCtx.lineTo(w,cy);shuttleCtx.stroke();
+    // Mothership at center
+    shuttleCtx.fillStyle='rgba(94,196,212,.6)';shuttleCtx.beginPath();shuttleCtx.arc(cx,cy,5,0,6.283);shuttleCtx.fill();
+    shuttleCtx.fillStyle='rgba(94,196,212,.2)';shuttleCtx.font=`${Math.max(12,w*.012)}px 'Courier New'`;shuttleCtx.fillText(shipName,cx+10,cy+4);
+    // Shuttle blip
+    const sAngle=now*.3;const sDist=Math.min(shuttleProgress,.8)*Math.min(w,h)*.35;
+    const sx=cx+Math.cos(sAngle)*sDist,sy=cy+Math.sin(sAngle)*sDist;
+    shuttleCtx.fillStyle=`rgba(46,204,113,${.5+Math.sin(now*3)*.3})`;shuttleCtx.beginPath();shuttleCtx.arc(sx,sy,4,0,6.283);shuttleCtx.fill();
+    shuttleCtx.strokeStyle='rgba(46,204,113,.2)';shuttleCtx.lineWidth=1;shuttleCtx.beginPath();shuttleCtx.arc(sx,sy,10,0,6.283);shuttleCtx.stroke();
+    shuttleCtx.fillStyle='rgba(46,204,113,.3)';shuttleCtx.fillText('SHUTTLE 1',sx+12,sy+4);
+    // Trail
+    shuttleCtx.strokeStyle='rgba(46,204,113,.06)';shuttleCtx.lineWidth=1;shuttleCtx.beginPath();shuttleCtx.moveTo(cx,cy);shuttleCtx.lineTo(sx,sy);shuttleCtx.stroke();
+    // Range rings labels
+    shuttleCtx.fillStyle='rgba(94,196,212,.1)';shuttleCtx.fillText('5km',cx+Math.min(w,h)*.08+3,cy-3);
+    shuttleCtx.fillText('15km',cx+Math.min(w,h)*.24+3,cy-3);
+    // Update tracking readouts
+    shuttleRange=(shuttleProgress*20).toFixed(1);shuttleVel=Math.round(200+shuttleProgress*800);
+    shuttleFuel=Math.max(0,100-shuttleProgress*30);
+    document.getElementById('shuttle-range').textContent=shuttleRange+' km';
+    document.getElementById('shuttle-vel').textContent=shuttleVel+' m/s';
+    document.getElementById('shuttle-fuel').textContent=Math.round(shuttleFuel)+'%';
+    document.getElementById('shuttle-fuel').style.color=shuttleFuel<30?'#e74c3c':'#5ec4d4';
+  }
+  else if(shuttleState==='recovery'){
+    // Landing bay view
+    shuttleCtx.fillStyle='rgba(4,8,12,.95)';shuttleCtx.fillRect(0,0,w,h);
+    // Bay doors — open
+    const doorW=w*.3,doorH=h*.4;
+    shuttleCtx.strokeStyle='rgba(94,196,212,.1)';shuttleCtx.lineWidth=2;
+    shuttleCtx.strokeRect(cx-doorW/2,cy-doorH/2,doorW,doorH);
+    // Guide lights — flashing sequence
+    for(let i=0;i<8;i++){
+      const t=i/8;const flash=(Math.floor(now*2+i)%3===0);
+      shuttleCtx.fillStyle=flash?'rgba(46,204,113,.4)':'rgba(46,204,113,.08)';
+      shuttleCtx.fillRect(cx-doorW/2-10,cy-doorH/2+t*doorH,6,6);
+      shuttleCtx.fillRect(cx+doorW/2+4,cy-doorH/2+t*doorH,6,6);
+    }
+    // Centerline
+    shuttleCtx.strokeStyle='rgba(212,160,60,.1)';shuttleCtx.setLineDash([8,8]);
+    shuttleCtx.beginPath();shuttleCtx.moveTo(cx,cy-doorH/2);shuttleCtx.lineTo(cx,cy+doorH/2);shuttleCtx.stroke();shuttleCtx.setLineDash([]);
+    // Shuttle approaching — grows with approach position
+    const appProgress=shuttleApproachPos/100;
+    const sSize=3+appProgress*20;
+    const sY=cy-doorH/2-20+(1-appProgress)*100;
+    shuttleCtx.fillStyle=`rgba(94,196,212,${.3+appProgress*.4})`;
+    shuttleCtx.beginPath();shuttleCtx.moveTo(cx,sY-sSize);shuttleCtx.lineTo(cx-sSize*.6,sY+sSize*.4);shuttleCtx.lineTo(cx+sSize*.6,sY+sSize*.4);shuttleCtx.closePath();shuttleCtx.fill();
+    // Engine glow
+    shuttleCtx.fillStyle=`rgba(94,196,212,${.1+appProgress*.2})`;shuttleCtx.beginPath();shuttleCtx.arc(cx,sY+sSize*.5,sSize*.3,0,6.283);shuttleCtx.fill();
+    // "RECOVERY BAY" label
+    shuttleCtx.fillStyle='rgba(94,196,212,.1)';shuttleCtx.font=`${Math.max(14,w*.015)}px 'Courier New'`;
+    shuttleCtx.fillText('RECOVERY BAY — PORT',cx-70,h-20);
+  }
+  else if(shuttleState==='landed'){
+    shuttleCtx.fillStyle='rgba(4,8,12,.95)';shuttleCtx.fillRect(0,0,w,h);
+    shuttleCtx.fillStyle='rgba(46,204,113,.15)';shuttleCtx.font=`${Math.max(18,w*.02)}px 'Courier New'`;
+    shuttleCtx.fillText('SHUTTLE SECURED',cx-80,cy-10);
+    shuttleCtx.fillStyle='rgba(46,204,113,.08)';shuttleCtx.font=`${Math.max(12,w*.012)}px 'Courier New'`;
+    shuttleCtx.fillText('Bay doors closing — pressurizing',cx-100,cy+20);
+  }
+
+  shuttleAnimFrame=requestAnimationFrame(drawShuttleBay);
+}
+
+// Mission select
+document.querySelectorAll('[data-smission]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    if(shuttleState!=='ready')return;
+    shuttleMission=btn.dataset.smission;
+    shuttlePilot=shuttlePilots[Math.floor(Math.random()*shuttlePilots.length)];
+    shuttleCheckStep=0;shuttleProgress=0;shuttleFuel=100;shuttleWaveOffs=0;
+    document.getElementById('shuttle-mission-card').style.display='none';
+    document.getElementById('shuttle-checklist-card').style.display='block';
+    document.getElementById('shuttle-mission-type').textContent=shuttleMission;
+    document.getElementById('shuttle-status').textContent='PRE-LAUNCH';document.getElementById('shuttle-status').style.color='#d4a03c';
+    shuttleComm('Bay Control','Mission: '+shuttleMission+'. Pilot: '+shuttlePilot+'. Initiating pre-launch.','lso');
+    shuttleComm(shuttlePilot,'Copy that. Running pre-flight checks.','pilot');
+    renderChecklist();
+    if(engaged)clickSound();
+  });
+});
+
+function renderChecklist(){
+  const el=document.getElementById('shuttle-checklist');
+  el.innerHTML=checklistSteps.map((s,i)=>`<div class="shuttle-check"><div class="sc-dot ${i<shuttleCheckStep?'done':i===shuttleCheckStep?'active':''}"></div><span class="sc-label ${i<shuttleCheckStep?'done':i===shuttleCheckStep?'active':''}">${s.label}</span></div>`).join('');
+  document.getElementById('shuttle-next-check').disabled=shuttleCheckStep>=checklistSteps.length;
+  if(shuttleCheckStep>=checklistSteps.length){
+    document.getElementById('shuttle-launch-card').style.display='block';
+    document.getElementById('shuttle-next-check').style.display='none';
+  }
+}
+
+document.getElementById('shuttle-next-check').addEventListener('click',()=>{
+  if(shuttleCheckStep>=checklistSteps.length)return;
+  const step=checklistSteps[shuttleCheckStep];
+  const btn=document.getElementById('shuttle-next-check');
+  btn.disabled=true;btn.textContent='Executing…';
+  // Sound
+  if(audioCtx){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=step.sound;o.frequency.linearRampToValueAtTime(step.sound*1.2,audioCtx.currentTime+step.dur/1000);g.gain.setValueAtTime(.04,audioCtx.currentTime);g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+step.dur/1000);o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+step.dur/1000+.1)}
+  setTimeout(()=>{
+    shuttleComm('Bay Control','✓ '+step.label+' — complete.','lso');
+    shuttleCheckStep++;
+    if(shuttleCheckStep===4)shuttleComm(shuttlePilot,'Pilot ready. Engines nominal. Let\'s do this.','pilot');
+    if(shuttleCheckStep===checklistSteps.length){
+      shuttleComm('Bay Control','Board is green. All stations report ready.','lso');
+      shuttleComm('Bay Control',shipName+', Shuttle One is cleared for launch.','lso');
+      shuttleState='checklist';
+    }
+    renderChecklist();btn.textContent='Execute Next Step';btn.disabled=false;
+    if(engaged)clickSound();
+  },step.dur);
+});
+
+// Launch
+document.getElementById('shuttle-launch-btn').addEventListener('click',()=>{
+  shuttleState='launching';shuttleProgress=0;
+  document.getElementById('shuttle-launch-card').style.display='none';
+  document.getElementById('shuttle-checklist-card').style.display='none';
+  document.getElementById('shuttle-status').textContent='LAUNCHING';document.getElementById('shuttle-status').style.color='#e74c3c';
+  // Countdown
+  let count=3;
+  shuttleComm('Bay Control','Standby for catapult…','lso');
+  const cInt=setInterval(()=>{
+    if(count>0){shuttleComm('Bay Control',count+'…','lso');count--}
+    else{
+      clearInterval(cInt);shuttleComm('Bay Control','LAUNCH!','lso');
+      // Catapult sound
+      if(audioCtx){
+        const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sawtooth';o.frequency.value=200;o.frequency.linearRampToValueAtTime(2000,audioCtx.currentTime+1.5);g.gain.setValueAtTime(.06,audioCtx.currentTime);g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+2);const f=audioCtx.createBiquadFilter();f.type='lowpass';f.frequency.value=800;f.frequency.linearRampToValueAtTime(3000,audioCtx.currentTime+1);o.connect(f);f.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+2.5);
+        // Bass thump
+        const o2=audioCtx.createOscillator(),g2=audioCtx.createGain();o2.type='sine';o2.frequency.value=50;g2.gain.setValueAtTime(.1,audioCtx.currentTime+.1);g2.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.6);o2.connect(g2);g2.connect(masterGain);o2.start(audioCtx.currentTime+.1);o2.stop(audioCtx.currentTime+.7);
+      }
+      // Screen shake
+      panTargetX=(Math.random()-.5)*20;panTargetY=(Math.random()-.5)*15;
+      setTimeout(()=>{panTargetX=0;panTargetY=0},800);
+      // Transition to deployed
+      setTimeout(()=>{
+        shuttleState='deployed';shuttleProgress=0;
+        document.getElementById('shuttle-tracking-card').style.display='block';
+        document.getElementById('shuttle-status').textContent='DEPLOYED';document.getElementById('shuttle-status').style.color='#2ecc71';
+        shuttleComm(shuttlePilot,'Clear of the ship! All systems green.','pilot');
+        shuttleComm('Bay Control',shuttlePilot+', '+shipName+' reads you. Godspeed.','lso');
+        // Mission timer — auto progress
+        const missionDur=shuttleMission==='recon'?60:shuttleMission==='salvage'?90:shuttleMission==='repair'?75:120;
+        const deployInt=setInterval(()=>{
+          shuttleProgress+=1/missionDur;
+          if(shuttleProgress>.3&&shuttleProgress<.32)shuttleComm('Bay Control',shipName+' Actual, shuttle at '+Math.round(shuttleProgress*20)+' km. Telemetry nominal.','lso');
+          if(shuttleProgress>.6&&shuttleProgress<.62)shuttleComm(shuttlePilot,'On station. Beginning '+shuttleMission+' operations.','pilot');
+          if(shuttleProgress>=1){
+            clearInterval(deployInt);
+            const mcFn=lsoDialogue.missionComplete[shuttleMission];
+            if(mcFn)shuttleComm(shuttlePilot,mcFn(shuttlePilot),'pilot');
+            shuttleComm('Bay Control','Copy, Shuttle One. Turn to recovery heading.','lso');
+            setTimeout(()=>beginRecovery(),3000);
+          }
+        },1000);
+      },2500);
+    }
+  },1000);
+  if(engaged)clickSound();
+});
+
+function beginRecovery(){
+  shuttleState='recovery';shuttleApproachPos=10;
+  document.getElementById('shuttle-tracking-card').style.display='none';
+  document.getElementById('shuttle-recovery-card').style.display='block';
+  document.getElementById('shuttle-status').textContent='RECOVERY';document.getElementById('shuttle-status').style.color='#d4a03c';
+  shuttleComm('Bay Control','Bay doors opening. Guide lights active.','lso');
+  shuttleComm(shuttlePilot,'Visual on the bay. Starting approach.','pilot');
+  // Shuttle drifts toward the zone
+  const approachInt=setInterval(()=>{
+    if(shuttleState!=='recovery'){clearInterval(approachInt);return}
+    shuttleApproachPos+=.5+Math.random()*.8+(Math.random()-.5)*1.2;
+    shuttleApproachPos=Math.max(5,Math.min(95,shuttleApproachPos));
+    document.getElementById('shuttle-dot').style.left=shuttleApproachPos+'%';
+    // LSO calls
+    const zoneL=42,zoneR=58;
+    const inZone=shuttleApproachPos>=zoneL&&shuttleApproachPos<=zoneR;
+    const lsoEl=document.getElementById('shuttle-lso-call');
+    if(shuttleApproachPos<30){lsoEl.textContent='Too far out — hold steady';lsoEl.style.color='#3a6a7a'}
+    else if(shuttleApproachPos<zoneL){lsoEl.textContent='On approach — looking good';lsoEl.style.color='#d4a03c'}
+    else if(inZone){lsoEl.textContent='On glideslope — speed good';lsoEl.style.color='#2ecc71'}
+    else if(shuttleApproachPos<75){lsoEl.textContent='Slightly past center — correct';lsoEl.style.color='#d4a03c'}
+    else{lsoEl.textContent='⚠ Too deep — wave off recommended';lsoEl.style.color='#e74c3c'}
+  },200);
+}
+
+document.getElementById('shuttle-call-ball').addEventListener('click',()=>{
+  if(shuttleState!=='recovery')return;
+  const zoneL=42,zoneR=58;
+  const inZone=shuttleApproachPos>=zoneL&&shuttleApproachPos<=zoneR;
+  if(inZone){
+    // Perfect trap!
+    shuttleState='landed';
+    document.getElementById('shuttle-recovery-card').style.display='none';
+    document.getElementById('shuttle-status').textContent='SECURED';document.getElementById('shuttle-status').style.color='#2ecc71';
+    shuttleComm(shuttlePilot,'Ball!','pilot');
+    shuttleComm('Bay Control','Roger ball — Trap! Trap! Trap!','lso');
+    // Mag-lock clunk
+    if(audioCtx){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=80;g.gain.setValueAtTime(.08,audioCtx.currentTime);g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.3);o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.4)}
+    setTimeout(()=>shuttleComm('Bay Control','Shuttle secured. Bay doors closing. Pressurizing.','lso'),2000);
+    setTimeout(()=>{
+      shuttleComm('Bay Control','Welcome home, '+shuttlePilot+'. '+shuttleMission+' mission complete.','lso');
+      addCrewEntry(shuttlePilot+' has returned to the ship. Mission: '+shuttleMission+'.');
+      sessionStats.probesLaunched++;
+    },4000);
+    setTimeout(()=>{
+      shuttleState='ready';
+      document.getElementById('shuttle-mission-card').style.display='block';
+      document.getElementById('shuttle-status').textContent='READY';document.getElementById('shuttle-status').style.color='#2ecc71';
+      document.getElementById('shuttle-next-check').style.display='block';
+    },8000);
+  } else {
+    // Miss — too early or too late
+    shuttleComm(shuttlePilot,'Ball!','pilot');
+    shuttleComm('Bay Control','Negative trap — '+
+      (shuttleApproachPos<42?'too early, you\'re short':'too deep, overshoot')+'. Go around!','lso');
+    shuttleWaveOffs++;
+    shuttleApproachPos=10;document.getElementById('shuttle-dot').style.left='10%';
+    if(shuttleWaveOffs>=3){
+      shuttleComm('Bay Control',shuttlePilot+', I\'m taking remote control. Hold steady.','lso');
+      setTimeout(()=>{
+        shuttleApproachPos=50;document.getElementById('shuttle-dot').style.left='50%';
+        shuttleComm('Bay Control','Auto-recovery engaged. Trap in 3…','lso');
+        setTimeout(()=>document.getElementById('shuttle-call-ball').click(),3000);
+      },2000);
+    }
+  }
+  if(engaged)clickSound();
+});
+
+document.getElementById('shuttle-wave-off').addEventListener('click',()=>{
+  if(shuttleState!=='recovery')return;
+  shuttleComm('Bay Control','Wave off! Wave off! Go around, '+shuttlePilot+'!','lso');
+  shuttleComm(shuttlePilot,'Copy, going around.','pilot');
+  shuttleApproachPos=10;document.getElementById('shuttle-dot').style.left='10%';
+  shuttleWaveOffs++;
+  if(engaged)clickSound();
+});
+
+document.getElementById('shuttle-close').addEventListener('click',()=>{
+  document.getElementById('shuttle-panel').classList.remove('show');
+  document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='shuttle')b.classList.remove('active')});
+  if(engaged)clickSound();
+});
 
 // === WEAPONS SYSTEM ===
 const wpnCanvas=document.getElementById('wpn-canvas');
@@ -5924,6 +7227,45 @@ function scheduleGravAnomaly(){
 }
 scheduleGravAnomaly();
 
+// === DISTANT SUPERNOVA ===
+let supernova=null;
+function triggerSupernova(){
+  const x=.15+Math.random()*.7,y=.15+Math.random()*.7;
+  const starNames=['Betelgeuse-7','Rigel-4','Antares-9','Vega-12','Altair-3','Deneb-6','Sirius-8','Arcturus-2','Polaris-11','Canopus-5'];
+  const name=starNames[Math.floor(Math.random()*starNames.length)];
+  const dist=(200+Math.floor(Math.random()*1800));
+  const mass=(8+Math.random()*40).toFixed(1);
+  supernova={x,y,phase:0,maxPhase:300,name,dist,mass,flashDone:false,ringRadius:0};
+  logComms('Science','◈ SUPERNOVA DETECTED — Massive stellar detonation at bearing '+(Math.floor(x*360))+'°, distance '+dist+' ly!');
+  addCrewEntry('Dr. Tanaka: "Supernova! Recording spectral data — this is extraordinary."');
+  setTimeout(()=>addCrewEntry('Lt. Park: "…I\'ve never seen anything like that."'),4000);
+  setTimeout(()=>addCrewEntry('Cpt. Vasquez: "Log everything. This is one for the records."'),8000);
+  // Flash sound — deep boom
+  if(audioCtx){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';o.frequency.value=60;
+    o.frequency.linearRampToValueAtTime(30,audioCtx.currentTime+2);
+    g.gain.setValueAtTime(0,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(.06,audioCtx.currentTime+.3);
+    g.gain.linearRampToValueAtTime(.03,audioCtx.currentTime+1);
+    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+3);
+    const f=audioCtx.createBiquadFilter();f.type='lowpass';f.frequency.value=100;
+    o.connect(f);f.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+3.5);
+    // High shimmer
+    const o2=audioCtx.createOscillator(),g2=audioCtx.createGain();
+    o2.type='sine';o2.frequency.value=2000;o2.frequency.linearRampToValueAtTime(800,audioCtx.currentTime+2);
+    g2.gain.setValueAtTime(0,audioCtx.currentTime);g2.gain.linearRampToValueAtTime(.02,audioCtx.currentTime+.2);
+    g2.gain.linearRampToValueAtTime(0,audioCtx.currentTime+3);
+    o2.connect(g2);g2.connect(masterGain);o2.start();o2.stop(audioCtx.currentTime+3.5);
+  }
+}
+
+function scheduleSupernova(){
+  const delay=(600000+Math.random()*900000)/getDifficultyMultiplier('eventFreq');// 10-25 min
+  setTimeout(()=>{if(engaged)triggerSupernova();scheduleSupernova()},delay);
+}
+scheduleSupernova();
+
 // RENDER
 let t=0;
 function draw(now){
@@ -6080,6 +7422,67 @@ function draw(now){
         const intensity=(1-dist/(W*.15))*a*.8;
         if(intensity>flareTarget){flareTarget=intensity;flareEl.style.left=(sx-60)+'px';flareEl.style.top=(sy-60)+'px'}
       }
+    }
+  }
+
+  // Distant supernova
+  if(supernova){
+    const sn=supernova;sn.phase++;
+    const snx=cx+panX+(sn.x-.5)*W*.6,sny=cy+panY+(sn.y-.5)*H*.6;
+    const progress=sn.phase/sn.maxPhase;
+    if(progress<.1){
+      // Initial flash — bright white expanding circle
+      const flashSize=progress/.1;
+      const flashAlpha=(1-flashSize)*.8+.2;
+      const flashR=10+flashSize*60;
+      const fg=ctx.createRadialGradient(snx,sny,0,snx,sny,flashR);
+      fg.addColorStop(0,`rgba(255,255,240,${flashAlpha})`);
+      fg.addColorStop(.3,`rgba(255,220,180,${flashAlpha*.6})`);
+      fg.addColorStop(.7,`rgba(255,160,80,${flashAlpha*.2})`);
+      fg.addColorStop(1,'transparent');
+      ctx.fillStyle=fg;ctx.beginPath();ctx.arc(snx,sny,flashR,0,6.283);ctx.fill();
+      // Screen flash on first frames
+      if(sn.phase<5){
+        ctx.fillStyle=`rgba(255,255,220,${.15-sn.phase*.03})`;ctx.fillRect(0,0,W,H);
+      }
+    } else if(progress<.5){
+      // Fading core + expanding ring
+      const fadeProgress=(progress-.1)/.4;
+      const coreAlpha=(.6-fadeProgress*.5);
+      const coreR=15+fadeProgress*10;
+      // Glowing core
+      const cg=ctx.createRadialGradient(snx,sny,0,snx,sny,coreR);
+      cg.addColorStop(0,`rgba(255,200,120,${coreAlpha})`);
+      cg.addColorStop(.5,`rgba(255,140,60,${coreAlpha*.4})`);
+      cg.addColorStop(1,'transparent');
+      ctx.fillStyle=cg;ctx.beginPath();ctx.arc(snx,sny,coreR,0,6.283);ctx.fill();
+      // Expanding ring
+      sn.ringRadius=30+fadeProgress*200;
+      const ringAlpha=(.3-fadeProgress*.25);
+      ctx.strokeStyle=`rgba(255,200,150,${ringAlpha})`;ctx.lineWidth=2-fadeProgress*1.5;
+      ctx.beginPath();ctx.arc(snx,sny,sn.ringRadius,0,6.283);ctx.stroke();
+      // Outer glow ring
+      ctx.strokeStyle=`rgba(255,150,80,${ringAlpha*.3})`;ctx.lineWidth=6;
+      ctx.beginPath();ctx.arc(snx,sny,sn.ringRadius,0,6.283);ctx.stroke();
+    } else {
+      // Final fade — just the ring getting bigger and dimmer
+      const fadeProgress=(progress-.5)/.5;
+      sn.ringRadius=230+fadeProgress*150;
+      const ringAlpha=(.1-fadeProgress*.1);
+      if(ringAlpha>0){
+        ctx.strokeStyle=`rgba(255,180,120,${ringAlpha})`;ctx.lineWidth=1;
+        ctx.beginPath();ctx.arc(snx,sny,sn.ringRadius,0,6.283);ctx.stroke();
+      }
+      // Tiny remnant dot
+      const dotAlpha=.15-fadeProgress*.15;
+      if(dotAlpha>0){
+        ctx.fillStyle=`rgba(255,200,150,${dotAlpha})`;
+        ctx.beginPath();ctx.arc(snx,sny,3,0,6.283);ctx.fill();
+      }
+    }
+    if(sn.phase>=sn.maxPhase){
+      addDiscovery('supernova','Supernova '+sn.name+' — '+sn.dist+' ly — Mass: '+sn.mass+' M☉ — Spectral data archived');
+      supernova=null;
     }
   }
 
