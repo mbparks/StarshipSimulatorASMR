@@ -2968,12 +2968,16 @@ const roomData={
   'Reactor':{deck:'Deck 3',desc:'Dual Tokamak fusion reactor. Restricted access. Radiation-shielded.',power:0,temp:38,press:1.03,o2:20,crew:[],actions:[]},
   'Cryo Bay':{deck:'Deck 3',desc:'Cryogenic suspension facility. 8 pods, 1 currently occupied.',power:22,temp:4,press:1.00,o2:18,crew:['Sgt. Mensah (cryo)'],actions:[{label:'Wake Crew Member',action:'wake',warn:true}]},
   'Life Support':{deck:'Deck 3',desc:'Atmospheric processing, water recycling, and environmental control center.',power:25,temp:20,press:1.01,o2:22,crew:[],actions:[]},
+  'Shuttle Bay':{deck:'Hangar',desc:'Launch and recovery bay for Shuttle One. Magnetic catapult rail, recovery trap system, fuel lines, and deck crew stations. Capacity: 2 shuttles.',power:30,temp:16,press:1.01,o2:21,crew:[],actions:[{label:'Open Bay Ops',action:'bayops'}]},
+  'Flight Deck':{deck:'Hangar',desc:'Shuttle pre-flight operations. Pilot briefing station, flight suit lockers, and launch control console.',power:8,temp:19,press:1.01,o2:21,crew:[],actions:[]},
+  'Fuel Storage':{deck:'Hangar',desc:'Shuttle fuel depot and transfer pumps. Separated by blast doors from main bay.',power:5,temp:14,press:1.02,o2:20,crew:[],actions:[]},
 };
 const deckLayout=[
   {name:'Bridge',rooms:['Helm','Ops','Comms','Nav']},
   {name:'Deck 1',rooms:['Quarters A','Quarters B','Mess Hall','Med Bay']},
   {name:'Deck 2',rooms:['Lab','Cargo Bay','Armory','Rec Room']},
   {name:'Deck 3',rooms:['Engineering','Reactor','Cryo Bay','Life Support']},
+  {name:'Hangar',rooms:['Flight Deck','Shuttle Bay','Fuel Storage']},
 ];
 const bulkheadStates={};// key: 'deckIdx-roomIdx' = locked boolean
 let selectedRoom=null;
@@ -3115,6 +3119,13 @@ function showRoomDetail(name){
             if(engaged)clickSound();
           });
         }
+      }
+      if(action==='bayops'){
+        document.getElementById('shuttle-panel').classList.add('show');
+        document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='shuttle')b.classList.add('active')});
+        initShuttleBay();drawShuttleBay();
+        btn.textContent='✓ Bay Ops Open';btn.style.borderColor='#2ecc71';btn.style.color='#2ecc71';
+        logComms('Hangar','Shuttle bay operations console activated.');
       }
       if(engaged)clickSound();
     });
