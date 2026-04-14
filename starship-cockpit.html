@@ -204,6 +204,14 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .watch-row .wr-val.warn{color:#d4a03c}
 .watch-close{background:none;border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:6px 16px;cursor:pointer;border-radius:3px;letter-spacing:3px;text-transform:uppercase;transition:all .2s;width:100%;margin-top:14px}
 .watch-close:hover{border-color:#5ec4d4;background:rgba(94,196,212,.06)}
+.watch-email{margin-top:10px;padding:8px;border:1px solid rgba(94,196,212,.08);border-radius:3px;background:rgba(4,8,12,.4)}
+.watch-email-row{display:flex;gap:6px;align-items:center}
+.watch-email input{flex:1;background:rgba(10,18,24,.8);border:1px solid rgba(94,196,212,.15);color:#5ec4d4;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:5px 8px;outline:none;border-radius:2px}
+.watch-email input:focus{border-color:rgba(94,196,212,.3)}
+.watch-email input::placeholder{color:#1a3a4a}
+.watch-email button{background:none;border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:5px 12px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s;white-space:nowrap}
+.watch-email button:hover{border-color:#5ec4d4;background:rgba(94,196,212,.06)}
+.watch-email-label{font-size:clamp(7px,.6vw,9px);color:#2a4a5a;letter-spacing:1px;margin-bottom:4px}
 
 /* === BIOLUMINESCENT ORGANISMS === */
 .bio-alert{position:fixed;bottom:clamp(240px,36vh,380px);left:50%;transform:translateX(-50%);z-index:10;display:none;text-align:center;pointer-events:none}
@@ -2153,7 +2161,10 @@ function radioStaticSound(){
 // === SHIP NAMING & DIFFICULTY ===
 let shipName=localStorage.getItem('shipName')||'ISS Artemis';
 let difficulty=localStorage.getItem('difficulty')||'standard';
-const sessionStats={scans:0,repairs:0,commsExchanged:0,courseChanges:0,probesLaunched:0,signalsDecrypted:0,nebulaSamples:0,hails:0,powerEvents:0,startTime:Date.now()};
+const sessionStats={scans:0,repairs:0,commsExchanged:0,courseChanges:0,probesLaunched:0,signalsDecrypted:0,nebulaSamples:0,hails:0,powerEvents:0,startTime:Date.now(),
+  lasersFired:0,torpedoesFired:0,targetsDestroyed:0,shuttleLaunches:0,shuttleRecoveries:0,waveOffs:0,
+  solarFlares:0,gravAnomalies:0,supernovae:0,bioEncounters:0,tractorLocks:0,
+  fuelTransferred:0,fuelJettisoned:0,filterCycles:0,objectivesCompleted:0,idleAutoRepairs:0};
 
 // Pre-fill name input
 document.getElementById('ship-name-input').value=shipName==='ISS Artemis'?'':shipName;
@@ -2251,6 +2262,9 @@ function showWatchSummary(){
   const distTraveled=(elapsed/1000*hudSpeed*.001).toFixed(3);
 
   const modal=document.getElementById('watch-modal');
+  const effGrade=fuelEfficiencyGrade();
+  const objCompleted=missionObjectives.filter(o=>o.done).length;
+  const objTotal=missionObjectives.length;
   modal.innerHTML=`<div class="watch-wrap">
     <div class="watch-header">
       <div class="wh-ship">${shipName}</div>
@@ -2263,6 +2277,7 @@ function showWatchSummary(){
       <div class="watch-row"><span class="wr-label">Current Heading</span><span class="wr-val">${hudHeading.toFixed(1)}°</span></div>
       <div class="watch-row"><span class="wr-label">Current Velocity</span><span class="wr-val">${hudSpeed.toFixed(4)}c</span></div>
       <div class="watch-row"><span class="wr-label">Course Changes</span><span class="wr-val">${sessionStats.courseChanges}</span></div>
+      <div class="watch-row"><span class="wr-label">Waypoints Plotted</span><span class="wr-val">${navRoute.length}</span></div>
     </div>
     <div class="watch-section">
       <div class="ws-title">Operations</div>
@@ -2270,7 +2285,20 @@ function showWatchSummary(){
       <div class="watch-row"><span class="wr-label">Probes Launched</span><span class="wr-val">${sessionStats.probesLaunched}</span></div>
       <div class="watch-row"><span class="wr-label">Signals Decrypted</span><span class="wr-val ${sessionStats.signalsDecrypted>0?'highlight':''}">${sessionStats.signalsDecrypted}</span></div>
       <div class="watch-row"><span class="wr-label">Nebula Samples</span><span class="wr-val">${sessionStats.nebulaSamples}</span></div>
+      <div class="watch-row"><span class="wr-label">Tractor Beam Locks</span><span class="wr-val">${sessionStats.tractorLocks}</span></div>
       <div class="watch-row"><span class="wr-label">Discoveries Logged</span><span class="wr-val highlight">${discoveries.length}</span></div>
+    </div>
+    <div class="watch-section">
+      <div class="ws-title">Tactical</div>
+      <div class="watch-row"><span class="wr-label">Lasers Fired</span><span class="wr-val">${sessionStats.lasersFired}</span></div>
+      <div class="watch-row"><span class="wr-label">Torpedoes Fired</span><span class="wr-val">${sessionStats.torpedoesFired}</span></div>
+      <div class="watch-row"><span class="wr-label">Targets Destroyed</span><span class="wr-val ${sessionStats.targetsDestroyed>0?'highlight':''}">${sessionStats.targetsDestroyed}</span></div>
+    </div>
+    <div class="watch-section">
+      <div class="ws-title">Shuttle Operations</div>
+      <div class="watch-row"><span class="wr-label">Missions Launched</span><span class="wr-val">${sessionStats.shuttleLaunches}</span></div>
+      <div class="watch-row"><span class="wr-label">Successful Recoveries</span><span class="wr-val ${sessionStats.shuttleRecoveries>0?'highlight':''}">${sessionStats.shuttleRecoveries}</span></div>
+      <div class="watch-row"><span class="wr-label">Wave-Offs</span><span class="wr-val ${sessionStats.waveOffs>0?'warn':''}">${sessionStats.waveOffs}</span></div>
     </div>
     <div class="watch-section">
       <div class="ws-title">Communications</div>
@@ -2282,14 +2310,40 @@ function showWatchSummary(){
       <div class="ws-title">Engineering</div>
       <div class="watch-row"><span class="wr-label">Systems Repaired</span><span class="wr-val ${sessionStats.repairs>0?'highlight':''}">${sessionStats.repairs}</span></div>
       <div class="watch-row"><span class="wr-label">Power Events</span><span class="wr-val ${sessionStats.powerEvents>0?'warn':''}">${sessionStats.powerEvents}</span></div>
-      <div class="watch-row"><span class="wr-label">Fuel Remaining</span><span class="wr-val">${hudFuel.toFixed(1)}%</span></div>
       <div class="watch-row"><span class="wr-label">Shield Integrity</span><span class="wr-val">${Math.round(shieldsVal)}%</span></div>
       <div class="watch-row"><span class="wr-label">O₂ Level</span><span class="wr-val">${Math.round(o2Val)}%</span></div>
     </div>
     <div class="watch-section">
-      <div class="ws-title">Mission Profile</div>
+      <div class="ws-title">Fuel Management</div>
+      <div class="watch-row"><span class="wr-label">Primary Fuel</span><span class="wr-val ${hudFuel<25?'warn':''}">${hudFuel.toFixed(1)}%</span></div>
+      <div class="watch-row"><span class="wr-label">Reserve Fuel</span><span class="wr-val">${fuelReserve.toFixed(1)}%</span></div>
+      <div class="watch-row"><span class="wr-label">Fuel Efficiency</span><span class="wr-val" style="color:${effGrade.color}">${effGrade.grade}</span></div>
+      <div class="watch-row"><span class="wr-label">Reserve Transfers</span><span class="wr-val">${sessionStats.fuelTransferred}</span></div>
+      <div class="watch-row"><span class="wr-label">Filter Cycles</span><span class="wr-val">${sessionStats.filterCycles}</span></div>
+      <div class="watch-row"><span class="wr-label">Fuel Purity</span><span class="wr-val">${Math.round(fuelPurity)}%</span></div>
+      ${sessionStats.fuelJettisoned>0?`<div class="watch-row"><span class="wr-label">Fuel Jettisoned</span><span class="wr-val warn">${sessionStats.fuelJettisoned}×</span></div>`:''}
+    </div>
+    <div class="watch-section">
+      <div class="ws-title">Environmental Events</div>
+      <div class="watch-row"><span class="wr-label">Solar Flares Survived</span><span class="wr-val">${sessionStats.solarFlares}</span></div>
+      <div class="watch-row"><span class="wr-label">Gravitational Anomalies</span><span class="wr-val">${sessionStats.gravAnomalies}</span></div>
+      <div class="watch-row"><span class="wr-label">Supernovae Observed</span><span class="wr-val ${sessionStats.supernovae>0?'highlight':''}">${sessionStats.supernovae}</span></div>
+      <div class="watch-row"><span class="wr-label">Bio Encounters</span><span class="wr-val ${sessionStats.bioEncounters>0?'highlight':''}">${sessionStats.bioEncounters}</span></div>
+    </div>
+    <div class="watch-section">
+      <div class="ws-title">Mission</div>
       <div class="watch-row"><span class="wr-label">Difficulty</span><span class="wr-val">${difficulty==='peaceful'?'Peaceful Cruise':difficulty==='frontier'?'Deep Frontier':'Standard Patrol'}</span></div>
+      <div class="watch-row"><span class="wr-label">Objectives Completed</span><span class="wr-val ${objCompleted>0?'highlight':''}">${objCompleted} / ${objTotal}</span></div>
       <div class="watch-row"><span class="wr-label">Crew Status</span><span class="wr-val highlight">5 Active / 1 Cryo</span></div>
+      ${signalPhase>0?`<div class="watch-row"><span class="wr-label">The Signal</span><span class="wr-val warn">Phase ${signalPhase} / 12</span></div>`:''}
+      ${sessionStats.idleAutoRepairs>0?`<div class="watch-row"><span class="wr-label">Idle Auto-Repairs</span><span class="wr-val">${sessionStats.idleAutoRepairs}</span></div>`:''}
+    </div>
+    <div class="watch-email">
+      <div class="watch-email-label">Email this report</div>
+      <div class="watch-email-row">
+        <input type="email" id="watch-email-input" placeholder="Enter email address…">
+        <button id="watch-email-btn">Send</button>
+      </div>
     </div>
     <button class="watch-close" id="watch-close-btn">Dismiss Report</button>
   </div>`;
@@ -2297,6 +2351,77 @@ function showWatchSummary(){
   document.getElementById('watch-close-btn').addEventListener('click',()=>{
     modal.classList.remove('show');
     if(engaged)clickSound();
+  });
+  // Email handler
+  document.getElementById('watch-email-btn').addEventListener('click',()=>{
+    const addr=document.getElementById('watch-email-input').value.trim();
+    if(!addr||!addr.includes('@')){document.getElementById('watch-email-input').style.borderColor='rgba(231,76,60,.4)';return}
+    const subj=encodeURIComponent(shipName+' — End of Watch Report');
+    let body=shipName+' — End of Watch Report\n';
+    body+='Duration: '+hrs+'h '+(mins%60)+'m real time\n\n';
+    body+='=== NAVIGATION ===\n';
+    body+='Mission Days Elapsed: '+mDays+'\n';
+    body+='Distance Traveled: '+distTraveled+' ly\n';
+    body+='Current Heading: '+hudHeading.toFixed(1)+'°\n';
+    body+='Current Velocity: '+hudSpeed.toFixed(4)+'c\n';
+    body+='Course Changes: '+sessionStats.courseChanges+'\n';
+    body+='Waypoints Plotted: '+navRoute.length+'\n\n';
+    body+='=== OPERATIONS ===\n';
+    body+='Objects Scanned: '+sessionStats.scans+'\n';
+    body+='Probes Launched: '+sessionStats.probesLaunched+'\n';
+    body+='Signals Decrypted: '+sessionStats.signalsDecrypted+'\n';
+    body+='Nebula Samples: '+sessionStats.nebulaSamples+'\n';
+    body+='Tractor Beam Locks: '+sessionStats.tractorLocks+'\n';
+    body+='Discoveries Logged: '+discoveries.length+'\n\n';
+    body+='=== TACTICAL ===\n';
+    body+='Lasers Fired: '+sessionStats.lasersFired+'\n';
+    body+='Torpedoes Fired: '+sessionStats.torpedoesFired+'\n';
+    body+='Targets Destroyed: '+sessionStats.targetsDestroyed+'\n\n';
+    body+='=== SHUTTLE OPERATIONS ===\n';
+    body+='Missions Launched: '+sessionStats.shuttleLaunches+'\n';
+    body+='Successful Recoveries: '+sessionStats.shuttleRecoveries+'\n';
+    body+='Wave-Offs: '+sessionStats.waveOffs+'\n\n';
+    body+='=== COMMUNICATIONS ===\n';
+    body+='Radio Messages Received: '+commsLog.filter(c=>!c.isCaptain).length+'\n';
+    body+='Hails Initiated: '+sessionStats.hails+'\n';
+    body+='Captain\'s Log Entries: '+commsLog.filter(c=>c.isCaptain).length+'\n\n';
+    body+='=== ENGINEERING ===\n';
+    body+='Systems Repaired: '+sessionStats.repairs+'\n';
+    body+='Power Events: '+sessionStats.powerEvents+'\n';
+    body+='Shield Integrity: '+Math.round(shieldsVal)+'%\n';
+    body+='O2 Level: '+Math.round(o2Val)+'%\n\n';
+    body+='=== FUEL MANAGEMENT ===\n';
+    body+='Primary Fuel: '+hudFuel.toFixed(1)+'%\n';
+    body+='Reserve Fuel: '+fuelReserve.toFixed(1)+'%\n';
+    body+='Fuel Efficiency: '+effGrade.grade+'\n';
+    body+='Reserve Transfers: '+sessionStats.fuelTransferred+'\n';
+    body+='Filter Cycles: '+sessionStats.filterCycles+'\n';
+    body+='Fuel Purity: '+Math.round(fuelPurity)+'%\n';
+    if(sessionStats.fuelJettisoned>0)body+='Fuel Jettisoned: '+sessionStats.fuelJettisoned+'x\n';
+    body+='\n=== ENVIRONMENTAL EVENTS ===\n';
+    body+='Solar Flares Survived: '+sessionStats.solarFlares+'\n';
+    body+='Gravitational Anomalies: '+sessionStats.gravAnomalies+'\n';
+    body+='Supernovae Observed: '+sessionStats.supernovae+'\n';
+    body+='Bio Encounters: '+sessionStats.bioEncounters+'\n\n';
+    body+='=== MISSION ===\n';
+    body+='Difficulty: '+(difficulty==='peaceful'?'Peaceful Cruise':difficulty==='frontier'?'Deep Frontier':'Standard Patrol')+'\n';
+    body+='Objectives Completed: '+objCompleted+' / '+objTotal+'\n';
+    body+='Crew Status: 5 Active / 1 Cryo\n';
+    if(signalPhase>0)body+='The Signal: Phase '+signalPhase+' / 12\n';
+    if(sessionStats.idleAutoRepairs>0)body+='Idle Auto-Repairs: '+sessionStats.idleAutoRepairs+'\n';
+    body+='\n— Report generated by Starship ASMR Simulator —\n';
+    window.open('mailto:'+encodeURIComponent(addr)+'?subject='+subj+'&body='+encodeURIComponent(body));
+    const btn=document.getElementById('watch-email-btn');
+    btn.textContent='Opened';btn.style.borderColor='#2ecc71';btn.style.color='#2ecc71';
+    setTimeout(()=>{btn.textContent='Send';btn.style.borderColor='';btn.style.color=''},3000);
+    if(engaged)clickSound();
+  });
+  document.getElementById('watch-email-input').addEventListener('keydown',e=>{
+    if(e.key==='Enter')document.getElementById('watch-email-btn').click();
+    e.stopPropagation();
+  });
+  document.getElementById('watch-email-input').addEventListener('input',()=>{
+    document.getElementById('watch-email-input').style.borderColor='';
   });
   if(engaged)clickSound();
 }
@@ -3549,7 +3674,7 @@ function renderObjectives(){
       const idx=parseInt(el.dataset.oidx);
       missionObjectives[idx].done=!missionObjectives[idx].done;
       renderObjectives();
-      if(missionObjectives[idx].done)logComms('Command','Objective completed: '+missionObjectives[idx].text);
+      if(missionObjectives[idx].done){sessionStats.objectivesCompleted++;logComms('Command','Objective completed: '+missionObjectives[idx].text);}
       if(engaged)clickSound();
     });
   });
@@ -3855,7 +3980,7 @@ function renderMission(){
     el.addEventListener('click',()=>{
       const idx=parseInt(el.dataset.midx);
       missionObjectives[idx].done=!missionObjectives[idx].done;
-      if(missionObjectives[idx].done)logComms('Command','Objective completed: '+missionObjectives[idx].text);
+      if(missionObjectives[idx].done){sessionStats.objectivesCompleted++;logComms('Command','Objective completed: '+missionObjectives[idx].text);}
       renderMission();if(engaged)clickSound();
     });
   });
@@ -4507,14 +4632,14 @@ document.getElementById('fuel-close').addEventListener('click',()=>{
 document.getElementById('fuel-transfer').addEventListener('click',()=>{
   if(fuelReserve<=0)return;
   const amt=Math.min(10,fuelReserve);fuelReserve-=amt;hudFuel=Math.min(100,hudFuel+amt);
-  addFuelLog('Manual transfer: +'+amt.toFixed(1)+'% from reserve');
+  sessionStats.fuelTransferred++;addFuelLog('Manual transfer: +'+amt.toFixed(1)+'% from reserve');
   logComms('Engineering','Fuel transfer: '+amt.toFixed(1)+'% moved from reserve to primary.');
   if(engaged)clickSound();
 });
 document.getElementById('fuel-filter').addEventListener('click',()=>{
   const btn=document.getElementById('fuel-filter');
   btn.textContent='Filtering…';btn.disabled=true;
-  addFuelLog('Filter cycle initiated');
+  sessionStats.filterCycles++;addFuelLog('Filter cycle initiated');
   setTimeout(()=>{fuelPurity=Math.min(100,fuelPurity+30);btn.textContent='✓ Filtered';btn.disabled=false;
     setTimeout(()=>{btn.textContent='Run Filter Cycle'},2000);
     addFuelLog('Filter complete — purity restored to '+Math.round(fuelPurity)+'%');
@@ -4535,7 +4660,7 @@ document.getElementById('fuel-jettison').addEventListener('click',()=>{
     setTimeout(()=>{fuelJettisonConfirm=false;btn.textContent='⚠ Jettison Fuel'},5000);
   } else {
     const dumped=hudFuel*.3;hudFuel-=dumped;fuelJettisonConfirm=false;btn.textContent='⚠ Jettison Fuel';
-    addFuelLog('JETTISON: '+dumped.toFixed(1)+'% fuel dumped');
+    sessionStats.fuelJettisoned++;addFuelLog('JETTISON: '+dumped.toFixed(1)+'% fuel dumped');
     logComms('Engineering','⚠ Fuel jettison! '+dumped.toFixed(1)+'% dumped to reduce mass.');
   }
   if(engaged)clickSound();
@@ -5403,7 +5528,7 @@ document.getElementById('shuttle-launch-btn').addEventListener('click',()=>{
   const cInt=setInterval(()=>{
     if(count>0){shuttleComm('Bay Control',count+'…','lso');count--}
     else{
-      clearInterval(cInt);shuttleComm('Bay Control','LAUNCH!','lso');
+      clearInterval(cInt);shuttleComm('Bay Control','LAUNCH!','lso');sessionStats.shuttleLaunches++;
       // Catapult sound
       if(audioCtx){
         const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sawtooth';o.frequency.value=200;o.frequency.linearRampToValueAtTime(2000,audioCtx.currentTime+1.5);g.gain.setValueAtTime(.06,audioCtx.currentTime);g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+2);const f=audioCtx.createBiquadFilter();f.type='lowpass';f.frequency.value=800;f.frequency.linearRampToValueAtTime(3000,audioCtx.currentTime+1);o.connect(f);f.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+2.5);
@@ -5475,7 +5600,7 @@ document.getElementById('shuttle-call-ball').addEventListener('click',()=>{
     document.getElementById('shuttle-recovery-card').style.display='none';
     document.getElementById('shuttle-status').textContent='SECURED';document.getElementById('shuttle-status').style.color='#2ecc71';
     shuttleComm(shuttlePilot,'Ball!','pilot');
-    shuttleComm('Bay Control','Roger ball — Trap! Trap! Trap!','lso');
+    sessionStats.shuttleRecoveries++;shuttleComm('Bay Control','Roger ball — Trap! Trap! Trap!','lso');
     // Mag-lock clunk
     if(audioCtx){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=80;g.gain.setValueAtTime(.08,audioCtx.currentTime);g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.3);o.connect(g);g.connect(masterGain);o.start();o.stop(audioCtx.currentTime+.4)}
     setTimeout(()=>shuttleComm('Bay Control','Shuttle secured. Bay doors closing. Pressurizing.','lso'),2000);
@@ -5495,7 +5620,7 @@ document.getElementById('shuttle-call-ball').addEventListener('click',()=>{
     shuttleComm(shuttlePilot,'Ball!','pilot');
     shuttleComm('Bay Control','Negative trap — '+
       (shuttleApproachPos<42?'too early, you\'re short':'too deep, overshoot')+'. Go around!','lso');
-    shuttleWaveOffs++;
+    shuttleWaveOffs++;sessionStats.waveOffs++;
     shuttleApproachPos=10;document.getElementById('shuttle-dot').style.left='10%';
     if(shuttleWaveOffs>=3){
       shuttleComm('Bay Control',shuttlePilot+', I\'m taking remote control. Hold steady.','lso');
@@ -5514,7 +5639,7 @@ document.getElementById('shuttle-wave-off').addEventListener('click',()=>{
   shuttleComm('Bay Control','Wave off! Wave off! Go around, '+shuttlePilot+'!','lso');
   shuttleComm(shuttlePilot,'Copy, going around.','pilot');
   shuttleApproachPos=10;document.getElementById('shuttle-dot').style.left='10%';
-  shuttleWaveOffs++;
+  shuttleWaveOffs++;sessionStats.waveOffs++;
   if(engaged)clickSound();
 });
 
@@ -5705,6 +5830,7 @@ document.getElementById('wpn-fire-laser').addEventListener('click',()=>{
   // Hit calculation
   const hitChance=.6+wpnIntensity*.003;
   const hit=Math.random()<hitChance;
+  sessionStats.lasersFired++;
   if(hit){
     const dmg=wpnIntensity*(wpnMode==='beam'?.8:.5)*(wpnFreq/50);
     if(target.shieldStr>0){
@@ -5714,7 +5840,7 @@ document.getElementById('wpn-fire-laser').addEventListener('click',()=>{
       target.health=Math.max(0,target.health-dmg*.5);
       wpnLogEntry('Laser hit '+target.name+' — hull damage ('+Math.round(target.health)+'% integrity)','hit');
     }
-    if(target.health<=0)wpnLogEntry('*** '+target.name+' DESTROYED ***','hit');
+    if(target.health<=0){wpnLogEntry('*** '+target.name+' DESTROYED ***','hit');sessionStats.targetsDestroyed++}
   } else {
     wpnLogEntry('Laser missed '+target.name,'miss');
   }
@@ -5794,6 +5920,7 @@ document.getElementById('wpn-fire-torp').addEventListener('click',()=>{
   const ty=cy+(tObj.y||0)*invZ*(wpnCanvas.height/4);
   wpnTorpTrails.push({sx:cx,sy:cy+30,tx,ty,progress:0,target,hit:Math.random()<.85});
   wpnLogEntry('Torpedo launched at '+target.name,'');
+  sessionStats.torpedoesFired++;
   logComms('Tactical','Torpedo away — tracking '+target.name+'.');
   // Sound — whoosh
   if(audioCtx){
@@ -5956,7 +6083,7 @@ function drawWeaponsView(){
         } else {t.target.health=Math.max(0,t.target.health-dmg*.6);
           wpnLogEntry('Torpedo IMPACT on '+t.target.name+' — hull breach ('+Math.round(t.target.health)+'%)','hit');
         }
-        if(t.target.health<=0)wpnLogEntry('*** '+t.target.name+' DESTROYED ***','hit');
+        if(t.target.health<=0){wpnLogEntry('*** '+t.target.name+' DESTROYED ***','hit');sessionStats.targetsDestroyed++}
         // Explosion effect
         wpnCtx.fillStyle='rgba(255,200,50,.4)';wpnCtx.beginPath();wpnCtx.arc(t.tx,t.ty,25,0,6.283);wpnCtx.fill();
         wpnCtx.fillStyle='rgba(255,100,30,.3)';wpnCtx.beginPath();wpnCtx.arc(t.tx,t.ty,40,0,6.283);wpnCtx.fill();
@@ -6864,7 +6991,7 @@ function spawnBioEvent(){
   const delay=(300000+Math.random()*600000)/getDifficultyMultiplier('eventFreq'); // 5-15 min
   setTimeout(()=>{
     if(!engaged){spawnBioEvent();return}
-    bioEventActive=true;
+    bioEventActive=true;sessionStats.bioEncounters++;
     // Spawn cluster of 5-12 creatures
     const count=5+Math.floor(Math.random()*8);
     const clusterX=.3+Math.random()*.4;
@@ -6996,7 +7123,7 @@ tractorBtn.addEventListener('click',()=>{
 function lockTractor(obj,sx,sy){
   if(!tractorMode||tractorLocked)return;
   tractorTarget=obj;
-  tractorLocked=true;
+  tractorLocked=true;sessionStats.tractorLocks++;
   tractorBtn.classList.remove('active');
   tractorBtn.classList.add('locked');
   tractorBtn.textContent='Tractor ◉';
@@ -7143,7 +7270,7 @@ scheduleDecryptEvent();
 let solarFlareActive=false;
 function triggerSolarFlare(){
   if(solarFlareActive||difficulty==='peaceful')return;
-  solarFlareActive=true;
+  solarFlareActive=true;sessionStats.solarFlares++;
   solarWind=.9+Math.random()*.1;// spike weather
   const warning=document.getElementById('flare-warning');
   warning.classList.add('show');
@@ -7192,7 +7319,7 @@ scheduleSolarFlare();
 let gravAnomalyActive=false;
 function triggerGravAnomaly(){
   if(gravAnomalyActive)return;
-  gravAnomalyActive=true;
+  gravAnomalyActive=true;sessionStats.gravAnomalies++;
   logComms('Science','◈ Gravitational anomaly detected! Instruments fluctuating.');
   addCrewEntry('Dr. Tanaka: "Fascinating — gravitational lensing! Recording everything."');
   addCrewEntry('Lt. Park: "Helm is sluggish — compensating."');
@@ -7246,7 +7373,7 @@ function triggerSupernova(){
   const name=starNames[Math.floor(Math.random()*starNames.length)];
   const dist=(200+Math.floor(Math.random()*1800));
   const mass=(8+Math.random()*40).toFixed(1);
-  supernova={x,y,phase:0,maxPhase:300,name,dist,mass,flashDone:false,ringRadius:0};
+  sessionStats.supernovae++;supernova={x,y,phase:0,maxPhase:300,name,dist,mass,flashDone:false,ringRadius:0};
   logComms('Science','◈ SUPERNOVA DETECTED — Massive stellar detonation at bearing '+(Math.floor(x*360))+'°, distance '+dist+' ly!');
   addCrewEntry('Dr. Tanaka: "Supernova! Recording spectral data — this is extraordinary."');
   setTimeout(()=>addCrewEntry('Lt. Park: "…I\'ve never seen anything like that."'),4000);
@@ -7310,7 +7437,7 @@ setInterval(()=>{
       const sys=activeMaint.sys;sys.recover();
       if(sys.sgDot){document.getElementById(sys.sgDot).className='sg-dot ok';document.getElementById(sys.sgText).style.color='#2ecc71';document.getElementById(sys.sgText).textContent='Nominal'}
       if(maintEscalateTimer){clearTimeout(maintEscalateTimer);maintEscalateTimer=null}
-      idleEvents.push(sys.name+' auto-repaired');activeMaint=null;
+      idleEvents.push(sys.name+' auto-repaired');sessionStats.idleAutoRepairs++;activeMaint=null;
       document.getElementById('maint-notif').classList.remove('show');
     }
     if(hudFuel<20&&fuelReserve>5){const t=Math.min(10,fuelReserve);fuelReserve-=t;hudFuel+=t;idleEvents.push('Fuel transferred from reserve: +'+t.toFixed(0)+'%')}
