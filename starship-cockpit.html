@@ -5204,21 +5204,21 @@ function drawShuttleBay(){
     // Tube walls — perspective lines
     const vanX=cx,vanY=cy;
     const tubeW=w*.35,tubeH=h*.35;
-    shuttleCtx.strokeStyle='rgba(94,196,212,.06)';shuttleCtx.lineWidth=1;
+    shuttleCtx.strokeStyle='rgba(94,196,212,0.22)';shuttleCtx.lineWidth=1;
     for(let i=0;i<12;i++){
       const t=i/12;
       const lx=t*tubeW,rx=w-t*tubeW,ty=t*tubeH,by=h-t*tubeH;
       shuttleCtx.strokeRect(lx,ty,rx-lx,by-ty);
     }
     // Guide rails
-    shuttleCtx.strokeStyle='rgba(212,160,60,.08)';shuttleCtx.lineWidth=2;
-    shuttleCtx.beginPath();shuttleCtx.moveTo(0,h*.3);shuttleCtx.lineTo(vanX,vanY);shuttleCtx.moveTo(0,h*.7);shuttleCtx.lineTo(vanX,vanY);
-    shuttleCtx.moveTo(w,h*.3);shuttleCtx.lineTo(vanX,vanY);shuttleCtx.moveTo(w,h*.7);shuttleCtx.lineTo(vanX,vanY);shuttleCtx.stroke();
+    shuttleCtx.strokeStyle='rgba(212,160,60,0.3)';shuttleCtx.lineWidth=2;
+    shuttleCtx.beginPath();shuttleCtx.moveTo(0,h*0.45);shuttleCtx.lineTo(vanX,vanY);shuttleCtx.moveTo(0,h*1);shuttleCtx.lineTo(vanX,vanY);
+    shuttleCtx.moveTo(w,h*0.45);shuttleCtx.lineTo(vanX,vanY);shuttleCtx.moveTo(w,h*1);shuttleCtx.lineTo(vanX,vanY);shuttleCtx.stroke();
     // Warning stripes
     for(let i=0;i<8;i++){
       const t=i/8;const sz=20+t*30;
-      shuttleCtx.fillStyle=i%2===0?'rgba(212,160,60,.04)':'rgba(4,8,12,.02)';
-      shuttleCtx.fillRect(w*.1+t*(cx-w*.1),h-sz,sz,sz);
+      shuttleCtx.fillStyle=i%2===0?'rgba(212,160,60,.18)':'rgba(4,8,12,.06)';
+      shuttleCtx.fillRect(w*.1+t*(cx-w*0.15),h-sz,sz,sz);
       shuttleCtx.fillRect(w*.9-t*(w*.9-cx)-sz,h-sz,sz,sz);
     }
     // Starfield at end of tube
@@ -5229,7 +5229,7 @@ function drawShuttleBay(){
       for(let i=0;i<30;i++){
         const sx=cx-starRect+Math.random()*starRect*2;
         const sy=cy-starRect*.6+Math.random()*starRect*1.2;
-        shuttleCtx.fillStyle=`rgba(200,220,255,${.1+Math.random()*.3})`;
+        shuttleCtx.fillStyle=`rgba(200,220,255,${.3+Math.random()*.5})`;
         shuttleCtx.beginPath();shuttleCtx.arc(sx,sy,.5+Math.random(),0,6.283);shuttleCtx.fill();
       }
     }
@@ -5239,14 +5239,14 @@ function drawShuttleBay(){
     for(let i=0;i<6;i++){
       const t=i/6;const lx=t*tubeW*.8,ly=h*.15+t*(cy-h*.15);
       const col=i<shuttleCheckStep?(i<3?lightColor:midColor):'rgba(60,20,20,';
-      shuttleCtx.fillStyle=col+'.15)';shuttleCtx.fillRect(lx+10,ly,8,3);
+      shuttleCtx.fillStyle=col+'0.6)';shuttleCtx.fillRect(lx+10,ly,8,3);
       shuttleCtx.fillRect(w-lx-18,ly,8,3);
     }
     // Shuttle silhouette
-    shuttleCtx.fillStyle='rgba(94,196,212,.05)';
+    shuttleCtx.fillStyle='rgba(94,196,212,0.3)';
     shuttleCtx.beginPath();shuttleCtx.moveTo(cx,cy+40);shuttleCtx.lineTo(cx-60,cy+100);shuttleCtx.lineTo(cx+60,cy+100);shuttleCtx.closePath();shuttleCtx.fill();
     // "TUBE 2" label
-    shuttleCtx.fillStyle='rgba(94,196,212,.1)';shuttleCtx.font=`${Math.max(14,w*.015)}px 'Courier New'`;
+    shuttleCtx.fillStyle='rgba(94,196,212,0.52)';shuttleCtx.font=`${Math.max(14,w*.015)}px 'Courier New'`;
     shuttleCtx.fillText('LAUNCH TUBE 2',cx-60,h-20);
   }
   else if(shuttleState==='launching'){
@@ -5256,7 +5256,7 @@ function drawShuttleBay(){
     for(let i=0;i<60;i++){
       const sx=Math.random()*w,sy=Math.random()*h;
       const len=20+Math.random()*80;
-      shuttleCtx.strokeStyle=`rgba(200,220,255,${.1+Math.random()*.3})`;shuttleCtx.lineWidth=1;
+      shuttleCtx.strokeStyle=`rgba(200,220,255,${.3+Math.random()*.5})`;shuttleCtx.lineWidth=1;
       shuttleCtx.beginPath();shuttleCtx.moveTo(sx,sy);shuttleCtx.lineTo(sx,sy+len);shuttleCtx.stroke();
     }
     // Flash
@@ -5266,22 +5266,22 @@ function drawShuttleBay(){
     // Tracking view — radar-like display of shuttle
     shuttleCtx.fillStyle='rgba(4,8,12,.95)';shuttleCtx.fillRect(0,0,w,h);
     // Grid
-    shuttleCtx.strokeStyle='rgba(94,196,212,.04)';shuttleCtx.lineWidth=1;
+    shuttleCtx.strokeStyle='rgba(94,196,212,0.15)';shuttleCtx.lineWidth=1;
     [.2,.4,.6,.8,1].forEach(s=>{shuttleCtx.beginPath();shuttleCtx.arc(cx,cy,Math.min(w,h)*.4*s,0,6.283);shuttleCtx.stroke()});
     shuttleCtx.beginPath();shuttleCtx.moveTo(cx,0);shuttleCtx.lineTo(cx,h);shuttleCtx.moveTo(0,cy);shuttleCtx.lineTo(w,cy);shuttleCtx.stroke();
     // Mothership at center
-    shuttleCtx.fillStyle='rgba(94,196,212,.6)';shuttleCtx.beginPath();shuttleCtx.arc(cx,cy,5,0,6.283);shuttleCtx.fill();
-    shuttleCtx.fillStyle='rgba(94,196,212,.2)';shuttleCtx.font=`${Math.max(12,w*.012)}px 'Courier New'`;shuttleCtx.fillText(shipName,cx+10,cy+4);
+    shuttleCtx.fillStyle='rgba(94,196,212,0.9)';shuttleCtx.beginPath();shuttleCtx.arc(cx,cy,5,0,6.283);shuttleCtx.fill();
+    shuttleCtx.fillStyle='rgba(94,196,212,0.75)';shuttleCtx.font=`${Math.max(12,w*.012)}px 'Courier New'`;shuttleCtx.fillText(shipName,cx+10,cy+4);
     // Shuttle blip
     const sAngle=now*.3;const sDist=Math.min(shuttleProgress,.8)*Math.min(w,h)*.35;
     const sx=cx+Math.cos(sAngle)*sDist,sy=cy+Math.sin(sAngle)*sDist;
-    shuttleCtx.fillStyle=`rgba(46,204,113,${.5+Math.sin(now*3)*.3})`;shuttleCtx.beginPath();shuttleCtx.arc(sx,sy,4,0,6.283);shuttleCtx.fill();
-    shuttleCtx.strokeStyle='rgba(46,204,113,.2)';shuttleCtx.lineWidth=1;shuttleCtx.beginPath();shuttleCtx.arc(sx,sy,10,0,6.283);shuttleCtx.stroke();
-    shuttleCtx.fillStyle='rgba(46,204,113,.3)';shuttleCtx.fillText('SHUTTLE 1',sx+12,sy+4);
+    shuttleCtx.fillStyle=`rgba(46,204,113,${.65+Math.sin(now*3)*.3})`;shuttleCtx.beginPath();shuttleCtx.arc(sx,sy,4,0,6.283);shuttleCtx.fill();
+    shuttleCtx.strokeStyle='rgba(46,204,113,0.6)';shuttleCtx.lineWidth=1;shuttleCtx.beginPath();shuttleCtx.arc(sx,sy,10,0,6.283);shuttleCtx.stroke();
+    shuttleCtx.fillStyle='rgba(46,204,113,0.9)';shuttleCtx.fillText('SHUTTLE 1',sx+12,sy+4);
     // Trail
-    shuttleCtx.strokeStyle='rgba(46,204,113,.06)';shuttleCtx.lineWidth=1;shuttleCtx.beginPath();shuttleCtx.moveTo(cx,cy);shuttleCtx.lineTo(sx,sy);shuttleCtx.stroke();
+    shuttleCtx.strokeStyle='rgba(46,204,113,0.22)';shuttleCtx.lineWidth=1;shuttleCtx.beginPath();shuttleCtx.moveTo(cx,cy);shuttleCtx.lineTo(sx,sy);shuttleCtx.stroke();
     // Range rings labels
-    shuttleCtx.fillStyle='rgba(94,196,212,.1)';shuttleCtx.fillText('5km',cx+Math.min(w,h)*.08+3,cy-3);
+    shuttleCtx.fillStyle='rgba(94,196,212,0.45)';shuttleCtx.fillText('5km',cx+Math.min(w,h)*.08+3,cy-3);
     shuttleCtx.fillText('15km',cx+Math.min(w,h)*.24+3,cy-3);
     // Update tracking readouts
     shuttleRange=(shuttleProgress*20).toFixed(1);shuttleVel=Math.round(200+shuttleProgress*800);
@@ -5296,35 +5296,35 @@ function drawShuttleBay(){
     shuttleCtx.fillStyle='rgba(4,8,12,.95)';shuttleCtx.fillRect(0,0,w,h);
     // Bay doors — open
     const doorW=w*.3,doorH=h*.4;
-    shuttleCtx.strokeStyle='rgba(94,196,212,.1)';shuttleCtx.lineWidth=2;
+    shuttleCtx.strokeStyle='rgba(94,196,212,0.38)';shuttleCtx.lineWidth=2;
     shuttleCtx.strokeRect(cx-doorW/2,cy-doorH/2,doorW,doorH);
     // Guide lights — flashing sequence
     for(let i=0;i<8;i++){
       const t=i/8;const flash=(Math.floor(now*2+i)%3===0);
-      shuttleCtx.fillStyle=flash?'rgba(46,204,113,.4)':'rgba(46,204,113,.08)';
+      shuttleCtx.fillStyle=flash?'rgba(46,204,113,0.9)':'rgba(46,204,113,0.22)';
       shuttleCtx.fillRect(cx-doorW/2-10,cy-doorH/2+t*doorH,6,6);
       shuttleCtx.fillRect(cx+doorW/2+4,cy-doorH/2+t*doorH,6,6);
     }
     // Centerline
-    shuttleCtx.strokeStyle='rgba(212,160,60,.1)';shuttleCtx.setLineDash([8,8]);
+    shuttleCtx.strokeStyle='rgba(212,160,60,0.38)';shuttleCtx.setLineDash([8,8]);
     shuttleCtx.beginPath();shuttleCtx.moveTo(cx,cy-doorH/2);shuttleCtx.lineTo(cx,cy+doorH/2);shuttleCtx.stroke();shuttleCtx.setLineDash([]);
     // Shuttle approaching — grows with approach position
     const appProgress=shuttleApproachPos/100;
     const sSize=3+appProgress*20;
     const sY=cy-doorH/2-20+(1-appProgress)*100;
-    shuttleCtx.fillStyle=`rgba(94,196,212,${.3+appProgress*.4})`;
-    shuttleCtx.beginPath();shuttleCtx.moveTo(cx,sY-sSize);shuttleCtx.lineTo(cx-sSize*.6,sY+sSize*.4);shuttleCtx.lineTo(cx+sSize*.6,sY+sSize*.4);shuttleCtx.closePath();shuttleCtx.fill();
+    shuttleCtx.fillStyle=`rgba(94,196,212,${.45+appProgress*.5})`;
+    shuttleCtx.beginPath();shuttleCtx.moveTo(cx,sY-sSize);shuttleCtx.lineTo(cx-sSize*.6,sY+sSize*0.6);shuttleCtx.lineTo(cx+sSize*.6,sY+sSize*0.6);shuttleCtx.closePath();shuttleCtx.fill();
     // Engine glow
-    shuttleCtx.fillStyle=`rgba(94,196,212,${.1+appProgress*.2})`;shuttleCtx.beginPath();shuttleCtx.arc(cx,sY+sSize*.5,sSize*.3,0,6.283);shuttleCtx.fill();
+    shuttleCtx.fillStyle=`rgba(94,196,212,${.2+appProgress*.3})`;shuttleCtx.beginPath();shuttleCtx.arc(cx,sY+sSize*.5,sSize*.3,0,6.283);shuttleCtx.fill();
     // "RECOVERY BAY" label
-    shuttleCtx.fillStyle='rgba(94,196,212,.1)';shuttleCtx.font=`${Math.max(14,w*.015)}px 'Courier New'`;
+    shuttleCtx.fillStyle='rgba(94,196,212,0.52)';shuttleCtx.font=`${Math.max(14,w*.015)}px 'Courier New'`;
     shuttleCtx.fillText('RECOVERY BAY — PORT',cx-70,h-20);
   }
   else if(shuttleState==='landed'){
     shuttleCtx.fillStyle='rgba(4,8,12,.95)';shuttleCtx.fillRect(0,0,w,h);
-    shuttleCtx.fillStyle='rgba(46,204,113,.15)';shuttleCtx.font=`${Math.max(18,w*.02)}px 'Courier New'`;
+    shuttleCtx.fillStyle='rgba(46,204,113,0.6)';shuttleCtx.font=`${Math.max(18,w*.02)}px 'Courier New'`;
     shuttleCtx.fillText('SHUTTLE SECURED',cx-80,cy-10);
-    shuttleCtx.fillStyle='rgba(46,204,113,.08)';shuttleCtx.font=`${Math.max(12,w*.012)}px 'Courier New'`;
+    shuttleCtx.fillStyle='rgba(46,204,113,0.38)';shuttleCtx.font=`${Math.max(12,w*.012)}px 'Courier New'`;
     shuttleCtx.fillText('Bay doors closing — pressurizing',cx-100,cy+20);
   }
 
