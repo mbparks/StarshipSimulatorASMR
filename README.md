@@ -1,3 +1,5 @@
+<img width="1536" height="1024" alt="ChatGPT Image Apr 14, 2026, 03_17_37 AM" src="https://github.com/user-attachments/assets/69fe0333-fd68-4d5b-ba84-63096b8af394" />
+
 # Starship ASMR Simulator
 
 **A browser-based ambient starship cockpit experience designed for relaxation, immersion, and creative production.  The simulator is not software, it's not developed.  It is an interactive painting that has been drawn with bits and keystrokes instead of paint and brushes.**
