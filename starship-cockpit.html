@@ -491,6 +491,25 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .db-content h3{color:#5ec4d4;font-size:clamp(9px,.85vw,12px);margin:12px 0 4px;letter-spacing:2px}
 .db-content p{margin-bottom:8px}
 .db-content .spec{color:#2a4a5a;margin-right:10px;display:inline-block;width:120px}
+/* Captain's notes & mission objectives */
+.db-notes-area{width:100%;min-height:80px;max-height:200px;background:rgba(10,18,24,.6);border:1px solid rgba(94,196,212,.12);color:#5ec4d4;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:8px;outline:none;border-radius:3px;resize:vertical;line-height:1.6;margin-top:8px}
+.db-notes-area:focus{border-color:rgba(94,196,212,.3)}
+.db-notes-area::placeholder{color:#1a3a4a}
+.db-obj-list{margin-top:8px}
+.db-obj{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(94,196,212,.04);font-size:clamp(9px,.8vw,11px)}
+.db-obj-check{width:14px;height:14px;border:1px solid rgba(94,196,212,.2);border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#2ecc71;transition:all .2s;flex-shrink:0}
+.db-obj-check:hover{border-color:rgba(94,196,212,.4)}
+.db-obj-check.done{background:rgba(46,204,113,.08);border-color:rgba(46,204,113,.3)}
+.db-obj-text{flex:1;color:#4a7a8a}
+.db-obj-text.done{text-decoration:line-through;color:#2a4a5a}
+.db-obj-del{color:#2a3a3a;cursor:pointer;font-size:clamp(10px,.9vw,14px);transition:color .2s;flex-shrink:0}
+.db-obj-del:hover{color:#e74c3c}
+.db-obj-add{display:flex;gap:4px;margin-top:8px}
+.db-obj-input{flex:1;background:rgba(10,18,24,.6);border:1px solid rgba(94,196,212,.12);color:#5ec4d4;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:5px 8px;outline:none;border-radius:2px}
+.db-obj-input:focus{border-color:rgba(94,196,212,.3)}
+.db-obj-input::placeholder{color:#1a3a4a}
+.db-obj-btn{background:none;border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:4px 10px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s}
+.db-obj-btn:hover{border-color:#5ec4d4;background:rgba(94,196,212,.06)}
 
 /* Engineering */
 .eng-graph{width:100%;height:60px;border:1px solid rgba(94,196,212,.08);border-radius:2px;margin:4px 0;background:rgba(4,8,12,.5);cursor:pointer}
@@ -667,10 +686,35 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .ai-input-row span{color:#5ec4d4;padding:4px 6px;font-size:clamp(8px,.7vw,10px)}
 #ai-input{flex:1;background:none;border:none;color:#5ec4d4;font-family:inherit;font-size:clamp(8px,.7vw,10px);outline:none;padding:4px 0}
 
-/* Fuel graph */
-#fuel-graph{position:fixed;z-index:11;width:clamp(140px,14vw,200px);height:clamp(50px,6vh,70px);border:1px solid rgba(94,196,212,.1);border-radius:2px;background:rgba(4,8,12,.6);bottom:clamp(40px,7vh,80px);left:clamp(10px,1.5vw,20px);display:none}
-#fuel-graph.show{display:block}
-.fg-label{position:absolute;top:2px;left:4px;font-size:clamp(5px,.45vw,6px);color:#2a4a5a;letter-spacing:1px;text-transform:uppercase}
+/* Fuel Management */
+.fuel-screen{position:fixed;inset:0;z-index:14;display:none;background:rgba(4,8,12,.88);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);pointer-events:auto}
+.fuel-screen.show{display:flex}
+.fuel-layout{display:flex;width:100%;height:100%;padding:clamp(10px,1.5vh,16px)}
+.fuel-main{flex:1;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.fuel-sidebar{width:clamp(220px,20vw,300px);display:flex;flex-direction:column;gap:8px;margin-left:12px;overflow-y:auto}
+.fuel-row{display:flex;gap:8px}
+.fuel-card{border:1px solid rgba(94,196,212,.08);border-radius:3px;padding:8px 10px;background:rgba(4,8,12,.4)}
+.fuel-card-title{font-size:clamp(9px,.8vw,11px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.fuel-big-val{font-size:clamp(20px,2vw,30px);color:#5ec4d4;font-variant-numeric:tabular-nums;letter-spacing:2px}
+.fuel-big-val.warn{color:#d4a03c}.fuel-big-val.crit{color:#e74c3c}
+.fuel-sub{font-size:clamp(8px,.7vw,10px);color:#3a5a6a;margin-top:2px}
+.fuel-tank{width:100%;height:clamp(30px,3.5vh,45px);border:1px solid rgba(94,196,212,.12);border-radius:3px;background:rgba(4,8,12,.5);position:relative;overflow:hidden}
+.fuel-tank-fill{height:100%;border-radius:2px;transition:width .5s;position:relative}
+.fuel-tank-fill.primary{background:linear-gradient(90deg,rgba(46,204,113,.15),rgba(46,204,113,.3))}
+.fuel-tank-fill.reserve{background:linear-gradient(90deg,rgba(212,160,60,.15),rgba(212,160,60,.3))}
+.fuel-tank-label{position:absolute;top:50%;right:8px;transform:translateY(-50%);font-size:clamp(9px,.8vw,11px);color:#5ec4d4;font-variant-numeric:tabular-nums}
+.fuel-sm-btn{background:none;border:1px solid rgba(94,196,212,.2);color:#4a7a8a;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:3px 8px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .2s}
+.fuel-sm-btn:hover{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.05)}
+.fuel-sm-btn.active{border-color:#2ecc71;color:#2ecc71}
+.fuel-grade{font-size:clamp(20px,2vw,28px);font-weight:bold;text-align:center;margin:4px 0}
+.fuel-preset-row{display:flex;gap:4px}
+.fuel-preset{flex:1;padding:6px 4px;border:1px solid rgba(94,196,212,.1);border-radius:2px;cursor:pointer;text-align:center;font-family:inherit;font-size:clamp(8px,.7vw,10px);color:#3a6a7a;background:none;transition:all .2s;letter-spacing:1px}
+.fuel-preset:hover{border-color:rgba(94,196,212,.3);color:#5ec4d4}
+.fuel-preset.active{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.06)}
+.fuel-log{flex:1;border:1px solid rgba(94,196,212,.06);border-radius:3px;overflow-y:auto;background:rgba(4,8,12,.4);min-height:60px}
+.fuel-log-title{font-size:clamp(9px,.8vw,11px);color:#2a4a5a;letter-spacing:2px;padding:6px 8px;border-bottom:1px solid rgba(94,196,212,.04);text-transform:uppercase}
+.fuel-log-entry{font-size:clamp(8px,.7vw,10px);padding:3px 8px;border-bottom:1px solid rgba(94,196,212,.02);color:#3a6a7a}
+.fuel-time-btns{display:flex;gap:3px;margin-bottom:4px}
 
 /* === RADIO REPLY === */
 #radio-reply{position:fixed;bottom:clamp(228px,34vh,360px);left:50%;transform:translateX(-50%);z-index:7;display:none;gap:6px;justify-content:center;margin-top:6px}
@@ -1449,7 +1493,86 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
 <div id="ai-terminal"><div class="ai-header"><span>Artemis AI — v4.2.1</span><button id="ai-close">×</button></div><div class="ai-log" id="ai-log"><div class="ai-resp">ARTEMIS AI online. Type a command.</div></div><div class="ai-input-row"><span>›</span><input type="text" id="ai-input" placeholder="status, scan, crew, eta, help…"></div></div>
 
 <!-- Fuel Graph -->
-<div id="fuel-graph"><div class="fg-label">Fuel Cell</div><canvas id="fg-canvas" width="200" height="70"></canvas></div>
+<div class="fuel-screen" id="fuel-screen">
+<div class="fuel-layout">
+  <div class="fuel-main">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:clamp(12px,1.1vw,16px);color:#5ec4d4;letter-spacing:4px;text-transform:uppercase">Fuel Management</span>
+      <button class="pwr-close" id="fuel-close">Close</button>
+    </div>
+    <div class="fuel-row">
+      <div class="fuel-card" style="flex:2">
+        <div class="fuel-card-title">Primary Fuel Cell</div>
+        <div class="fuel-tank"><div class="fuel-tank-fill primary" id="fuel-fill-pri"></div><div class="fuel-tank-label" id="fuel-val-pri"></div></div>
+      </div>
+      <div class="fuel-card" style="flex:1">
+        <div class="fuel-card-title">Reserve Tank</div>
+        <div class="fuel-tank"><div class="fuel-tank-fill reserve" id="fuel-fill-res"></div><div class="fuel-tank-label" id="fuel-val-res"></div></div>
+        <button class="fuel-sm-btn" id="fuel-transfer" style="width:100%;margin-top:4px">Transfer to Primary</button>
+      </div>
+    </div>
+    <div class="fuel-row">
+      <div class="fuel-card"><div class="fuel-card-title">Burn Rate</div><div class="fuel-big-val" id="fuel-burn">0.00</div><div class="fuel-sub">units/hr</div></div>
+      <div class="fuel-card"><div class="fuel-card-title">Projected Range</div><div class="fuel-big-val" id="fuel-range">0.0</div><div class="fuel-sub">light-years</div></div>
+      <div class="fuel-card"><div class="fuel-card-title">Bingo Fuel</div><div class="fuel-big-val" id="fuel-bingo">--</div><div class="fuel-sub">point of no return</div></div>
+    </div>
+    <div class="fuel-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="fuel-card-title">Consumption History</div>
+        <div class="fuel-time-btns">
+          <button class="eng-time-btn active" data-ftw="60">1m</button>
+          <button class="eng-time-btn" data-ftw="300">5m</button>
+          <button class="eng-time-btn" data-ftw="9999">All</button>
+        </div>
+      </div>
+      <canvas id="fuel-graph-cv" style="width:100%;height:clamp(80px,10vh,120px);border:1px solid rgba(94,196,212,.06);border-radius:2px;background:rgba(4,8,12,.3)"></canvas>
+    </div>
+    <div class="fuel-row">
+      <div class="fuel-card">
+        <div class="fuel-card-title">Fuel Quality</div>
+        <canvas id="fuel-quality-cv" style="width:100%;height:clamp(40px,5vh,60px);border:1px solid rgba(94,196,212,.06);border-radius:2px"></canvas>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+          <span style="font-size:clamp(8px,.7vw,10px);color:#3a6a7a" id="fuel-purity">Purity: 100%</span>
+          <button class="fuel-sm-btn" id="fuel-filter">Run Filter Cycle</button>
+        </div>
+      </div>
+      <div class="fuel-card">
+        <div class="fuel-card-title">T-P Diagram</div>
+        <canvas id="fuel-tp-cv" style="width:100%;height:clamp(40px,5vh,60px);border:1px solid rgba(94,196,212,.06);border-radius:2px"></canvas>
+        <div style="font-size:clamp(8px,.7vw,10px);color:#3a6a7a;text-align:center;margin-top:4px" id="fuel-tp-status">Optimal</div>
+      </div>
+    </div>
+  </div>
+  <div class="fuel-sidebar">
+    <div class="fuel-card"><div class="fuel-card-title">Efficiency</div><div class="fuel-grade" id="fuel-grade" style="color:#2ecc71">A</div><div class="fuel-sub" style="text-align:center" id="fuel-grade-desc">Excellent fuel discipline</div></div>
+    <div class="fuel-card">
+      <div class="fuel-card-title">Rationing Mode</div>
+      <div class="fuel-preset-row">
+        <button class="fuel-preset active" data-ration="standard">Standard</button>
+        <button class="fuel-preset" data-ration="conserve">Conserve</button>
+        <button class="fuel-preset" data-ration="emergency">Emergency</button>
+      </div>
+    </div>
+    <div class="fuel-card">
+      <div class="fuel-card-title">Controls</div>
+      <button class="fuel-sm-btn" id="fuel-eco-toggle" style="width:100%;margin-bottom:4px">Eco Throttle: OFF</button>
+      <button class="fuel-sm-btn danger" id="fuel-jettison" style="width:100%">⚠ Jettison Fuel</button>
+    </div>
+    <div class="fuel-card">
+      <div class="fuel-card-title">Route Fuel Cost</div>
+      <div style="font-size:clamp(9px,.8vw,11px);color:#5ec4d4" id="fuel-route-cost">No route plotted</div>
+    </div>
+    <div class="fuel-card">
+      <div class="fuel-card-title">Budget</div>
+      <div id="fuel-budget" style="font-size:clamp(8px,.7vw,10px);color:#3a6a7a"></div>
+    </div>
+    <div class="fuel-log">
+      <div class="fuel-log-title">Fuel Log</div>
+      <div id="fuel-log-body"></div>
+    </div>
+  </div>
+</div>
+</div>
 
 <!-- Radio Reply -->
 <div id="radio-reply"></div>
@@ -1639,7 +1762,6 @@ let distVal=4.243,radVal=.04,driftVal=.003;
 
 function tickHUD(){
   hudHeading+=(Math.random()-.5)*.03;if(hudHeading>360)hudHeading-=360;if(hudHeading<0)hudHeading+=360;
-  hudFuel-=Math.random()*.001;if(hudFuel<60)hudFuel=92+Math.random()*6;
   hudTemp+=(Math.random()-.5)*.04;
   hudPress+=(Math.random()-.5)*.0005;
   shieldsVal+=(Math.random()-.5)*.3;shieldsVal=Math.max(80,Math.min(100,shieldsVal));
@@ -2672,7 +2794,12 @@ document.querySelectorAll('.scr-btn').forEach(btn=>{
     const id=btn.dataset.screen;
     if(id==='pip'){document.getElementById('pip').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
     if(id==='ai'){document.getElementById('ai-terminal').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
-    if(id==='fuelg'){document.getElementById('fuel-graph').classList.toggle('show');btn.classList.toggle('active');if(engaged)clickSound();return}
+    if(id==='fuelg'){
+      const fs=document.getElementById('fuel-screen');
+      if(fs.classList.contains('show')){fs.classList.remove('show');btn.classList.remove('active')}
+      else{fs.classList.add('show');btn.classList.add('active');renderFuelScreen()}
+      if(engaged)clickSound();return
+    }
     if(id==='weapons'){
       const wp=document.getElementById('weapons-panel');
       if(wp.classList.contains('show')){wp.classList.remove('show');btn.classList.remove('active');cancelAnimationFrame(wpnAnimFrame)}
@@ -3251,13 +3378,95 @@ setInterval(()=>{if(activeScreen==='lrs')updateContactLog()},3000);
 const dbEntries={
   ship:{title:'Ship Specifications',content:`<h3>ISS Artemis — Explorer Class</h3><p><span class="spec">Registry:</span>ISS-7742-A</p><p><span class="spec">Class:</span>Horizon Explorer</p><p><span class="spec">Length:</span>284 meters</p><p><span class="spec">Mass:</span>45,200 metric tons</p><p><span class="spec">Crew Capacity:</span>12 (6 active)</p><p><span class="spec">FTL Drive:</span>Alcubierre-Tanaka Mk IV</p><p><span class="spec">Max Velocity:</span>0.009c (sublight)</p><p><span class="spec">Reactor:</span>Dual Tokamak Fusion</p><p><span class="spec">Armament:</span>Point-defense array, mining lasers</p><p><span class="spec">Commissioned:</span>2347</p>`},
   systems:{title:'Star Systems',content:`<h3>Kepler-442</h3><p>G-type main sequence star, 1,206 ly from Sol. One confirmed habitable exoplanet (Kepler-442b) with 60% Earth Similarity Index. Targeted for long-range survey.</p><h3>Proxima Centauri</h3><p>M-type red dwarf, 4.24 ly from Sol. Proxima b orbits in habitable zone but tidally locked. Relay station established 2298.</p><h3>Trappist-1</h3><p>Ultra-cool red dwarf, 39 ly. Seven rocky planets, three in habitable zone. Active colonization survey in progress.</p>`},
-  mission:{title:'Mission Brief',content:`<h3>Operation Far Reach</h3><p>Objective: Long-range survey and relay deployment along the Kepler corridor. Secondary: spectral analysis of anomalous baryonic readings in Sector 7.</p><p>Duration: Estimated 2,847 days. Crew rotation at Waypoint Echo (Day 1,400).</p><p>Authorization: UESA Deep Space Command, Directive 7-Alpha.</p>`},
-  crew:{title:'Crew Bios',content:`<h3>Cpt. Elara Vasquez</h3><p>Commanding officer. 14 years deep-space experience. Previously commanded ISS Magellan on Trappist survey.</p><h3>Dr. Amara Okafor</h3><p>Chief Medical Officer. Specialist in long-duration spaceflight physiology and cryo-recovery.</p><h3>Lt. Jin Park</h3><p>Navigation & Helm. Top graduate, Orbital Academy class of '44. First deep-space posting.</p><h3>Cpl. Diego Reyes</h3><p>Engineering & EVA specialist. 8 years service. Hull repair and reactor maintenance certified.</p><h3>Dr. Yuki Tanaka</h3><p>Science Officer. Astrophysics PhD, focused on baryonic matter anomalies.</p><h3>Sgt. Kwame Mensah</h3><p>Security & Comms. Currently in scheduled cryo rotation. Wake date: Day 1,026.</p>`}
+  mission:{title:'Mission Brief',content:`<h3>Operation Far Reach</h3><p>Objective: Long-range survey and relay deployment along the Kepler corridor. Secondary: spectral analysis of anomalous baryonic readings in Sector 7.</p><p>Duration: Estimated 2,847 days. Crew rotation at Waypoint Echo (Day 1,400).</p><p>Authorization: UESA Deep Space Command, Directive 7-Alpha.</p>`,hasObjectives:true},
+  crew:{title:'Crew Bios',content:`<h3>Cpt. Elara Vasquez</h3><p>Commanding officer. 14 years deep-space experience. Previously commanded ISS Magellan on Trappist survey.</p><h3>Dr. Amara Okafor</h3><p>Chief Medical Officer. Specialist in long-duration spaceflight physiology and cryo-recovery.</p><h3>Lt. Jin Park</h3><p>Navigation & Helm. Top graduate, Orbital Academy class of '44. First deep-space posting.</p><h3>Cpl. Diego Reyes</h3><p>Engineering & EVA specialist. 8 years service. Hull repair and reactor maintenance certified.</p><h3>Dr. Yuki Tanaka</h3><p>Science Officer. Astrophysics PhD, focused on baryonic matter anomalies.</p><h3>Sgt. Kwame Mensah</h3><p>Security & Comms. Currently in scheduled cryo rotation. Wake date: Day 1,026.</p>`},
+  notes:{title:"Captain's Notes",hasNotes:true}
 };
+
+let captainNotes=localStorage.getItem('captainNotes')||'';
+const missionObjectives=[
+  {text:'Deploy relay beacon at Waypoint Echo',done:false,preset:true},
+  {text:'Complete spectral analysis of Sector 7 anomaly',done:false,preset:true},
+  {text:'Perform crew rotation at Day 1,400',done:false,preset:true},
+];
+
 function renderDatabase(tab){
   document.querySelectorAll('.db-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
   const entry=dbEntries[tab];
-  document.getElementById('db-content').innerHTML=entry?entry.content:'<p>No data.</p>';
+  if(!entry){document.getElementById('db-content').innerHTML='<p>No data.</p>';return}
+
+  let html=entry.content||'';
+
+  // Captain's Notes tab
+  if(entry.hasNotes){
+    html=`<h3>Captain's Notes</h3>
+      <p style="color:#3a5a6a;font-size:clamp(8px,.7vw,10px)">Personal observations, reminders, and mission notes. Saved automatically.</p>
+      <textarea class="db-notes-area" id="db-notes-input" placeholder="Type your notes here…">${captainNotes}</textarea>`;
+  }
+
+  // Mission tab with objectives
+  if(entry.hasObjectives){
+    html+=`<h3>Mission Objectives</h3><div class="db-obj-list" id="db-obj-list"></div>
+      <div class="db-obj-add"><input type="text" class="db-obj-input" id="db-obj-input" placeholder="Add new objective…" maxlength="120"><button class="db-obj-btn" id="db-obj-add-btn">Add</button></div>`;
+  }
+
+  document.getElementById('db-content').innerHTML=html;
+
+  // Attach notes handler
+  if(entry.hasNotes){
+    const textarea=document.getElementById('db-notes-input');
+    textarea.addEventListener('input',()=>{
+      captainNotes=textarea.value;
+      localStorage.setItem('captainNotes',captainNotes);
+    });
+    textarea.addEventListener('keydown',e=>e.stopPropagation());
+  }
+
+  // Attach objectives handlers
+  if(entry.hasObjectives){
+    renderObjectives();
+    document.getElementById('db-obj-add-btn').addEventListener('click',()=>{
+      const input=document.getElementById('db-obj-input');
+      const text=input.value.trim();
+      if(!text)return;
+      missionObjectives.push({text,done:false,preset:false});
+      input.value='';
+      renderObjectives();
+      logComms('Command','New objective added: '+text);
+      if(engaged)clickSound();
+    });
+    document.getElementById('db-obj-input').addEventListener('keydown',e=>{
+      if(e.key==='Enter')document.getElementById('db-obj-add-btn').click();
+      e.stopPropagation();
+    });
+  }
+}
+
+function renderObjectives(){
+  const list=document.getElementById('db-obj-list');
+  if(!list)return;
+  list.innerHTML=missionObjectives.map((obj,i)=>`<div class="db-obj">
+    <div class="db-obj-check${obj.done?' done':''}" data-oidx="${i}">${obj.done?'✓':''}</div>
+    <div class="db-obj-text${obj.done?' done':''}">${obj.text}</div>
+    ${!obj.preset?`<div class="db-obj-del" data-odel="${i}">×</div>`:''}
+  </div>`).join('');
+  list.querySelectorAll('.db-obj-check').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const idx=parseInt(el.dataset.oidx);
+      missionObjectives[idx].done=!missionObjectives[idx].done;
+      renderObjectives();
+      if(missionObjectives[idx].done)logComms('Command','Objective completed: '+missionObjectives[idx].text);
+      if(engaged)clickSound();
+    });
+  });
+  list.querySelectorAll('.db-obj-del').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const idx=parseInt(el.dataset.odel);
+      missionObjectives.splice(idx,1);
+      renderObjectives();
+      if(engaged)clickSound();
+    });
+  });
 }
 // Build nav tabs
 (function(){
@@ -3528,7 +3737,7 @@ function renderCrew(){
 
 // === MISSION OBJECTIVES ===
 function renderMission(){
-  const objs=[
+  const presetObjs=[
     {status:'done',title:'Launch from Waypoint Delta',desc:'Departed on schedule. All systems nominal at launch.'},
     {status:'done',title:'Deploy Relay Beacon 14',desc:'Beacon active. Signal relay confirmed.'},
     {status:'done',title:'Transit Oort Debris Field',desc:'Minor hull impacts. No structural damage.'},
@@ -3538,7 +3747,42 @@ function renderMission(){
     {status:'pending',title:'Deploy Relay Beacon 15',desc:'Pending. Components staged in Cargo Bay.'},
     {status:'pending',title:'Arrive Kepler-442 System',desc:'Final survey and report transmission to UESA.'},
   ];
-  document.getElementById('mission-body').innerHTML=objs.map(o=>`<div class="mission-obj"><div class="obj-check ${o.status}">${o.status==='done'?'✓':o.status==='active'?'►':''}</div><div class="obj-text ${o.status}"><div class="obj-title">${o.title}</div><div class="obj-desc">${o.desc}</div></div></div>`).join('');
+  let html=presetObjs.map(o=>`<div class="mission-obj"><div class="obj-check ${o.status}">${o.status==='done'?'✓':o.status==='active'?'►':''}</div><div class="obj-text ${o.status}"><div class="obj-title">${o.title}</div><div class="obj-desc">${o.desc}</div></div></div>`).join('');
+  // Custom objectives
+  if(missionObjectives.length>0){
+    html+='<div style="margin-top:12px;padding-top:8px;border-top:1px solid rgba(94,196,212,.06);font-size:clamp(9px,.8vw,11px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Captain\'s Objectives</div>';
+    html+=missionObjectives.map((obj,i)=>`<div class="mission-obj"><div class="obj-check ${obj.done?'done':'active'}" data-midx="${i}" style="cursor:pointer">${obj.done?'✓':'►'}</div><div class="obj-text ${obj.done?'done':'active'}"><div class="obj-title">${obj.text}</div></div>${!obj.preset?`<div class="db-obj-del" data-mdel="${i}" style="margin-left:auto;cursor:pointer;color:#2a3a3a;font-size:14px">×</div>`:''}</div>`).join('');
+  }
+  // Add objective input
+  html+='<div style="display:flex;gap:6px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(94,196,212,.04)"><input type="text" class="db-obj-input" id="misn-obj-input" placeholder="Add new objective…" maxlength="120" style="flex:1"><button class="db-obj-btn" id="misn-obj-add">Add</button></div>';
+  document.getElementById('mission-body').innerHTML=html;
+  // Attach handlers
+  document.querySelectorAll('[data-midx]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const idx=parseInt(el.dataset.midx);
+      missionObjectives[idx].done=!missionObjectives[idx].done;
+      if(missionObjectives[idx].done)logComms('Command','Objective completed: '+missionObjectives[idx].text);
+      renderMission();if(engaged)clickSound();
+    });
+  });
+  document.querySelectorAll('[data-mdel]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      missionObjectives.splice(parseInt(el.dataset.mdel),1);
+      renderMission();if(engaged)clickSound();
+    });
+  });
+  document.getElementById('misn-obj-add').addEventListener('click',()=>{
+    const input=document.getElementById('misn-obj-input');
+    const text=input.value.trim();if(!text)return;
+    missionObjectives.push({text,done:false,preset:false});
+    input.value='';renderMission();
+    logComms('Command','New objective added: '+text);
+    if(engaged)clickSound();
+  });
+  document.getElementById('misn-obj-input').addEventListener('keydown',e=>{
+    if(e.key==='Enter')document.getElementById('misn-obj-add').click();
+    e.stopPropagation();
+  });
 }
 
 // === AUDIO MIXER ===
@@ -3986,24 +4230,245 @@ document.getElementById('ai-input').addEventListener('keydown',e=>{
 });
 
 // === FUEL GRAPH ===
-const fgCanvas=document.getElementById('fg-canvas');
-const fgCtx=fgCanvas.getContext('2d');
-const fuelHistory=[];
-setInterval(()=>{fuelHistory.push(hudFuel);if(fuelHistory.length>100)fuelHistory.shift()},3000);
-function drawFuelGraph(){
-  if(!document.getElementById('fuel-graph').classList.contains('show')){requestAnimationFrame(drawFuelGraph);return}
-  const w=fgCanvas.width,h=fgCanvas.height;
-  fgCtx.fillStyle='rgba(4,8,12,.3)';fgCtx.fillRect(0,0,w,h);
-  fgCtx.strokeStyle='rgba(94,196,212,.06)';fgCtx.lineWidth=.5;
-  for(let y=0;y<h;y+=14){fgCtx.beginPath();fgCtx.moveTo(0,y);fgCtx.lineTo(w,y);fgCtx.stroke()}
-  if(fuelHistory.length>1){
-    fgCtx.strokeStyle='rgba(46,204,113,.5)';fgCtx.lineWidth=1.5;fgCtx.beginPath();
-    fuelHistory.forEach((v,i)=>{const x=i/100*w,y=h-(v-50)/55*h;i===0?fgCtx.moveTo(x,y):fgCtx.lineTo(x,y)});
-    fgCtx.stroke();
+// === FUEL MANAGEMENT ===
+const fuelHistory=[],burnHistory=[],throttleHistory=[];
+let fuelReserve=25,fuelPurity=100,fuelEcoMode=false,fuelRationMode='standard';
+let fuelTransit=0,fuelManeuver=0,fuelWarp=0;
+const fuelLog=[];let fuelTimeWindow=60;
+let fuelJettisonConfirm=false;
+
+setInterval(()=>{
+  const burnMod=fuelRationMode==='conserve'?.6:fuelRationMode==='emergency'?.2:1;
+  const ecoBurnMod=fuelEcoMode?.8:1;
+  const burn=throttle*.01*burnMod*ecoBurnMod;
+  hudFuel-=burn;
+  if(warping){hudFuel-=.05*burnMod;fuelWarp+=.05*burnMod}
+  fuelTransit+=burn*.7;fuelManeuver+=burn*.3;
+  // Purity degrades
+  fuelPurity=Math.max(40,fuelPurity-.003);
+  // Low fuel auto-reserve
+  if(hudFuel<15&&fuelReserve>0&&fuelRationMode!=='standard'){
+    const transfer=Math.min(.5,fuelReserve);fuelReserve-=transfer;hudFuel+=transfer;
+    addFuelLog('Auto-transfer: '+transfer.toFixed(1)+'% from reserve');
   }
-  requestAnimationFrame(drawFuelGraph);
+  if(hudFuel<0)hudFuel=0;
+  fuelHistory.push(hudFuel);burnHistory.push(burn*60);throttleHistory.push(throttle*100);
+  if(fuelHistory.length>600){fuelHistory.shift();burnHistory.shift();throttleHistory.shift()}
+  // Contamination stutters
+  if(fuelPurity<60&&Math.random()<.02){throttle=Math.max(.05,throttle-.1);setTimeout(()=>{throttle=Math.min(1,throttle+.1)},500)}
+},1000);
+
+function addFuelLog(text){
+  const elapsed=Date.now()-missionStart;const ms=elapsed*100;const ts=Math.floor(ms/1000);
+  const h=Math.floor(ts/3600)%24,m=Math.floor(ts/60)%60;
+  fuelLog.unshift({time:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'),text});
+  if(fuelLog.length>40)fuelLog.pop();
 }
-drawFuelGraph();
+
+function fuelEfficiencyGrade(){
+  if(burnHistory.length<10)return{grade:'--',desc:'Collecting data…',color:'#3a6a7a'};
+  const avg=burnHistory.reduce((s,v)=>s+v,0)/burnHistory.length;
+  if(avg<.15)return{grade:'A+',desc:'Exceptional fuel discipline',color:'#2ecc71'};
+  if(avg<.25)return{grade:'A',desc:'Excellent efficiency',color:'#2ecc71'};
+  if(avg<.4)return{grade:'B',desc:'Good fuel management',color:'#5ec4d4'};
+  if(avg<.6)return{grade:'C',desc:'Average consumption',color:'#d4a03c'};
+  if(avg<.8)return{grade:'D',desc:'Heavy burn rate',color:'#d4a03c'};
+  return{grade:'F',desc:'Excessive fuel use',color:'#e74c3c'};
+}
+
+function renderFuelScreen(){
+  // Tanks
+  document.getElementById('fuel-fill-pri').style.width=Math.max(0,hudFuel)+'%';
+  document.getElementById('fuel-val-pri').textContent=hudFuel.toFixed(1)+'%';
+  document.getElementById('fuel-fill-res').style.width=Math.max(0,fuelReserve)+'%';
+  document.getElementById('fuel-val-res').textContent=fuelReserve.toFixed(1)+'%';
+  // Burn rate
+  const curBurn=burnHistory.length?burnHistory[burnHistory.length-1]:0;
+  const burnEl=document.getElementById('fuel-burn');
+  burnEl.textContent=curBurn.toFixed(2);
+  burnEl.className='fuel-big-val'+(curBurn>.5?' crit':curBurn>.25?' warn':'');
+  // Range
+  const hoursLeft=curBurn>0?(hudFuel+fuelReserve)/curBurn:Infinity;
+  const range=(hoursLeft*hudSpeed*.001*365).toFixed(1);
+  document.getElementById('fuel-range').textContent=range>999?'999+':range;
+  // Bingo
+  const nearestFuel=navWaypoints.filter(w=>w.fuel&&!w.current).sort((a,b)=>{
+    const da=Math.sqrt((a.x-.48)**2+(a.y-.48)**2),db=Math.sqrt((b.x-.48)**2+(b.y-.48)**2);return da-db;
+  })[0];
+  if(nearestFuel){
+    const dist=Math.sqrt((nearestFuel.x-.48)**2+(nearestFuel.y-.48)**2)*40;
+    const fuelNeeded=dist*2.3;
+    const bingoEl=document.getElementById('fuel-bingo');
+    bingoEl.textContent=fuelNeeded.toFixed(0)+'%';
+    bingoEl.className='fuel-big-val'+(hudFuel<fuelNeeded?' crit':'');
+  }
+  // Grade
+  const eff=fuelEfficiencyGrade();
+  document.getElementById('fuel-grade').textContent=eff.grade;
+  document.getElementById('fuel-grade').style.color=eff.color;
+  document.getElementById('fuel-grade-desc').textContent=eff.desc;
+  // Purity
+  document.getElementById('fuel-purity').textContent='Purity: '+Math.round(fuelPurity)+'%';
+  document.getElementById('fuel-purity').style.color=fuelPurity<60?'#e74c3c':fuelPurity<80?'#d4a03c':'#3a6a7a';
+  // Route cost
+  if(navRoute.length>1){
+    let totalDist=0;for(let i=1;i<navRoute.length;i++){const a=navWaypoints[navRoute[i-1]],b=navWaypoints[navRoute[i]];totalDist+=Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2)*40}
+    const cost=totalDist*2.3;const after=hudFuel-cost;
+    document.getElementById('fuel-route-cost').innerHTML=`Cost: ${cost.toFixed(0)}% · After: <span style="color:${after<0?'#e74c3c':'#2ecc71'}">${after.toFixed(0)}%</span>`;
+  } else document.getElementById('fuel-route-cost').textContent='No route plotted';
+  // Budget
+  const total=fuelTransit+fuelManeuver+fuelWarp+.001;
+  document.getElementById('fuel-budget').innerHTML=`Transit: ${(fuelTransit/total*100).toFixed(0)}% · Maneuver: ${(fuelManeuver/total*100).toFixed(0)}% · Warp: ${(fuelWarp/total*100).toFixed(0)}%`;
+  // Log
+  document.getElementById('fuel-log-body').innerHTML=fuelLog.length?fuelLog.map(e=>`<div class="fuel-log-entry"><span style="color:#2a4a5a;margin-right:4px">[${e.time}]</span>${e.text}</div>`).join(''):'<div class="fuel-log-entry" style="font-style:italic;color:#2a4a5a">No events</div>';
+  // Draw canvases
+  drawFuelGraph();drawFuelQuality();drawFuelTP();
+}
+
+function drawFuelGraph(){
+  const cv=document.getElementById('fuel-graph-cv');if(!cv)return;
+  const w=cv.width=cv.offsetWidth*2||600,h=cv.height=cv.offsetHeight*2||120;
+  const cx=cv.getContext('2d');
+  cx.fillStyle='rgba(4,8,12,.3)';cx.fillRect(0,0,w,h);
+  cx.strokeStyle='rgba(94,196,212,.04)';cx.lineWidth=.5;
+  for(let y=0;y<h;y+=h/5){cx.beginPath();cx.moveTo(0,y);cx.lineTo(w,y);cx.stroke()}
+  const showN=Math.min(fuelHistory.length,fuelTimeWindow);
+  const data=fuelHistory.slice(-showN),burn=burnHistory.slice(-showN),thr=throttleHistory.slice(-showN);
+  if(data.length>1){
+    // Throttle (dim)
+    cx.strokeStyle='rgba(94,196,212,.08)';cx.lineWidth=1;cx.beginPath();
+    thr.forEach((v,i)=>{const x=i/(showN-1)*w,y=h-v/100*h;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});cx.stroke();
+    // Burn rate (amber)
+    cx.strokeStyle='rgba(212,160,60,.4)';cx.lineWidth=1.5;cx.beginPath();
+    burn.forEach((v,i)=>{const x=i/(showN-1)*w,y=h-Math.min(v,1)*h;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});cx.stroke();
+    // Fuel level (cyan)
+    cx.strokeStyle='rgba(46,204,113,.6)';cx.lineWidth=2;cx.beginPath();
+    data.forEach((v,i)=>{const x=i/(showN-1)*w,y=h-(v/100)*h;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});cx.stroke();
+    // Glow
+    cx.strokeStyle='rgba(46,204,113,.1)';cx.lineWidth=5;cx.beginPath();
+    data.forEach((v,i)=>{const x=i/(showN-1)*w,y=h-(v/100)*h;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});cx.stroke();
+  }
+  // Legend
+  cx.fillStyle='rgba(46,204,113,.3)';cx.font=`${Math.max(9,w*.015)}px 'Courier New'`;cx.fillText('Fuel',4,12);
+  cx.fillStyle='rgba(212,160,60,.3)';cx.fillText('Burn',40,12);
+  cx.fillStyle='rgba(94,196,212,.15)';cx.fillText('Throttle',80,12);
+}
+
+function drawFuelQuality(){
+  const cv=document.getElementById('fuel-quality-cv');if(!cv)return;
+  const w=cv.width=cv.offsetWidth*2||300,h=cv.height=cv.offsetHeight*2||50;
+  const cx=cv.getContext('2d');const n=performance.now()*.001;
+  cx.fillStyle='rgba(4,8,12,.3)';cx.fillRect(0,0,w,h);
+  // Spectrograph lines
+  const sharpness=fuelPurity/100;
+  for(let i=0;i<12;i++){
+    const x=w*.08+i*(w*.07);
+    const lineH=(.3+Math.random()*.4*sharpness)*h;
+    const hue=200+i*12;
+    cx.fillStyle=`hsla(${hue},60%,50%,${.1+sharpness*.3})`;
+    cx.fillRect(x,h/2-lineH/2,2+sharpness*2,lineH);
+    // Noise (impurity)
+    if(fuelPurity<80){
+      for(let j=0;j<3;j++){
+        cx.fillStyle=`rgba(231,76,60,${(.8-sharpness)*.15})`;
+        cx.fillRect(x+Math.random()*10-5,Math.random()*h,1,2);
+      }
+    }
+  }
+}
+
+function drawFuelTP(){
+  const cv=document.getElementById('fuel-tp-cv');if(!cv)return;
+  const w=cv.width=cv.offsetWidth*2||300,h=cv.height=cv.offsetHeight*2||50;
+  const cx=cv.getContext('2d');
+  cx.fillStyle='rgba(4,8,12,.3)';cx.fillRect(0,0,w,h);
+  // Axes
+  cx.strokeStyle='rgba(94,196,212,.08)';cx.lineWidth=1;
+  cx.beginPath();cx.moveTo(20,h-10);cx.lineTo(w-10,h-10);cx.moveTo(20,h-10);cx.lineTo(20,10);cx.stroke();
+  cx.fillStyle='rgba(94,196,212,.15)';cx.font=`${Math.max(8,w*.015)}px 'Courier New'`;
+  cx.fillText('T',w-15,h-2);cx.fillText('P',12,12);
+  // Optimal zone
+  cx.fillStyle='rgba(46,204,113,.06)';cx.fillRect(w*.3,h*.2,w*.4,h*.5);
+  cx.strokeStyle='rgba(46,204,113,.12)';cx.lineWidth=1;cx.strokeRect(w*.3,h*.2,w*.4,h*.5);
+  // Current point based on throttle & reactor
+  const temp=.2+throttle*.6;const press=.3+hudPress*.3;
+  const px=20+(w-30)*temp,py=h-10-(h-20)*press;
+  const inZone=temp>.3&&temp<.7&&press>.3&&press<.7;
+  cx.fillStyle=inZone?'rgba(46,204,113,.7)':temp>.7?'rgba(231,76,60,.7)':'rgba(212,160,60,.7)';
+  cx.beginPath();cx.arc(px,py,4,0,6.283);cx.fill();
+  cx.fillStyle=inZone?'rgba(46,204,113,.2)':temp>.7?'rgba(231,76,60,.2)':'rgba(212,160,60,.2)';
+  cx.beginPath();cx.arc(px,py,8,0,6.283);cx.fill();
+  const status=document.getElementById('fuel-tp-status');
+  if(temp>.7){status.textContent='⚠ High temp — volatile';status.style.color='#e74c3c'}
+  else if(temp<.3){status.textContent='Cold — thickened flow';status.style.color='#d4a03c'}
+  else{status.textContent='Optimal';status.style.color='#2ecc71'}
+}
+
+// Controls
+document.getElementById('fuel-close').addEventListener('click',()=>{
+  document.getElementById('fuel-screen').classList.remove('show');
+  document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='fuelg')b.classList.remove('active')});
+  if(engaged)clickSound();
+});
+document.getElementById('fuel-transfer').addEventListener('click',()=>{
+  if(fuelReserve<=0)return;
+  const amt=Math.min(10,fuelReserve);fuelReserve-=amt;hudFuel=Math.min(100,hudFuel+amt);
+  addFuelLog('Manual transfer: +'+amt.toFixed(1)+'% from reserve');
+  logComms('Engineering','Fuel transfer: '+amt.toFixed(1)+'% moved from reserve to primary.');
+  if(engaged)clickSound();
+});
+document.getElementById('fuel-filter').addEventListener('click',()=>{
+  const btn=document.getElementById('fuel-filter');
+  btn.textContent='Filtering…';btn.disabled=true;
+  addFuelLog('Filter cycle initiated');
+  setTimeout(()=>{fuelPurity=Math.min(100,fuelPurity+30);btn.textContent='✓ Filtered';btn.disabled=false;
+    setTimeout(()=>{btn.textContent='Run Filter Cycle'},2000);
+    addFuelLog('Filter complete — purity restored to '+Math.round(fuelPurity)+'%');
+    logComms('Engineering','Fuel filter cycle complete. Purity: '+Math.round(fuelPurity)+'%.');
+  },3000);
+  if(engaged)clickSound();
+});
+document.getElementById('fuel-eco-toggle').addEventListener('click',()=>{
+  fuelEcoMode=!fuelEcoMode;
+  document.getElementById('fuel-eco-toggle').textContent='Eco Throttle: '+(fuelEcoMode?'ON':'OFF');
+  document.getElementById('fuel-eco-toggle').classList.toggle('active',fuelEcoMode);
+  addFuelLog('Eco throttle '+(fuelEcoMode?'engaged':'disengaged'));
+  if(engaged)clickSound();
+});
+document.getElementById('fuel-jettison').addEventListener('click',()=>{
+  const btn=document.getElementById('fuel-jettison');
+  if(!fuelJettisonConfirm){fuelJettisonConfirm=true;btn.textContent='⚠ Confirm Jettison — Irreversible';
+    setTimeout(()=>{fuelJettisonConfirm=false;btn.textContent='⚠ Jettison Fuel'},5000);
+  } else {
+    const dumped=hudFuel*.3;hudFuel-=dumped;fuelJettisonConfirm=false;btn.textContent='⚠ Jettison Fuel';
+    addFuelLog('JETTISON: '+dumped.toFixed(1)+'% fuel dumped');
+    logComms('Engineering','⚠ Fuel jettison! '+dumped.toFixed(1)+'% dumped to reduce mass.');
+  }
+  if(engaged)clickSound();
+});
+document.querySelectorAll('.fuel-preset').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    fuelRationMode=btn.dataset.ration;
+    document.querySelectorAll('.fuel-preset').forEach(b=>b.classList.toggle('active',b.dataset.ration===fuelRationMode));
+    addFuelLog('Ration mode: '+fuelRationMode);
+    logComms('Engineering','Fuel rationing set to '+fuelRationMode+'.');
+    if(engaged)clickSound();
+  });
+});
+document.querySelectorAll('[data-ftw]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    fuelTimeWindow=parseInt(btn.dataset.ftw);
+    document.querySelectorAll('[data-ftw]').forEach(b=>b.classList.toggle('active',b===btn));
+    if(engaged)clickSound();
+  });
+});
+
+// Animate fuel screen
+function animFuelScreen(){
+  if(document.getElementById('fuel-screen').classList.contains('show'))renderFuelScreen();
+  requestAnimationFrame(animFuelScreen);
+}
+animFuelScreen();
 
 // === HAIL SYSTEM ===
 const hailPrompt=document.getElementById('hail-prompt');
