@@ -3965,14 +3965,14 @@ function drawReactorGauge(cx,w,h,val,n){
       cx.beginPath();cx.arc(g.x,cY,r*.35,0,6.283);cx.fill();
     }
     // Value
-    cx.fillStyle=g.color+'cc';cx.font=`bold ${Math.max(12,w*.024)}px 'Courier New'`;cx.textAlign='center';
+    cx.fillStyle=g.color+'cc';cx.font=`bold ${Math.max(11,Math.min(13,w*0.014))}px 'Courier New'`;cx.textAlign='center';
     cx.fillText(g.val.toFixed(0)+'%',g.x,cY+4);
     // Label
-    cx.fillStyle=g.color+'55';cx.font=`${Math.max(7,w*.014)}px 'Courier New'`;
+    cx.fillStyle=g.color+'55';cx.font=`${Math.max(7,Math.min(9,w*0.008))}px 'Courier New'`;
     cx.fillText(g.label,g.x,cY+r+14);
   });
   // Overall output label
-  cx.fillStyle='rgba(94,196,212,.2)';cx.font=`${Math.max(8,w*.016)}px 'Courier New'`;
+  cx.fillStyle='rgba(94,196,212,.2)';cx.font=`${Math.max(7,Math.min(10,w*0.01))}px 'Courier New'`;
   cx.fillText('OUTPUT: '+val.toFixed(0)+'%',w/2,12);
   cx.textAlign='start';
 }
@@ -4016,7 +4016,7 @@ function drawCoolantThermo(cx,w,h,val,data,n){
     data.forEach((v,i)=>{const x=gx+i/(data.length-1)*gw,y=10+gh-(v/100)*gh;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});cx.stroke();
   }
   // Value
-  cx.fillStyle='rgba(212,160,60,.6)';cx.font=`${Math.max(11,w*.022)}px 'Courier New'`;
+  cx.fillStyle='rgba(212,160,60,.6)';cx.font=`${Math.max(10,Math.min(11,w*0.013))}px 'Courier New'`;
   cx.fillText(val.toFixed(0)+' kPa',gx,h-2);
 }
 
@@ -4155,7 +4155,7 @@ function drawHullSilhouette(cx,w,h,val,n){
   cx.beginPath();cx.moveTo(cX+.12*scale,cY-.3*scale);cx.lineTo(cX+.12*scale,cY+.04*scale);cx.stroke();// stbd frame
 
   // Labels
-  cx.fillStyle='rgba(94,196,212,.2)';cx.font=`${Math.max(8,w*.016)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillStyle='rgba(94,196,212,.2)';cx.font=`${Math.max(7,Math.min(10,w*0.01))}px 'Courier New'`;cx.textAlign='center';
   cx.fillText('FWD',cX,cY-.46*scale);
   cx.fillText('AFT',cX,cY+.16*scale);
   cx.textAlign='start';
@@ -4164,7 +4164,7 @@ function drawHullSilhouette(cx,w,h,val,n){
 
   // Integrity readout on ship
   const intColor=val>90?'rgba(46,204,113,':'rgba(212,160,60,';
-  cx.fillStyle=intColor+'.5)';cx.font=`bold ${Math.max(12,w*.024)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillStyle=intColor+'.5)';cx.font=`bold ${Math.max(11,Math.min(13,w*0.014))}px 'Courier New'`;cx.textAlign='center';
   cx.fillText(val.toFixed(0)+'%',cX,cY+.22*scale);
   cx.textAlign='start';
 
@@ -4187,9 +4187,9 @@ function drawHullSilhouette(cx,w,h,val,n){
   ];
   rows.forEach((r2,i)=>{
     const ry=8+i*14;
-    cx.fillStyle='rgba(94,196,212,.1)';cx.font=`${Math.max(8,w*.014)}px 'Courier New'`;cx.textAlign='start';
+    cx.fillStyle='rgba(94,196,212,.1)';cx.font=`${Math.max(7,Math.min(10,w*0.008))}px 'Courier New'`;cx.textAlign='start';
     cx.fillText(r2.label,rx,ry);
-    cx.fillStyle=r2.color;cx.font=`${Math.max(9,w*.017)}px 'Courier New'`;cx.textAlign='end';
+    cx.fillStyle=r2.color;cx.font=`${Math.max(8,Math.min(11,w*0.01))}px 'Courier New'`;cx.textAlign='end';
     cx.fillText(r2.val,rx+rw,ry);cx.textAlign='start';
     cx.strokeStyle='rgba(94,196,212,.03)';cx.lineWidth=.5;
     cx.beginPath();cx.moveTo(rx,ry+4);cx.lineTo(rx+rw,ry+4);cx.stroke();
@@ -4233,7 +4233,7 @@ function drawShieldRadial(cx,w,h,val,n){
     cx.beginPath();cx.ellipse(cX,cY,rX*pulse,rY*pulse,0,s.start,s.end);cx.stroke();
     // Label with value
     cx.fillStyle=`rgba(${s.color},${.35+(s.val/100)*.3})`;
-    cx.font=`${Math.max(8,w*.015)}px 'Courier New'`;cx.textAlign='center';
+    cx.font=`${Math.max(7,Math.min(10,w*0.009))}px 'Courier New'`;cx.textAlign='center';
     cx.fillText(s.label+' '+s.val.toFixed(0)+'%',s.lx,s.ly);
   });
   // Ship silhouette at center
@@ -4270,7 +4270,7 @@ function drawShieldRadial(cx,w,h,val,n){
     }
   }
   // Overall value
-  cx.fillStyle='rgba(94,196,212,.5)';cx.font=`bold ${Math.max(13,w*.026)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillStyle='rgba(94,196,212,.5)';cx.font=`bold ${Math.max(12,Math.min(13,w*0.016))}px 'Courier New'`;cx.textAlign='center';
   cx.fillText(val.toFixed(0)+'%',cX,cY+3);
   cx.textAlign='start';
 }
@@ -4298,7 +4298,7 @@ function drawLifeSupportBars(cx,w,h,val,n){
     grad.addColorStop(0,b.color+'.3)');grad.addColorStop(1,b.color+'.1)');
     cx.fillStyle=grad;cx.fillRect(b.x+1,topY+barH-fillH,barW-2,fillH);
     // Label
-    cx.fillStyle=b.color+'.5)';cx.font=`${Math.max(9,w*.018)}px 'Courier New'`;cx.textAlign='center';
+    cx.fillStyle=b.color+'.5)';cx.font=`${Math.max(8,Math.min(11,w*0.011))}px 'Courier New'`;cx.textAlign='center';
     cx.fillText(b.label,b.x+barW/2,h-1);
     // Value
     cx.fillText(Math.round(b.val)+'%',b.x+barW/2,topY+barH-fillH-3);
@@ -4328,7 +4328,7 @@ function drawTachometer(cx,w,h,val,n,label){
     cx.lineTo(cX+Math.cos(a)*(r+2),cY+Math.sin(a)*(r+2));cx.stroke();
     // Number labels on major ticks
     if(i%2===0){
-      cx.fillStyle='rgba(94,196,212,.12)';cx.font=`${Math.max(7,w*.013)}px 'Courier New'`;cx.textAlign='center';
+      cx.fillStyle='rgba(94,196,212,.12)';cx.font=`${Math.max(7,Math.min(9,w*0.008))}px 'Courier New'`;cx.textAlign='center';
       cx.fillText(i*10,cX+Math.cos(a)*(r+10),cY+Math.sin(a)*(r+10)+3);
     }
   }
@@ -4340,9 +4340,6 @@ function drawTachometer(cx,w,h,val,n,label){
   cx.beginPath();cx.moveTo(cX,cY);cx.lineTo(cX+Math.cos(actualA)*(r-3),cY+Math.sin(actualA)*(r-3));cx.stroke();
   // Center dot
   cx.fillStyle='rgba(94,196,212,.4)';cx.beginPath();cx.arc(cX,cY,3,0,6.283);cx.fill();
-  // Label
-  cx.fillStyle='rgba(94,196,212,.25)';cx.font=`${Math.max(8,w*.016)}px 'Courier New'`;cx.textAlign='center';
-  cx.fillText(label+' THRUSTER',cX,16);
   // Right-side readout panel
   const rx=w*.62,rw=w*.34;
   cx.textAlign='start';
@@ -4355,9 +4352,9 @@ function drawTachometer(cx,w,h,val,n,label){
   ];
   rows.forEach((r2,i)=>{
     const ry=14+i*18;
-    cx.fillStyle='rgba(94,196,212,.1)';cx.font=`${Math.max(8,w*.015)}px 'Courier New'`;
+    cx.fillStyle='rgba(94,196,212,.1)';cx.font=`${Math.max(7,Math.min(10,w*0.009))}px 'Courier New'`;
     cx.fillText(r2.label,rx,ry);
-    cx.fillStyle=r2.color;cx.font=`${Math.max(10,w*.019)}px 'Courier New'`;cx.textAlign='end';
+    cx.fillStyle=r2.color;cx.font=`${Math.max(9,Math.min(11,w*0.011))}px 'Courier New'`;cx.textAlign='end';
     cx.fillText(r2.val,rx+rw,ry);cx.textAlign='start';
     // Separator
     cx.strokeStyle='rgba(94,196,212,.03)';cx.lineWidth=.5;
@@ -4395,7 +4392,7 @@ function drawMultiLineHistory(cx,w,h,channels){
   cx.strokeStyle='rgba(94,196,212,.04)';cx.lineWidth=.5;
   for(let y=0;y<h;y+=15){cx.beginPath();cx.moveTo(0,y);cx.lineTo(w,y);cx.stroke()}
   // Y-axis labels
-  cx.fillStyle='rgba(94,196,212,.12)';cx.font=`${Math.max(8,w*.016)}px 'Courier New'`;
+  cx.fillStyle='rgba(94,196,212,.12)';cx.font=`${Math.max(7,Math.min(10,w*0.01))}px 'Courier New'`;
   cx.fillText('100',2,10);cx.fillText('50',2,h/2+4);cx.fillText('0',2,h-2);
   // Draw each channel
   channels.forEach((ch,ci)=>{
@@ -4414,12 +4411,12 @@ function drawMultiLineHistory(cx,w,h,channels){
     const lastV=ch.data[ch.data.length-1];const lastY=h-(Math.max(0,Math.min(100,lastV))/100)*h;
     cx.fillStyle=ch.color+'.8)';cx.beginPath();cx.arc(w-2,lastY,3,0,6.283);cx.fill();
     // Value at end
-    cx.fillStyle=ch.color+'.6)';cx.font=`${Math.max(9,w*.018)}px 'Courier New'`;
+    cx.fillStyle=ch.color+'.6)';cx.font=`${Math.max(8,Math.min(11,w*0.011))}px 'Courier New'`;
     const yOff=ci*12-((channels.length-1)*6);
     cx.fillText(lastV.toFixed(0)+'%',w-36,lastY+yOff);
   });
   // Legend
-  cx.font=`${Math.max(9,w*.018)}px 'Courier New'`;
+  cx.font=`${Math.max(8,Math.min(11,w*0.011))}px 'Courier New'`;
   let lx=gx+4;
   channels.forEach(ch=>{
     cx.fillStyle=ch.color+'.5)';cx.fillText('■ '+ch.label,lx,12);
@@ -4443,7 +4440,7 @@ function drawFallbackGraph(cx,w,h,data,color,amber,red){
   cx.strokeStyle='rgba(94,196,212,.04)';cx.lineWidth=.5;
   for(let y=0;y<h;y+=15){cx.beginPath();cx.moveTo(0,y);cx.lineTo(w,y);cx.stroke()}
   // Y-axis labels
-  cx.fillStyle='rgba(94,196,212,.12)';cx.font=`${Math.max(8,w*.016)}px 'Courier New'`;
+  cx.fillStyle='rgba(94,196,212,.12)';cx.font=`${Math.max(7,Math.min(10,w*0.01))}px 'Courier New'`;
   cx.fillText('100',2,10);cx.fillText('50',2,h/2+4);cx.fillText('0',2,h-2);
   const amberY=h-(amber/100)*h,redY=h-(red/100)*h;
   cx.strokeStyle='rgba(212,160,60,.15)';cx.setLineDash([3,3]);cx.beginPath();cx.moveTo(20,amberY);cx.lineTo(w,amberY);cx.stroke();
@@ -4465,7 +4462,7 @@ function drawFallbackGraph(cx,w,h,data,color,amber,red){
     // Current value at end
     const lastV=data[data.length-1];const lastY=h-(Math.max(0,Math.min(100,lastV))/100)*h;
     cx.fillStyle=color+'cc';cx.beginPath();cx.arc(w-2,lastY,3,0,6.283);cx.fill();
-    cx.fillStyle=color+'80';cx.font=`${Math.max(10,w*.02)}px 'Courier New'`;
+    cx.fillStyle=color+'80';cx.font=`${Math.max(9,Math.min(11,w*0.012))}px 'Courier New'`;
     cx.fillText(lastV.toFixed(1),w-40,lastY-6);
   }
 }
