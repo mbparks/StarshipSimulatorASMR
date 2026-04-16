@@ -520,7 +520,7 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .db-obj-btn:hover{border-color:#5ec4d4;background:rgba(94,196,212,.06)}
 
 /* Engineering */
-.eng-graph{width:100%;height:60px;border:1px solid rgba(94,196,212,.08);border-radius:2px;margin:4px 0;background:rgba(4,8,12,.5);cursor:pointer}
+.eng-graph{width:100%;height:110px;border:1px solid rgba(94,196,212,.08);border-radius:2px;margin:4px 0;background:rgba(4,8,12,.5);cursor:pointer}
 .eng-section{margin-bottom:12px;border:1px solid rgba(94,196,212,.06);border-radius:3px;padding:8px 10px;transition:border-color .3s}
 .eng-section:hover{border-color:rgba(94,196,212,.12)}
 .eng-section.degraded{border-color:rgba(212,160,60,.2)}
@@ -534,6 +534,11 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .eng-sm-btn.warn-btn{border-color:rgba(212,160,60,.2);color:#d4a03c}
 .eng-sm-btn.warn-btn:hover{border-color:#d4a03c;background:rgba(212,160,60,.05)}
 .eng-time-btns{display:flex;gap:3px;margin-bottom:4px}
+.eng-view-tabs{display:flex;gap:0;margin-bottom:4px}
+.eng-view-tab{flex:1;background:none;border:1px solid rgba(94,196,212,.1);color:#2a4a5a;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:3px 6px;cursor:pointer;transition:all .15s;letter-spacing:1px;text-align:center}
+.eng-view-tab:first-child{border-radius:2px 0 0 2px}
+.eng-view-tab:last-child{border-radius:0 2px 2px 0}
+.eng-view-tab.active{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.06)}
 .eng-time-btn{background:none;border:1px solid rgba(94,196,212,.1);color:#2a4a5a;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:2px 7px;cursor:pointer;border-radius:2px;transition:all .15s}
 .eng-time-btn.active{border-color:#5ec4d4;color:#5ec4d4}
 .eng-tuning{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:clamp(8px,.7vw,10px);color:#2a4a5a}
@@ -3699,32 +3704,32 @@ function renderObjectives(){
 
 // === ENGINEERING ===
 const engSystems=[
-  {id:'reactor',label:'Reactor Core',color:'#5ec4d4',data:[],val:()=>98+Math.random()*2,unit:'%',
-   tuning:.5,alertAmber:70,alertRed:50,expanded:false,restarting:false,bypassed:false,
+  {id:'reactor',label:'Reactor Core',color:'#5ec4d4',data:[],plasmaData:[],containData:[],fluxData:[],val:()=>98+Math.random()*2,unit:'%',
+   tuning:.5,alertAmber:70,alertRed:50,viewMode:"live",expanded:false,restarting:false,bypassed:false,
    bypassInfo:'Route through auxiliary fusion cell — 60% capacity',
    components:['Plasma Injector','Containment Field','Magnetic Coils','Fuel Rod Assembly','Heat Exchanger','Control Matrix','Neutron Moderator','Emergency Shutoff']},
   {id:'coolant',label:'Coolant Loop',color:'#d4a03c',data:[],val:()=>hudPress*70+Math.random()*10,unit:'kPa',
-   tuning:.5,alertAmber:70,alertRed:50,expanded:false,restarting:false,bypassed:false,
+   tuning:.5,alertAmber:70,alertRed:50,viewMode:"live",expanded:false,restarting:false,bypassed:false,
    bypassInfo:'Bypass through secondary coolant manifold — reduced flow rate',
    components:['Primary Pump','Pressure Regulator','Flow Sensor','Heat Sink Array','Expansion Valve','Coolant Filter','Loop Seal','Temperature Probe']},
   {id:'hull',label:'Hull Integrity',color:'#2ecc71',data:[],val:()=>97+Math.random()*3,unit:'%',
-   tuning:.5,alertAmber:80,alertRed:60,expanded:false,restarting:false,bypassed:false,
+   tuning:.5,alertAmber:80,alertRed:60,viewMode:"live",expanded:false,restarting:false,bypassed:false,
    bypassInfo:'Reinforce with emergency hull plating — temporary patch',
    components:['Outer Plating','Inner Bulkhead','Pressure Seal','Stress Sensor','Micro-fracture Grid','Thermal Insulation','Radiation Shield','Emergency Patch Kit']},
-  {id:'shields',label:'Shield Emitters',color:'#5ec4d4',data:[],val:()=>shieldsVal+Math.random()*2,unit:'%',
-   tuning:.5,alertAmber:70,alertRed:50,expanded:false,restarting:false,bypassed:false,
+  {id:'shields',label:'Shield Emitters',color:'#5ec4d4',data:[],fwdData:[],portData:[],stbdData:[],aftData:[],val:()=>shieldsVal+Math.random()*2,unit:'%',
+   tuning:.5,alertAmber:70,alertRed:50,viewMode:"live",expanded:false,restarting:false,bypassed:false,
    bypassInfo:'Route through weapons emitters — 40% capacity, weapons offline',
    components:['Forward Emitter','Port Emitter','Starboard Emitter','Aft Emitter','Power Coupler','Frequency Generator','Field Stabilizer','Backup Capacitor']},
-  {id:'lifesup',label:'Life Support',color:'#2ecc71',data:[],val:()=>o2Val+Math.random()*2,unit:'%',
-   tuning:.5,alertAmber:70,alertRed:50,expanded:false,restarting:false,bypassed:false,
+  {id:'lifesup',label:'Life Support',color:'#2ecc71',data:[],co2Data:[],humData:[],val:()=>o2Val+Math.random()*2,unit:'%',
+   tuning:.5,alertAmber:70,alertRed:50,viewMode:"live",expanded:false,restarting:false,bypassed:false,
    bypassInfo:'Borrow from atmospheric processors — 75% capacity',
    components:['O₂ Generator','CO₂ Scrubber','Humidity Control','Air Circulator','Water Recycler','Temp Regulator','Pressure Equalizer','Backup O₂ Tank']},
   {id:'port_thruster',label:'Port Thruster',color:'#5ec4d4',data:[],val:()=>96+Math.random()*4,unit:'%',
-   tuning:.5,alertAmber:70,alertRed:50,expanded:false,restarting:false,bypassed:false,
+   tuning:.5,alertAmber:70,alertRed:50,viewMode:"live",expanded:false,restarting:false,bypassed:false,
    bypassInfo:'Reroute through RCS maneuvering jets — 50% thrust, limited gimbal',
    components:['Fuel Injector','Ignition Chamber','Nozzle Assembly','Gimbal Actuator','Thrust Vector Control','Fuel Line','Temperature Sensor','Emergency Cutoff']},
   {id:'stbd_thruster',label:'Starboard Thruster',color:'#d4a03c',data:[],val:()=>80+Math.random()*10,unit:'%',
-   tuning:.5,alertAmber:70,alertRed:50,expanded:false,restarting:false,bypassed:false,
+   tuning:.5,alertAmber:70,alertRed:50,viewMode:"live",expanded:false,restarting:false,bypassed:false,
    bypassInfo:'Compensate via port thruster differential — reduced maneuverability',
    components:['Fuel Injector','Ignition Chamber','Nozzle Assembly','Gimbal Actuator','Thrust Vector Control','Fuel Line','Temperature Sensor','Emergency Cutoff']},
 ];
@@ -3739,7 +3744,38 @@ setInterval(()=>{
     if(s.restarting)v=0;
     if(s.bypassed)v=v*.6;
     s.data.push(v);
-    if(s.data.length>300)s.data.shift();// keep 5 min at 1/sec
+    if(s.data.length>300)s.data.shift();
+    // Track additional life support channels
+    if(s.id==='lifesup'){
+      const n=performance.now()*.001;
+      s.co2Data.push(100-o2Val*.95+Math.sin(n)*.5);
+      s.humData.push(45+Math.sin(n*.3)*5+Math.random()*2);
+      if(s.co2Data.length>300)s.co2Data.shift();
+      if(s.humData.length>300)s.humData.shift();
+    }
+    // Track reactor subsystems
+    if(s.id==='reactor'){
+      const n=performance.now()*.001;
+      const base=v;
+      s.plasmaData.push(Math.max(0,Math.min(100,base*.95+Math.sin(n*.7)*3+Math.random()*2)));
+      s.containData.push(Math.max(0,Math.min(100,base*1.02+Math.sin(n*.5)*2-Math.random()*1.5)));
+      s.fluxData.push(Math.max(0,Math.min(100,base*.9+Math.sin(n*1.1)*4+Math.random()*3)));
+      if(s.plasmaData.length>300)s.plasmaData.shift();
+      if(s.containData.length>300)s.containData.shift();
+      if(s.fluxData.length>300)s.fluxData.shift();
+    }
+    // Track shield emitter sectors
+    if(s.id==='shields'){
+      const n=performance.now()*.001;
+      s.fwdData.push(Math.max(0,Math.min(100,v*1.0+Math.sin(n*.4)*2)));
+      s.portData.push(Math.max(0,Math.min(100,v*.95+Math.sin(n*.6)*3)));
+      s.stbdData.push(Math.max(0,Math.min(100,v*.92+Math.sin(n*.8)*2.5)));
+      s.aftData.push(Math.max(0,Math.min(100,v*.88+Math.sin(n*.3)*3.5)));
+      if(s.fwdData.length>300)s.fwdData.shift();
+      if(s.portData.length>300)s.portData.shift();
+      if(s.stbdData.length>300)s.stbdData.shift();
+      if(s.aftData.length>300)s.aftData.shift();
+    }
   });
 },1000);
 
@@ -3775,12 +3811,16 @@ function renderEngineering(){
           ${isDegraded||isCritical?`<button class="eng-sm-btn warn-btn" data-action="bypass" data-idx="${si}">${s.bypassed?'✕ End Bypass':'⤮ Bypass'}</button>`:''}
         </div>
       </div>
-      <div class="eng-time-btns">
+      <div class="eng-view-tabs">
+        <button class="eng-view-tab ${s.viewMode==='live'?'active':''}" data-view="live" data-vidx="${si}">Live</button>
+        <button class="eng-view-tab ${s.viewMode==='history'?'active':''}" data-view="history" data-vidx="${si}">History</button>
+      </div>
+      ${s.viewMode==='history'?`<div class="eng-time-btns">
         <button class="eng-time-btn ${engTimeWindow===30?'active':''}" data-tw="30">30s</button>
         <button class="eng-time-btn ${engTimeWindow===60?'active':''}" data-tw="60">1m</button>
         <button class="eng-time-btn ${engTimeWindow===300?'active':''}" data-tw="300">5m</button>
-      </div>
-      <canvas class="eng-graph" id="eng-cv-${s.id}" width="500" height="60"></canvas>
+      </div>`:''}
+      <canvas class="eng-graph" id="eng-cv-${s.id}" width="500" height="110"></canvas>
       <div class="eng-tuning">
         <span class="et-label long">Longevity</span>
         <input type="range" min="0" max="100" value="${s.tuning*100}" data-tune="${si}">
@@ -3807,6 +3847,13 @@ function renderEngineering(){
   });
 
   // Attach all event handlers
+  el.querySelectorAll('[data-view]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const idx=parseInt(btn.dataset.vidx);
+      engSystems[idx].viewMode=btn.dataset.view;
+      renderEngineering();if(engaged)clickSound();
+    });
+  });
   el.querySelectorAll('[data-action]').forEach(btn=>{
     btn.addEventListener('click',()=>{
       const idx=parseInt(btn.dataset.idx);
@@ -3854,25 +3901,572 @@ function drawEngGraph(id,data,color,amber,red){
   const cv=document.getElementById('eng-cv-'+id);
   if(!cv)return;
   const cx=cv.getContext('2d');
-  cv.width=cv.offsetWidth||500;cv.height=60;
+  cv.width=cv.offsetWidth||500;cv.height=110;
   cx.fillStyle='rgba(4,8,12,.3)';cx.fillRect(0,0,cv.width,cv.height);
+  const val=data.length?data[data.length-1]:0;
+  const n=performance.now()*.001;
+  const sys=engSystems.find(s=>s.id===id);
+  const mode=sys?sys.viewMode:'live';
+
+  if(mode==='history'){
+    if(id==='lifesup') drawLifeSupportHistory(cx,cv.width,cv.height,data,sys);
+    else if(id==='reactor') drawReactorHistory(cx,cv.width,cv.height,data,sys);
+    else if(id==='shields') drawShieldHistory(cx,cv.width,cv.height,data,sys);
+    else drawFallbackGraph(cx,cv.width,cv.height,data,color,amber,red);
+    return;
+  }
+
+  if(id==='reactor') drawReactorGauge(cx,cv.width,cv.height,val,n);
+  else if(id==='coolant') drawCoolantThermo(cx,cv.width,cv.height,val,data,n);
+  else if(id==='hull') drawHullSilhouette(cx,cv.width,cv.height,val,n);
+  else if(id==='shields') drawShieldRadial(cx,cv.width,cv.height,val,n);
+  else if(id==='lifesup') drawLifeSupportBars(cx,cv.width,cv.height,val,n);
+  else if(id==='port_thruster') drawTachometer(cx,cv.width,cv.height,val,n,'PORT');
+  else if(id==='stbd_thruster') drawTachometer(cx,cv.width,cv.height,val,n,'STBD');
+  else drawFallbackGraph(cx,cv.width,cv.height,data,color,amber,red);
+}
+
+// REACTOR — Triple arc gauge
+function drawReactorGauge(cx,w,h,val,n){
+  const sys=engSystems.find(s=>s.id==='reactor');
+  const plasma=sys&&sys.plasmaData.length?sys.plasmaData[sys.plasmaData.length-1]:val*.95;
+  const contain=sys&&sys.containData.length?sys.containData[sys.containData.length-1]:val*1.02;
+  const flux=sys&&sys.fluxData.length?sys.fluxData[sys.fluxData.length-1]:val*.9;
+  const gauges=[
+    {label:'PLASMA',val:plasma,color:'#e74c3c',x:w*.17},
+    {label:'CONTAIN',val:contain,color:'#5ec4d4',x:w*.5},
+    {label:'MAG FLUX',val:flux,color:'#d4a03c',x:w*.83},
+  ];
+  const r=h*.32,startA=Math.PI*.75,endA=Math.PI*2.25;
+  gauges.forEach(g=>{
+    const cY=h*.5;
+    const valA=startA+(endA-startA)*(Math.min(100,g.val)/100);
+    // Background arc
+    cx.strokeStyle='rgba(94,196,212,.06)';cx.lineWidth=5;
+    cx.beginPath();cx.arc(g.x,cY,r,startA,endA);cx.stroke();
+    // Value arc
+    cx.strokeStyle=g.color+'90';cx.lineWidth=5;
+    cx.beginPath();cx.arc(g.x,cY,r,startA,valA);cx.stroke();
+    // Glow
+    cx.strokeStyle=g.color+'18';cx.lineWidth=12;
+    cx.beginPath();cx.arc(g.x,cY,r,startA,valA);cx.stroke();
+    // Ticks
+    cx.strokeStyle='rgba(94,196,212,.1)';cx.lineWidth=.5;
+    for(let i=0;i<=8;i++){
+      const a=startA+(endA-startA)*(i/8);
+      cx.beginPath();cx.moveTo(g.x+Math.cos(a)*(r+3),cY+Math.sin(a)*(r+3));
+      cx.lineTo(g.x+Math.cos(a)*(r+6),cY+Math.sin(a)*(r+6));cx.stroke();
+    }
+    // Pulse at high output
+    if(g.val>85){
+      const pulse=.06+Math.sin(n*4+g.x)*.03;
+      const pc=g.label==='PLASMA'?'231,76,60':g.label==='CONTAIN'?'94,196,212':'212,160,60';
+      cx.fillStyle=`rgba(${pc},${pulse})`;
+      cx.beginPath();cx.arc(g.x,cY,r*.35,0,6.283);cx.fill();
+    }
+    // Value
+    cx.fillStyle=g.color+'cc';cx.font=`bold ${Math.max(12,w*.024)}px 'Courier New'`;cx.textAlign='center';
+    cx.fillText(g.val.toFixed(0)+'%',g.x,cY+4);
+    // Label
+    cx.fillStyle=g.color+'55';cx.font=`${Math.max(7,w*.014)}px 'Courier New'`;
+    cx.fillText(g.label,g.x,cY+r+14);
+  });
+  // Overall output label
+  cx.fillStyle='rgba(94,196,212,.2)';cx.font=`${Math.max(8,w*.016)}px 'Courier New'`;
+  cx.fillText('OUTPUT: '+val.toFixed(0)+'%',w/2,12);
+  cx.textAlign='start';
+}
+
+// COOLANT — Vertical thermometer
+function drawCoolantThermo(cx,w,h,val,data,n){
+  const tubeW=18,tubeH=h-16,tubeX=w*.05,tubeY=8;
+  const fillH=(val/100)*tubeH;
+  const tempColor=val>80?'rgba(231,76,60,':'rgba(46,204,113,';
+  // Tube outline
+  cx.strokeStyle='rgba(94,196,212,.15)';cx.lineWidth=1;
+  cx.beginPath();cx.moveTo(tubeX+6,tubeY);cx.lineTo(tubeX+tubeW-6,tubeY);cx.arcTo(tubeX+tubeW,tubeY,tubeX+tubeW,tubeY+6,6);cx.lineTo(tubeX+tubeW,tubeY+tubeH-6);cx.arcTo(tubeX+tubeW,tubeY+tubeH,tubeX+tubeW-6,tubeY+tubeH,6);cx.lineTo(tubeX+6,tubeY+tubeH);cx.arcTo(tubeX,tubeY+tubeH,tubeX,tubeY+tubeH-6,6);cx.lineTo(tubeX,tubeY+6);cx.arcTo(tubeX,tubeY,tubeX+6,tubeY,6);cx.closePath();cx.stroke();
+  // Fill
+  const grad=cx.createLinearGradient(0,tubeY+tubeH,0,tubeY+tubeH-fillH);
+  grad.addColorStop(0,val>80?'rgba(231,76,60,.4)':val>50?'rgba(46,204,113,.3)':'rgba(94,196,212,.3)');
+  grad.addColorStop(1,val>80?'rgba(231,76,60,.15)':'rgba(94,196,212,.1)');
+  cx.fillStyle=grad;
+  cx.fillRect(tubeX+1,tubeY+tubeH-fillH,tubeW-2,fillH);
+  // Bubbles when pressure high
+  if(val>60){
+    for(let i=0;i<3;i++){
+      const bx=tubeX+4+Math.random()*(tubeW-8);
+      const by=tubeY+tubeH-Math.random()*fillH;
+      cx.fillStyle='rgba(94,196,212,.15)';cx.beginPath();cx.arc(bx,by,1+Math.random()*2,0,6.283);cx.fill();
+    }
+  }
+  // Bulb
+  cx.fillStyle=tempColor+'.3)';cx.beginPath();cx.arc(tubeX+tubeW/2,tubeY+tubeH+2,tubeW*.6,0,6.283);cx.fill();
+  // Scale marks
+  cx.strokeStyle='rgba(94,196,212,.1)';cx.lineWidth=.5;
+  for(let i=0;i<=5;i++){
+    const my=tubeY+tubeH-i/5*tubeH;
+    cx.beginPath();cx.moveTo(tubeX+tubeW+2,my);cx.lineTo(tubeX+tubeW+8,my);cx.stroke();
+  }
+  // Mini graph to the right
+  const gx=w*.15,gw=w*.82,gh=h-20;
+  cx.strokeStyle='rgba(94,196,212,.04)';cx.lineWidth=.5;
+  for(let y=0;y<gh;y+=gh/4){cx.beginPath();cx.moveTo(gx,10+y);cx.lineTo(gx+gw,10+y);cx.stroke()}
+  if(data.length>1){
+    cx.strokeStyle='rgba(212,160,60,.4)';cx.lineWidth=1.5;cx.beginPath();
+    data.forEach((v,i)=>{const x=gx+i/(data.length-1)*gw,y=10+gh-(v/100)*gh;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});cx.stroke();
+  }
+  // Value
+  cx.fillStyle='rgba(212,160,60,.6)';cx.font=`${Math.max(11,w*.022)}px 'Courier New'`;
+  cx.fillText(val.toFixed(0)+' kPa',gx,h-2);
+}
+
+// HULL — Ship silhouette with segments
+// Hull plate persistent state
+const hullPlates=[];
+let hullScanAngle=0,hullInited=false;
+function initHullPlates(){
+  if(hullInited)return;hullInited=true;
+  // Define 28 hull plates as a top-down ship shape
+  // Ship points: nose at top, widens at mid, nacelles, narrows at aft, engine block
+  const layout=[
+    // Nose section (row 0)
+    {x:-.04,y:-.42,w:.08,h:.08,zone:'bow',heat:0},
+    // Forward hull (row 1)
+    {x:-.1,y:-.34,w:.08,h:.07,zone:'fwd',heat:0},{x:-.02,y:-.34,w:.04,h:.07,zone:'fwd',heat:.02},{x:.02,y:-.34,w:.08,h:.07,zone:'fwd',heat:0},
+    // Forward-mid (row 2)
+    {x:-.14,y:-.27,w:.08,h:.07,zone:'fwd-mid',heat:.01},{x:-.06,y:-.27,w:.06,h:.07,zone:'fwd-mid',heat:.03},{x:.0,y:-.27,w:.06,h:.07,zone:'fwd-mid',heat:.03},{x:.06,y:-.27,w:.08,h:.07,zone:'fwd-mid',heat:.01},
+    // Mid section (row 3) — widest
+    {x:-.18,y:-.2,w:.07,h:.1,zone:'mid',heat:.02},{x:-.11,y:-.2,w:.06,h:.1,zone:'mid',heat:.04},{x:-.05,y:-.2,w:.05,h:.1,zone:'mid-core',heat:.05},{x:.0,y:-.2,w:.05,h:.1,zone:'mid-core',heat:.05},{x:.05,y:-.2,w:.06,h:.1,zone:'mid',heat:.04},{x:.11,y:-.2,w:.07,h:.1,zone:'mid',heat:.02},
+    // Aft-mid (row 4) — nacelle split
+    {x:-.2,y:-.1,w:.08,h:.08,zone:'nacelle-p',heat:.06},{x:-.12,y:-.1,w:.06,h:.08,zone:'aft-mid',heat:.05},{x:-.06,y:-.1,w:.06,h:.08,zone:'aft-mid',heat:.06},{x:.0,y:-.1,w:.06,h:.08,zone:'aft-mid',heat:.06},{x:.06,y:-.1,w:.06,h:.08,zone:'aft-mid',heat:.05},{x:.12,y:-.1,w:.08,h:.08,zone:'nacelle-s',heat:.06},
+    // Aft section (row 5)
+    {x:-.22,y:-.02,w:.08,h:.08,zone:'nacelle-p',heat:.1},{x:-.1,y:-.02,w:.1,h:.08,zone:'aft',heat:.08},{x:.0,y:-.02,w:.1,h:.08,zone:'aft',heat:.08},{x:.14,y:-.02,w:.08,h:.08,zone:'nacelle-s',heat:.1},
+    // Engine block (row 6)
+    {x:-.2,y:.06,w:.06,h:.06,zone:'engine-p',heat:.18},{x:-.06,y:.06,w:.12,h:.06,zone:'engine',heat:.15},{x:.14,y:.06,w:.06,h:.06,zone:'engine-s',heat:.18},
+  ];
+  layout.forEach((p,i)=>{
+    hullPlates.push({...p,integrity:98+Math.random()*2,flash:0,fractures:[],seed:Math.random()*100,impactCooldown:0});
+  });
+}
+
+function drawHullSilhouette(cx,w,h,val,n){
+  initHullPlates();
+  const cX=w*.35,cY=h*.48;
+  const scale=Math.min(w*.7,h*1.6);
+  hullScanAngle=(hullScanAngle+.008)%(Math.PI*2);
+
+  // Random micro-meteorite impact
+  if(Math.random()<.005){
+    const plate=hullPlates[Math.floor(Math.random()*hullPlates.length)];
+    plate.flash=1;plate.impactCooldown=60;
+    plate.integrity=Math.max(val*.85,plate.integrity-Math.random()*2);
+    if(plate.integrity<90&&plate.fractures.length<3)plate.fractures.push({dx:Math.random()-.5,dy:Math.random()-.5,len:.3+Math.random()*.5});
+  }
+
+  // Ship outline glow
+  cx.strokeStyle='rgba(94,196,212,.06)';cx.lineWidth=1;
+  cx.beginPath();
+  cx.moveTo(cX,cY-.45*scale);// nose
+  cx.lineTo(cX-.06*scale,cY-.35*scale);cx.lineTo(cX-.18*scale,cY-.22*scale);// port forward
+  cx.lineTo(cX-.24*scale,cY-.12*scale);cx.lineTo(cX-.24*scale,cY+.08*scale);// port nacelle
+  cx.lineTo(cX-.16*scale,cY+.13*scale);// port engine
+  cx.lineTo(cX-.08*scale,cY+.13*scale);cx.lineTo(cX-.08*scale,cY+.04*scale);// inner port
+  cx.lineTo(cX+.08*scale,cY+.04*scale);cx.lineTo(cX+.08*scale,cY+.13*scale);// inner stbd
+  cx.lineTo(cX+.16*scale,cY+.13*scale);// stbd engine
+  cx.lineTo(cX+.24*scale,cY+.08*scale);cx.lineTo(cX+.24*scale,cY-.12*scale);// stbd nacelle
+  cx.lineTo(cX+.18*scale,cY-.22*scale);cx.lineTo(cX+.06*scale,cY-.35*scale);// stbd forward
+  cx.closePath();cx.stroke();
+
+  // Draw hull plates
+  hullPlates.forEach((p,i)=>{
+    const px=cX+p.x*scale,py=cY+p.y*scale;
+    const pw=p.w*scale,ph=p.h*scale;
+
+    // Update plate integrity toward ship's overall val
+    p.integrity+=(val*(.92+p.heat*.8)-p.integrity)*.01;
+    p.integrity=Math.max(0,Math.min(100,p.integrity+Math.sin(n*.5+p.seed)*.1));
+
+    // Flash decay
+    if(p.flash>0)p.flash*=.92;
+    if(p.impactCooldown>0)p.impactCooldown--;
+
+    // Heat from engines adds ambient warmth
+    const effectiveVal=p.integrity-p.heat*15;
+
+    // Color based on integrity
+    let r2,g2,b2,alpha;
+    if(effectiveVal>92){r2=40;g2=160;b2=200;alpha=.15}// cool blue
+    else if(effectiveVal>80){r2=46;g2=204;b2=113;alpha=.2}// green
+    else if(effectiveVal>65){r2=212;g2=160;b2=60;alpha=.25}// amber
+    else{r2=231;g2=76;b2=60;alpha=.3}// red
+
+    // Plate fill
+    cx.fillStyle=`rgba(${r2},${g2},${b2},${alpha+p.heat*.15})`;
+    cx.fillRect(px,py,pw,ph);
+
+    // Flash overlay (micro-meteorite impact)
+    if(p.flash>.05){
+      cx.fillStyle=`rgba(255,255,255,${p.flash*.4})`;cx.fillRect(px,py,pw,ph);
+    }
+
+    // Plate border
+    cx.strokeStyle=`rgba(${r2},${g2},${b2},${alpha*.8+.05})`;cx.lineWidth=.5;
+    cx.strokeRect(px,py,pw,ph);
+
+    // Fracture lines on damaged plates
+    p.fractures.forEach(f=>{
+      cx.strokeStyle=`rgba(231,76,60,${.2+Math.sin(n*2+f.dx*10)*.1})`;cx.lineWidth=.8;
+      cx.beginPath();
+      cx.moveTo(px+pw*.5+f.dx*pw*.3,py+ph*.5+f.dy*ph*.3);
+      cx.lineTo(px+pw*.5+f.dx*pw*.3+f.len*pw*.4*(f.dx>.0?1:-1),py+ph*.5+f.dy*ph*.3+f.len*ph*.3);
+      cx.stroke();
+    });
+
+    // Engine glow for engine plates
+    if(p.zone.includes('engine')){
+      const eg=cx.createRadialGradient(px+pw/2,py+ph,0,px+pw/2,py+ph,pw*.8);
+      eg.addColorStop(0,`rgba(212,160,60,${.08+throttle*.06})`);eg.addColorStop(1,'transparent');
+      cx.fillStyle=eg;cx.beginPath();cx.arc(px+pw/2,py+ph,pw*.8,0,6.283);cx.fill();
+    }
+  });
+
+  // Scanning sweep line
+  const scanX=cX+Math.cos(hullScanAngle)*scale*.3;
+  const scanY1=cY-scale*.45,scanY2=cY+scale*.15;
+  const sweepX=cX-.25*scale+((hullScanAngle%(Math.PI*2))/(Math.PI*2))*.5*scale;
+  cx.strokeStyle='rgba(94,196,212,.15)';cx.lineWidth=1;
+  cx.beginPath();cx.moveTo(sweepX,scanY1);cx.lineTo(sweepX,scanY2);cx.stroke();
+  // Scan line trail
+  const trailGrad=cx.createLinearGradient(sweepX-20,0,sweepX,0);
+  trailGrad.addColorStop(0,'transparent');trailGrad.addColorStop(1,'rgba(94,196,212,.04)');
+  cx.fillStyle=trailGrad;cx.fillRect(sweepX-20,scanY1,20,scanY2-scanY1);
+
+  // Refresh plates near scan line
+  hullPlates.forEach(p=>{
+    const px=cX+p.x*scale;
+    if(Math.abs(px-sweepX)<10)p.flash=Math.max(p.flash,.08);
+  });
+
+  // Ship outline — sharper on top
+  cx.strokeStyle='rgba(94,196,212,.12)';cx.lineWidth=.5;
+  // Internal structure lines
+  cx.beginPath();cx.moveTo(cX,cY-.44*scale);cx.lineTo(cX,cY+.12*scale);cx.stroke();// centerline
+  cx.beginPath();cx.moveTo(cX-.12*scale,cY-.3*scale);cx.lineTo(cX-.12*scale,cY+.04*scale);cx.stroke();// port frame
+  cx.beginPath();cx.moveTo(cX+.12*scale,cY-.3*scale);cx.lineTo(cX+.12*scale,cY+.04*scale);cx.stroke();// stbd frame
+
+  // Labels
+  cx.fillStyle='rgba(94,196,212,.2)';cx.font=`${Math.max(8,w*.016)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillText('FWD',cX,cY-.46*scale);
+  cx.fillText('AFT',cX,cY+.16*scale);
+  cx.textAlign='start';
+  cx.fillText('P',cX-.27*scale,cY-.05*scale);
+  cx.fillText('S',cX+.24*scale,cY-.05*scale);
+
+  // Integrity readout on ship
+  const intColor=val>90?'rgba(46,204,113,':'rgba(212,160,60,';
+  cx.fillStyle=intColor+'.5)';cx.font=`bold ${Math.max(12,w*.024)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillText(val.toFixed(0)+'%',cX,cY+.22*scale);
+  cx.textAlign='start';
+
+  // Right-side readout panel
+  const nomPlates=hullPlates.filter(p=>p.integrity>90).length;
+  const stressedPlates=hullPlates.filter(p=>p.integrity<=90&&p.integrity>65).length;
+  const critPlates=hullPlates.filter(p=>p.integrity<=65).length;
+  const totalFractures=hullPlates.reduce((s,p)=>s+p.fractures.length,0);
+  const avgTemp=180+hullPlates.reduce((s,p)=>s+p.heat,0)/hullPlates.length*800;
+  const weakest=hullPlates.reduce((m,p)=>p.integrity<m.integrity?p:m,hullPlates[0]);
+  const rx=w*.62,rw=w*.34;
+  const rows=[
+    {label:'INTEGRITY',val:val.toFixed(1)+'%',color:val>90?'rgba(46,204,113,.5)':val>70?'rgba(212,160,60,.5)':'rgba(231,76,60,.5)'},
+    {label:'NOMINAL',val:nomPlates+'/'+hullPlates.length,color:'rgba(46,204,113,.4)'},
+    {label:'STRESSED',val:stressedPlates,color:stressedPlates>0?'rgba(212,160,60,.5)':'rgba(94,196,212,.25)'},
+    {label:'CRITICAL',val:critPlates,color:critPlates>0?'rgba(231,76,60,.5)':'rgba(94,196,212,.25)'},
+    {label:'FRACTURES',val:totalFractures,color:totalFractures>0?'rgba(231,76,60,.4)':'rgba(94,196,212,.25)'},
+    {label:'WEAKEST',val:weakest.integrity.toFixed(0)+'% ('+weakest.zone+')',color:weakest.integrity<80?'rgba(231,76,60,.4)':'rgba(94,196,212,.3)'},
+    {label:'AVG TEMP',val:avgTemp.toFixed(0)+'°C',color:'rgba(94,196,212,.3)'},
+  ];
+  rows.forEach((r2,i)=>{
+    const ry=8+i*14;
+    cx.fillStyle='rgba(94,196,212,.1)';cx.font=`${Math.max(8,w*.014)}px 'Courier New'`;cx.textAlign='start';
+    cx.fillText(r2.label,rx,ry);
+    cx.fillStyle=r2.color;cx.font=`${Math.max(9,w*.017)}px 'Courier New'`;cx.textAlign='end';
+    cx.fillText(r2.val,rx+rw,ry);cx.textAlign='start';
+    cx.strokeStyle='rgba(94,196,212,.03)';cx.lineWidth=.5;
+    cx.beginPath();cx.moveTo(rx,ry+4);cx.lineTo(rx+rw,ry+4);cx.stroke();
+  });
+}
+
+// SHIELDS — Wide elliptical shield bubble
+function drawShieldRadial(cx,w,h,val,n){
+  const cX=w/2,cY=h*.48;
+  const sys=engSystems.find(s=>s.id==='shields');
+  const fwd=sys&&sys.fwdData.length?sys.fwdData[sys.fwdData.length-1]:val;
+  const port=sys&&sys.portData.length?sys.portData[sys.portData.length-1]:val*.95;
+  const stbd=sys&&sys.stbdData.length?sys.stbdData[sys.stbdData.length-1]:val*.92;
+  const aft=sys&&sys.aftData.length?sys.aftData[sys.aftData.length-1]:val*.88;
+  const rX=w*.42,rY=h*.38;
+  // Outer shield envelope — pulsing ellipse
+  const pulse=1+Math.sin(n*1.5)*.008;
+  // Shield glow layers (3 nested ellipses for depth)
+  [.35,.25,.12].forEach((a,i)=>{
+    cx.strokeStyle=`rgba(94,196,212,${a*(val/100)})`;cx.lineWidth=1+i*2;
+    cx.beginPath();cx.ellipse(cX,cY,rX*pulse-i*4,rY*pulse-i*3,0,0,6.283);cx.stroke();
+  });
+  // Sector shading — 4 quadrants filled based on emitter strength
+  const sectors=[
+    {label:'FWD',val:fwd,start:-Math.PI*.8,end:-Math.PI*.2,color:'94,196,212',lx:cX,ly:cY-rY-6},
+    {label:'STBD',val:stbd,start:-Math.PI*.2,end:Math.PI*.2,color:'212,160,60',lx:cX+rX+6,ly:cY+3},
+    {label:'AFT',val:aft,start:Math.PI*.2,end:Math.PI*.8,color:'231,76,60',lx:cX,ly:cY+rY+12},
+    {label:'PORT',val:port,start:Math.PI*.8,end:Math.PI*1.2,color:'46,204,113',lx:cX-rX-20,ly:cY+3},
+  ];
+  sectors.forEach(s=>{
+    const alpha=.02+(s.val/100)*.08;
+    // Sector fill
+    cx.fillStyle=`rgba(${s.color},${alpha})`;
+    cx.beginPath();cx.moveTo(cX,cY);cx.ellipse(cX,cY,rX*.95,rY*.95,0,s.start,s.end);cx.closePath();cx.fill();
+    // Sector arc — thickness indicates strength
+    const thickness=1+(s.val/100)*5;
+    cx.strokeStyle=`rgba(${s.color},${.1+(s.val/100)*.35})`;cx.lineWidth=thickness;
+    cx.beginPath();cx.ellipse(cX,cY,rX*pulse,rY*pulse,0,s.start,s.end);cx.stroke();
+    // Glow on arc
+    cx.strokeStyle=`rgba(${s.color},${(s.val/100)*.08})`;cx.lineWidth=thickness+8;
+    cx.beginPath();cx.ellipse(cX,cY,rX*pulse,rY*pulse,0,s.start,s.end);cx.stroke();
+    // Label with value
+    cx.fillStyle=`rgba(${s.color},${.35+(s.val/100)*.3})`;
+    cx.font=`${Math.max(8,w*.015)}px 'Courier New'`;cx.textAlign='center';
+    cx.fillText(s.label+' '+s.val.toFixed(0)+'%',s.lx,s.ly);
+  });
+  // Ship silhouette at center
+  cx.fillStyle='rgba(94,196,212,.08)';
+  cx.beginPath();cx.moveTo(cX,cY-18);cx.lineTo(cX-5,cY-10);cx.lineTo(cX-8,cY+6);cx.lineTo(cX-12,cY+12);
+  cx.lineTo(cX+12,cY+12);cx.lineTo(cX+8,cY+6);cx.lineTo(cX+5,cY-10);cx.closePath();cx.fill();
+  cx.strokeStyle='rgba(94,196,212,.15)';cx.lineWidth=.5;
+  cx.beginPath();cx.moveTo(cX,cY-18);cx.lineTo(cX-5,cY-10);cx.lineTo(cX-8,cY+6);cx.lineTo(cX-12,cY+12);
+  cx.lineTo(cX+12,cY+12);cx.lineTo(cX+8,cY+6);cx.lineTo(cX+5,cY-10);cx.closePath();cx.stroke();
+  // Engine nubs
+  cx.fillStyle='rgba(212,160,60,.12)';cx.fillRect(cX-10,cY+12,4,3);cx.fillRect(cX+6,cY+12,4,3);
+  // Impact particles when shields are taking hits (low shields)
+  if(val<70){
+    for(let i=0;i<3;i++){
+      const a=n*2+i*2.1;const dist=rX*.85+Math.sin(a*3)*8;
+      const px=cX+Math.cos(a)*dist*(.9+Math.sin(a)*.1);
+      const py=cY+Math.sin(a)*(rY*.85+Math.sin(a*3)*6);
+      cx.fillStyle=`rgba(94,196,212,${.1+Math.random()*.15})`;
+      cx.beginPath();cx.arc(px,py,1+Math.random(),0,6.283);cx.fill();
+    }
+  }
+  // Hexagonal grid pattern on shield surface (subtle)
+  cx.strokeStyle='rgba(94,196,212,.02)';cx.lineWidth=.5;
+  const hexR=14;
+  for(let gx=-6;gx<=6;gx++){
+    for(let gy=-3;gy<=3;gy++){
+      const hx=cX+gx*hexR*1.5;
+      const hy=cY+gy*hexR*1.73+(gx%2?hexR*.87:0);
+      const dx=hx-cX,dy=(hy-cY)*(rX/rY);
+      if(dx*dx+dy*dy>rX*rX*.85)continue;
+      cx.beginPath();
+      for(let v=0;v<6;v++){const a=Math.PI/3*v-Math.PI/6;cx.lineTo(hx+Math.cos(a)*hexR*.5,hy+Math.sin(a)*hexR*.5)}
+      cx.closePath();cx.stroke();
+    }
+  }
+  // Overall value
+  cx.fillStyle='rgba(94,196,212,.5)';cx.font=`bold ${Math.max(13,w*.026)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillText(val.toFixed(0)+'%',cX,cY+3);
+  cx.textAlign='start';
+}
+
+// LIFE SUPPORT — Three vertical bars
+function drawLifeSupportBars(cx,w,h,val,n){
+  const bars=[
+    {label:'O₂',val:o2Val,target:21,color:'rgba(94,196,212,',x:w*.06},
+    {label:'CO₂',val:100-o2Val*.95+Math.sin(n)*.5,target:78,color:'rgba(212,160,60,',x:w*.37},
+    {label:'HUM',val:45+Math.sin(n*.3)*5,target:45,color:'rgba(46,204,113,',x:w*.68},
+  ];
+  const barW=w*.24,barH=h-24,topY=8;
+  bars.forEach(b=>{
+    const fillH=(Math.min(100,b.val)/100)*barH;
+    // Background
+    cx.strokeStyle='rgba(94,196,212,.1)';cx.lineWidth=.5;
+    cx.strokeRect(b.x,topY,barW,barH);
+    // Target zone
+    const tzY=topY+barH-(b.target/100)*barH;
+    cx.fillStyle='rgba(46,204,113,.04)';cx.fillRect(b.x,tzY-4,barW,8);
+    cx.strokeStyle='rgba(46,204,113,.15)';cx.lineWidth=.5;cx.setLineDash([2,3]);
+    cx.beginPath();cx.moveTo(b.x,tzY);cx.lineTo(b.x+barW,tzY);cx.stroke();cx.setLineDash([]);
+    // Fill
+    const grad=cx.createLinearGradient(0,topY+barH,0,topY+barH-fillH);
+    grad.addColorStop(0,b.color+'.3)');grad.addColorStop(1,b.color+'.1)');
+    cx.fillStyle=grad;cx.fillRect(b.x+1,topY+barH-fillH,barW-2,fillH);
+    // Label
+    cx.fillStyle=b.color+'.5)';cx.font=`${Math.max(9,w*.018)}px 'Courier New'`;cx.textAlign='center';
+    cx.fillText(b.label,b.x+barW/2,h-1);
+    // Value
+    cx.fillText(Math.round(b.val)+'%',b.x+barW/2,topY+barH-fillH-3);
+  });
+  cx.textAlign='start';
+}
+
+// THRUSTERS — Tachometer dial with side readouts
+function drawTachometer(cx,w,h,val,n,label){
+  const cX=w*.35,cY=h*.55,r=h*.4;
+  const startA=Math.PI*.7,endA=Math.PI*2.3;
+  // Colored zones
+  const zones=[{from:0,to:.6,color:'rgba(46,204,113,.06)'},{from:.6,to:.85,color:'rgba(212,160,60,.06)'},{from:.85,to:1,color:'rgba(231,76,60,.08)'}];
+  zones.forEach(z=>{
+    const a1=startA+(endA-startA)*z.from,a2=startA+(endA-startA)*z.to;
+    cx.fillStyle=z.color;cx.beginPath();cx.moveTo(cX,cY);cx.arc(cX,cY,r+4,a1,a2);cx.closePath();cx.fill();
+  });
+  // Background arc
+  cx.strokeStyle='rgba(94,196,212,.1)';cx.lineWidth=2;
+  cx.beginPath();cx.arc(cX,cY,r,startA,endA);cx.stroke();
+  // Tick marks
+  cx.strokeStyle='rgba(94,196,212,.15)';cx.lineWidth=1;
+  for(let i=0;i<=10;i++){
+    const a=startA+(endA-startA)*(i/10);
+    const inner=i%2===0?r-6:r-4;
+    cx.beginPath();cx.moveTo(cX+Math.cos(a)*inner,cY+Math.sin(a)*inner);
+    cx.lineTo(cX+Math.cos(a)*(r+2),cY+Math.sin(a)*(r+2));cx.stroke();
+    // Number labels on major ticks
+    if(i%2===0){
+      cx.fillStyle='rgba(94,196,212,.12)';cx.font=`${Math.max(7,w*.013)}px 'Courier New'`;cx.textAlign='center';
+      cx.fillText(i*10,cX+Math.cos(a)*(r+10),cY+Math.sin(a)*(r+10)+3);
+    }
+  }
+  // Needle
+  const needleA=startA+(endA-startA)*(val/100);
+  const vibration=Math.sin(n*15+val)*.02;
+  const actualA=needleA+vibration;
+  cx.strokeStyle='rgba(231,76,60,.7)';cx.lineWidth=1.5;
+  cx.beginPath();cx.moveTo(cX,cY);cx.lineTo(cX+Math.cos(actualA)*(r-3),cY+Math.sin(actualA)*(r-3));cx.stroke();
+  // Center dot
+  cx.fillStyle='rgba(94,196,212,.4)';cx.beginPath();cx.arc(cX,cY,3,0,6.283);cx.fill();
+  // Label
+  cx.fillStyle='rgba(94,196,212,.25)';cx.font=`${Math.max(8,w*.016)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillText(label+' THRUSTER',cX,16);
+  // Right-side readout panel
+  const rx=w*.62,rw=w*.34;
+  cx.textAlign='start';
+  const rows=[
+    {label:'OUTPUT',val:val.toFixed(1)+'%',color:val>85?'rgba(231,76,60,.5)':val>60?'rgba(212,160,60,.5)':'rgba(46,204,113,.5)'},
+    {label:'RPM',val:Math.round(val*42),color:'rgba(94,196,212,.4)'},
+    {label:'TEMP',val:Math.round(180+val*2.2)+'°C',color:val>85?'rgba(231,76,60,.4)':'rgba(94,196,212,.3)'},
+    {label:'VIBRATION',val:(Math.abs(Math.sin(n*15+val))*val*.04).toFixed(2)+' mm/s',color:'rgba(94,196,212,.3)'},
+    {label:'FUEL FLOW',val:(val*.082).toFixed(1)+' L/min',color:'rgba(212,160,60,.3)'},
+  ];
+  rows.forEach((r2,i)=>{
+    const ry=14+i*18;
+    cx.fillStyle='rgba(94,196,212,.1)';cx.font=`${Math.max(8,w*.015)}px 'Courier New'`;
+    cx.fillText(r2.label,rx,ry);
+    cx.fillStyle=r2.color;cx.font=`${Math.max(10,w*.019)}px 'Courier New'`;cx.textAlign='end';
+    cx.fillText(r2.val,rx+rw,ry);cx.textAlign='start';
+    // Separator
+    cx.strokeStyle='rgba(94,196,212,.03)';cx.lineWidth=.5;
+    cx.beginPath();cx.moveTo(rx,ry+5);cx.lineTo(rx+rw,ry+5);cx.stroke();
+  });
+}
+
+// REACTOR — Multi-line history
+function drawReactorHistory(cx,w,h,mainData,sys){
+  const showN=Math.min(sys.plasmaData.length,engTimeWindow);
+  const channels=[
+    {data:sys.plasmaData.slice(-showN),color:'rgba(231,76,60,',label:'Plasma'},
+    {data:sys.containData.slice(-showN),color:'rgba(94,196,212,',label:'Contain'},
+    {data:sys.fluxData.slice(-showN),color:'rgba(212,160,60,',label:'Flux'},
+  ];
+  drawMultiLineHistory(cx,w,h,channels);
+}
+
+// SHIELDS — Multi-line history
+function drawShieldHistory(cx,w,h,mainData,sys){
+  const showN=Math.min(sys.fwdData.length,engTimeWindow);
+  const channels=[
+    {data:sys.fwdData.slice(-showN),color:'rgba(94,196,212,',label:'FWD'},
+    {data:sys.portData.slice(-showN),color:'rgba(46,204,113,',label:'PORT'},
+    {data:sys.stbdData.slice(-showN),color:'rgba(212,160,60,',label:'STBD'},
+    {data:sys.aftData.slice(-showN),color:'rgba(231,76,60,',label:'AFT'},
+  ];
+  drawMultiLineHistory(cx,w,h,channels);
+}
+
+// Shared multi-line history renderer
+function drawMultiLineHistory(cx,w,h,channels){
+  const gx=20;
   // Grid
   cx.strokeStyle='rgba(94,196,212,.04)';cx.lineWidth=.5;
-  for(let y=0;y<cv.height;y+=12.5){cx.beginPath();cx.moveTo(0,y);cx.lineTo(cv.width,y);cx.stroke()}
-  // Threshold lines
-  const amberY=cv.height-(amber/100)*cv.height;
-  const redY=cv.height-(red/100)*cv.height;
-  cx.strokeStyle='rgba(212,160,60,.15)';cx.setLineDash([3,3]);cx.beginPath();cx.moveTo(0,amberY);cx.lineTo(cv.width,amberY);cx.stroke();
-  cx.strokeStyle='rgba(231,76,60,.15)';cx.beginPath();cx.moveTo(0,redY);cx.lineTo(cv.width,redY);cx.stroke();cx.setLineDash([]);
-  // Data line
+  for(let y=0;y<h;y+=15){cx.beginPath();cx.moveTo(0,y);cx.lineTo(w,y);cx.stroke()}
+  // Y-axis labels
+  cx.fillStyle='rgba(94,196,212,.12)';cx.font=`${Math.max(8,w*.016)}px 'Courier New'`;
+  cx.fillText('100',2,10);cx.fillText('50',2,h/2+4);cx.fillText('0',2,h-2);
+  // Draw each channel
+  channels.forEach((ch,ci)=>{
+    if(ch.data.length<2)return;
+    // Fill area
+    cx.fillStyle=ch.color+'.04)';cx.beginPath();cx.moveTo(gx,h);
+    ch.data.forEach((v,i)=>{const x=gx+i/(ch.data.length-1)*(w-gx),y=h-(Math.max(0,Math.min(100,v))/100)*h;cx.lineTo(x,y)});
+    cx.lineTo(gx+(ch.data.length-1)/(ch.data.length-1)*(w-gx),h);cx.closePath();cx.fill();
+    // Line
+    cx.strokeStyle=ch.color+'.6)';cx.lineWidth=1.5;cx.beginPath();
+    ch.data.forEach((v,i)=>{const x=gx+i/(ch.data.length-1)*(w-gx),y=h-(Math.max(0,Math.min(100,v))/100)*h;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});cx.stroke();
+    // Glow
+    cx.strokeStyle=ch.color+'.1)';cx.lineWidth=4;cx.beginPath();
+    ch.data.forEach((v,i)=>{const x=gx+i/(ch.data.length-1)*(w-gx),y=h-(Math.max(0,Math.min(100,v))/100)*h;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});cx.stroke();
+    // Current value dot
+    const lastV=ch.data[ch.data.length-1];const lastY=h-(Math.max(0,Math.min(100,lastV))/100)*h;
+    cx.fillStyle=ch.color+'.8)';cx.beginPath();cx.arc(w-2,lastY,3,0,6.283);cx.fill();
+    // Value at end
+    cx.fillStyle=ch.color+'.6)';cx.font=`${Math.max(9,w*.018)}px 'Courier New'`;
+    const yOff=ci*12-((channels.length-1)*6);
+    cx.fillText(lastV.toFixed(0)+'%',w-36,lastY+yOff);
+  });
+  // Legend
+  cx.font=`${Math.max(9,w*.018)}px 'Courier New'`;
+  let lx=gx+4;
+  channels.forEach(ch=>{
+    cx.fillStyle=ch.color+'.5)';cx.fillText('■ '+ch.label,lx,12);
+    lx+=cx.measureText('■ '+ch.label).width+12;
+  });
+}
+
+// LIFE SUPPORT — Multi-line history graph
+function drawLifeSupportHistory(cx,w,h,o2Data,sys){
+  const showN=Math.min(sys.co2Data.length,engTimeWindow);
+  const channels=[
+    {data:o2Data.slice(-showN),color:'rgba(94,196,212,',label:'O₂'},
+    {data:sys.co2Data.slice(-showN),color:'rgba(212,160,60,',label:'CO₂'},
+    {data:sys.humData.slice(-showN),color:'rgba(46,204,113,',label:'HUM'},
+  ];
+  drawMultiLineHistory(cx,w,h,channels);
+}
+
+// FALLBACK — Line graph for history view
+function drawFallbackGraph(cx,w,h,data,color,amber,red){
+  cx.strokeStyle='rgba(94,196,212,.04)';cx.lineWidth=.5;
+  for(let y=0;y<h;y+=15){cx.beginPath();cx.moveTo(0,y);cx.lineTo(w,y);cx.stroke()}
+  // Y-axis labels
+  cx.fillStyle='rgba(94,196,212,.12)';cx.font=`${Math.max(8,w*.016)}px 'Courier New'`;
+  cx.fillText('100',2,10);cx.fillText('50',2,h/2+4);cx.fillText('0',2,h-2);
+  const amberY=h-(amber/100)*h,redY=h-(red/100)*h;
+  cx.strokeStyle='rgba(212,160,60,.15)';cx.setLineDash([3,3]);cx.beginPath();cx.moveTo(20,amberY);cx.lineTo(w,amberY);cx.stroke();
+  cx.strokeStyle='rgba(231,76,60,.15)';cx.beginPath();cx.moveTo(20,redY);cx.lineTo(w,redY);cx.stroke();cx.setLineDash([]);
+  // Threshold labels
+  cx.fillStyle='rgba(212,160,60,.2)';cx.fillText('⚠'+amber,w-30,amberY-3);
+  cx.fillStyle='rgba(231,76,60,.2)';cx.fillText('✕'+red,w-30,redY-3);
   if(data.length>1){
+    // Fill area under curve
+    cx.fillStyle=color+'08';cx.beginPath();cx.moveTo(20,h);
+    data.forEach((v,i)=>{const x=20+i/(data.length-1)*(w-20),y=h-(Math.max(0,Math.min(100,v))/100)*h;cx.lineTo(x,y)});
+    cx.lineTo(20+(data.length-1)/(data.length-1)*(w-20),h);cx.closePath();cx.fill();
+    // Line
     cx.strokeStyle=color+'90';cx.lineWidth=1.5;cx.beginPath();
-    data.forEach((v,i)=>{const x=i/(data.length-1)*cv.width,y=cv.height-(Math.max(0,Math.min(100,v))/100)*cv.height;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});
-    cx.stroke();
+    data.forEach((v,i)=>{const x=20+i/(data.length-1)*(w-20),y=h-(Math.max(0,Math.min(100,v))/100)*h;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});cx.stroke();
     // Glow
     cx.strokeStyle=color+'20';cx.lineWidth=4;cx.beginPath();
-    data.forEach((v,i)=>{const x=i/(data.length-1)*cv.width,y=cv.height-(Math.max(0,Math.min(100,v))/100)*cv.height;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});
-    cx.stroke();
+    data.forEach((v,i)=>{const x=20+i/(data.length-1)*(w-20),y=h-(Math.max(0,Math.min(100,v))/100)*h;i===0?cx.moveTo(x,y):cx.lineTo(x,y)});cx.stroke();
+    // Current value at end
+    const lastV=data[data.length-1];const lastY=h-(Math.max(0,Math.min(100,lastV))/100)*h;
+    cx.fillStyle=color+'cc';cx.beginPath();cx.arc(w-2,lastY,3,0,6.283);cx.fill();
+    cx.fillStyle=color+'80';cx.font=`${Math.max(10,w*.02)}px 'Courier New'`;
+    cx.fillText(lastV.toFixed(1),w-40,lastY-6);
   }
 }
 
