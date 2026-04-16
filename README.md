@@ -2,7 +2,7 @@
 
 # Starship ASMR Simulator
 
-**A browser-based ambient starship cockpit experience designed for relaxation, immersion, and creative production.  The simulator is not software, it's not developed.  It is an interactive painting that has been drawn with bits and keystrokes instead of paint and brushes.**
+**A browser-based ambient starship cockpit experience designed for relaxation, immersion, and creative production.  The simulator is not software, it's not developed.  It is an interactive painting that has been drawn with bits and keystrokes instead of paint and brushes. It is an experiment of AI-assisted "vibe coding".**
 
 
 
