@@ -31,227 +31,205 @@ Starship ASMR Simulator is a single HTML file that transforms your browser into 
 
 ---
 
-## Quick Start
+Quick Start
 
-1. Download `starship-cockpit.html`
-2. Open it in any modern browser (Chrome, Firefox, Edge, Safari)
-3. Name your ship and select a difficulty profile
-4. Click **Engage Systems**
-5. Press **F** or double-click for full screen
-6. Pair with your favorite space ambient audio
+Download starship-cockpit.html
+Open it in any modern browser (Chrome, Firefox, Edge, Safari)
+Name your ship and select a difficulty profile
+Click Engage Systems
+Press F or double-click for full screen
+Pair with your favorite space ambient audio
 
 No server, no dependencies, no build step. It's a single self-contained HTML file.
 
----
+Features
+Viewport & Starfield
 
-## Features
+3D forward-flying starfield with parallax depth, star color variation, nebulae with lightning, comets, tumbling asteroids, distant ships with nav lights, planets with lit-side shading
+Bioluminescent space organisms — rare glowing jellyfish-like creatures, scannable with crew reactions
+Distant supernova — 3-phase flash with deep bass rumble, every 10-25 minutes
+CRT scanline overlay, vignette, lens flare, mouse parallax, condensation drips, day/night cockpit cycle
+Starfield density variation — star count shifts over time simulating denser and sparser regions
+Red Alert mode — full cockpit emergency red lighting with CSS classes on body
 
-### 🌌 Viewport & Starfield
+Cockpit Interface
 
-- **3D forward-flying starfield** with parallax depth — stars fly toward you from a central vanishing point, growing larger and brighter as they approach
-- **Star color variation** — white-blue, warm yellow, cool blue, pale orange, and rare pale red stars
-- **Nebula clouds** with slow drift and occasional lightning/energy discharges deep within the formations
-- **Comets** with glowing tails that cross the viewport every 10–15 minutes
-- **Asteroids** — tumbling irregular rocks with procedural shapes
-- **Distant ships** with blinking red/green navigation lights
-- **Planets** with lit-side gradient shading that slowly drift across the viewport
-- **Bioluminescent space organisms** — glowing jellyfish-like creatures that rarely appear in clusters, pulsing with soft light, with trailing tentacles. Fully scannable.
-- **CRT scanline overlay** and **vignette** darkening at the edges for a cockpit glass feel
-- **Lens flare** when bright stars pass near viewport center
-- **Mouse parallax** — cockpit bezel elements shift subtly with mouse movement, creating physical depth
-- **Condensation drips** — tiny droplets occasionally form and slide down the viewport edges
-- **Starfield density variation** — star count gradually shifts over time, simulating denser and sparser regions of space
-- **Day/night cockpit cycle** — ambient glow slowly shifts between cool blue and warm amber over ~10 minutes
+Top panel — 6 system status bars. Left panel — 9 toggle switches with LEDs and tooltips. Right panel — 7 live readouts
+Bottom console — HUD data, buttons, volume/throttle sliders, Engine/Map/Probe/Tractor/Warp/Red Alert controls
+Nav compass, oscilloscope, radar/lidar, mission clock (100x), crew activity log, fuel consumption graph
+Space weather radar — solar wind, radiation, magnetic fields with real shield/radiation effects
+System status grid — 8 clickable systems with detail popups
+Panel wear texture — subtle grain and scratch effects on bezel surfaces
+Custom scrollbars matching cockpit aesthetic
 
-### 🎛️ Cockpit Interface
+HUD Overlay
+Toggle the HUD button to project a translucent heads-up display onto the viewport with color-coded sections:
 
-- **Top panel** — System status bars for Shields, Reactor, O₂, Comms, Nav, and Gravity with animated progress bars
-- **Left panel** — 9 toggle switches (EXT, NAV, COM, SHD, LIF, WPN, SEN, AUX, EMR) with LED indicators, tooltips, and click sounds
-- **Right panel** — Live readouts for Distance, ETA, Crew count, Cargo, Radiation, Signal strength, and Drift
-- **Bottom console** — HUD data (Velocity, Heading, Hull Temp, System, Fuel Cell, Pressure), 7 console buttons with LED indicators, volume slider, throttle slider, and control buttons
-- **Nav compass** — Rotating needle tracking current heading
-- **Oscilloscope waveform** — Animated signal display that responds to throttle setting
-- **Radar/lidar display** — Circular sweep with rotating scan line and blips for nearby objects
-- **Mission clock** — Accelerated elapsed time display (100x real time)
-- **Crew activity log** — Scrolling ticker of crew events with captain's log input
-- **Fuel consumption graph** — Real-time line chart tracking fuel cell percentage
-- **Space weather radar** — Flowing visualization of solar wind, radiation belts, and magnetic field lines with real effects on ship systems
-- **System status grid** — Clickable status indicators for 8 subsystems with detailed popup panels showing specs, uptime, live component data, and performance graphs
-- **Panel wear texture** — Subtle grain and scratch effects on bezel surfaces
+Status indicator (green/amber/red), Navigation (green), Shields & Weapons (red), Engineering (yellow), Fuel (cyan)
+Throttle bar color-coded by level
+Course track with animated waypoints, ship marker, per-leg distances, and ETA
+3D Glide slope — large canvas-rendered approach tunnel with neon green rings, flight path diamond marker, motion trail, crosshair with pitch ladder
 
-### 🔊 Audio (Web Audio API)
+Audio (Web Audio API)
+All audio is procedurally generated — no external files. Engine hum, air circulation, console blips, radio static, scanner pings, button clicks, warp sounds, proximity alerts, weapons sounds, tractor beam, shuttle catapult, magnetic lock clunks, Cosmo's purring.
+Communications
 
-All audio is procedurally generated — no external files required.
+20+ procedural radio messages with reply system and follow-ups
+Hail system with multi-turn conversations (10+ contacts)
+Comms log, Captain's log input, Ship's AI terminal
+Distress signal with safety cover, SOS morse, red alert
+Signal decryption puzzle — 3-dial frequency matching with 12 lore fragments
+Unknown signal replies — "Triangulate" returns bearing/distance; "Ignore and log" archives data
 
-- **Engine hum** — Layered sine/triangle/sawtooth oscillators at 42–84 Hz with slow LFO modulation. Toggleable via the Engine button.
-- **Air circulation hiss** — Filtered white noise simulating life support airflow
-- **Console blips** — Soft randomized sine pings every 15–30 seconds
-- **Radio static bursts** — Bandpass-filtered noise preceding each radio transmission
-- **Scanner pings** — Descending frequency sweep when clicking the starfield
-- **Button click sounds** — Soft sine pips for all interface interactions
-- **Warp sounds** — Rising/falling sawtooth with lowpass filter for FTL engagement
-- **Proximity alert** — Gentle two-tone alarm when asteroids pass close
-- **Weapons sounds** — Laser fire (adjustable pitch by frequency setting), torpedo whoosh, impact rumbles
-- **Tractor beam hum** — Sustained tone during lock
-- **Various system sounds** — Restart whines, scan sweeps, hail connection tones, distress SOS morse
+Navigation & Helm
 
-### 📡 Communications
+Star map — toggleable constellation/waypoint overlay with sector grid
+Navigation planner — 12 star systems with full data (star type, planets, hazards, faction, fuel depot, relay status), zoom/pan (0.5x–4x), fog of war that clears as you travel, live ship position on route, clickable system detail cards ("NO DATA — Survey required" for unvisited), animated hyperspace lanes with 1.4x speed bonus, nebula background, 3D depth indicators, animated route lines with per-leg fuel/time/lane estimates, territorial boundaries triggering jurisdiction comms, comm relay coverage circles, right-click custom waypoint naming, clear route button
+Helm control — bearing/mark/velocity inputs, yaw/pitch/roll sliders with spring-back, click-drag starfield pan, heading updates propagated to viewport
+Warp drive with star streaks and rising engine pitch
 
-- **Radio chatter** — 20+ procedural radio messages from Artemis Control, cargo vessels, science ships, patrol craft, automated beacons, and unknown signals. Messages appear every 20–60 seconds.
-- **Radio reply system** — When messages arrive, 2–3 contextual reply options appear. Selecting one logs your response and occasionally triggers a follow-up message from the sender.
-- **Hail system** — Open a channel to any of 10+ known contacts or ships detected on sensors. Full multi-turn conversations with procedural responses covering status, heading, trade, news, and anomaly reports. Weak-signal contacts have longer connect times and a chance of connection failure.
-- **Comms log** — Full scrollable transcript of all radio traffic and captain's log entries
-- **Captain's log input** — Type entries that appear in the crew activity ticker and comms log
-- **Ship's AI terminal** — Type commands (`status`, `scan`, `crew`, `eta`, `fuel`, `shields`, `heading`, `log`, `help`) for typewriter-style procedural responses
-- **Distress signal** — Covered SOS toggle with safety flap animation. Activating turns edge glows red, plays repeating SOS morse, and broadcasts an emergency message.
+Long Range Scanner (LRS)
 
-### 🗺️ Navigation & Helm
+Animated sonar sweep line with real-time object movement, trails, and trajectory projections
+Collision course detection with warning indicators
+Click-to-select with detail sidebar (type, bearing, range, velocity)
+Right-click context menu: Scan, Hail, Set Intercept, Launch Probe, Tractor, Track
+Double-click track mode, drag-to-measure with ETA calculation
+Contact log sidebar with timestamped entries
+700×700 canvas with enlarged fonts
 
-- **Star map** — Toggleable constellation/waypoint overlay with sector grid
-- **Navigation planner** — Interactive chart where you click waypoints to plot multi-leg routes with estimated distance, fuel cost, and feasibility warnings
-- **Helm control** — Full-screen translucent overlay with:
-  - Course input (Bearing 0–360°, Mark -90 to +90° in Star Trek style, Velocity in fractions of c)
-  - "Engage" button with confirmation sound and comms log entry
-  - Attitude control (Yaw, Pitch, Roll sliders that spring back to center)
-  - Live heading readouts
-- **Click-and-drag pan** — Drag the starfield to shift your view with rubber-band return
-- **Warp drive** — Stretches stars into radial streaks with rising engine pitch
+Science & Exploration
 
-### 🔬 Science & Exploration
+Object scanning — Hover any space object and click "Scan" for a 3-second analysis with progress bar and sweep sound. Returns a data card with composition, mass, temperature, origin, and threat level.
+Deep scan probe — Launch a sensor probe toward a random target. 60-second transit with countdown. Returns standard, notable (22%), or exceptional findings (8% — alien artifacts, first contact evidence).
+Signal decryption — 3-dial frequency matching puzzle when "Unknown Signal" messages appear. 12 lore fragments about trade disputes, military movements, and ancient beacons.
+Nebula sample collection — Deploy a collector during nebula proximity for 30 seconds. Returns spectrographic analysis with classification, elemental composition, and emission spectrum.
+Discovery log — Persistent archive of all scanned objects, probe returns, decoded signals, collected samples, and triangulated signals
 
-- **Object scanning** — Hover any space object and click "Scan" for a 3-second analysis with progress bar and sweep sound. Returns a data card with procedurally generated composition, mass, temperature, origin, and threat level. Organisms get extra fields (bioluminescence color, colony size, species classification).
-- **Deep scan probe** — Launch a sensor probe toward a random target. 60-second transit with countdown timer. Returns standard, notable (22% chance), or exceptional findings (8% — alien artifacts, first contact evidence).
-- **Signal decryption** — When "Unknown Signal" messages appear, an "Attempt Decrypt" puzzle opens. Adjust three frequency dials to align your waveform with the target. Solving it reveals cryptic message fragments that accumulate across your session, building a mystery about ancient beacons and alien structures.
-- **Nebula sample collection** — When passing near a nebula, deploy a collector for 30 seconds. Returns a spectrographic analysis card with classification, elemental composition, emission spectrum visualization, and scientific findings.
-- **Discovery log** — Persistent archive of all scanned objects, probe returns, decoded signals, and collected samples
+Tractor Beam
 
-### 🔧 Engineering
+Arm via bottom console button, lock onto asteroids or bio creatures on the LRS
+Visible beam connects ship to target
+Release to cargo bay or set adrift
+Tracked in session stats and end of watch report
 
-- **Real-time animated graphs** — 7 systems (Reactor, Coolant, Hull, Shields, Life Support, Port Thruster, Starboard Thruster) with continuously scrolling data. Configurable time windows (30s, 1m, 5m).
-- **Per-system power cycling** — Take any system offline for 5 seconds to clear faults
-- **Component deep-dive** — Expand any system to see 8 individual components with OK/FAULT status. Replace faulty components individually.
-- **Bypass routing** — When degraded, reroute through backup systems with described tradeoffs
-- **Efficiency tuning** — Per-system Longevity ↔ Performance slider affecting output and wear
-- **Alert threshold configuration** — Adjustable amber/red warning levels per system
-- **Maintenance history** — Scrollable log of all repairs, restarts, and component replacements
-- **Automated recommendations** — Context-aware suggestions based on system state and repair frequency
+Emergency Systems
 
-### ⚡ Power Management
+Emergency override panel — Reactor Scram (dims all systems for 8s), Emergency Vent (drops pressure with rushing air sound), Thruster Override (ship shakes for 5s with thruster bursts)
+Maintenance events — System degradation with notification and escalation timer. Ignore for 60s and it goes critical with cascading failures. 4-step diagnostic repair or 7 unique mini-game puzzles.
+Proximity alerts — Amber bezel flash with two-tone alarm when asteroids pass close
+Screen flicker/interference — Visual static on Unknown Signal radio transmissions
 
-- **Power allocation grid** — 5 systems (Engines, Shields, Sensors, Life Support, Weapons) sharing 500 total reactor units
-- **Real effects** — Engine power controls throttle, shield power controls deflector strength, life support power controls O₂
-- **Overload system** — Push any system above 130% for boosted performance with burnout risk (40–70% chance after 8–20 seconds). Burned-out systems go offline for 15 seconds.
-- **Auto-redistribution** — Sliding one system up proportionally reduces others
+Engineering — Unique Gauges Per System
+Each of the 7 systems has a unique Live display and a History tab:
 
-### 🚀 Ship Systems
+Reactor Core — 3 arc gauges (Plasma/Containment/Flux) with pulse glow; 3-line history
+Coolant Loop — Vertical thermometer with bubbles + mini graph; single-line history
+Hull Integrity — Top-down ship wireframe with 28 hull plates, stress heatmap (blue to red), micro-meteorite impacts, scanning sweep, fracture lines, 7-row readout panel; single-line history
+Shield Emitters — Wide elliptical shield bubble with 4 color-coded quadrants, hexagonal grid, impact particles; 4-line history (FWD/PORT/STBD/AFT)
+Life Support — 3 vertical bars (O2/CO2/Humidity) with target zones; 3-line history
+Port/Starboard Thrusters — Tachometer dials with vibrating needles, colored zones, 5-row readout panels (Output, RPM, Temp, Vibration, Fuel Flow)
 
-- **Deck schematic** — Interactive 4-deck, 16-room ship layout with crew positions. Click any room for detailed info (atmosphere, power draw, occupants, description). Room-specific actions: Med Bay bio-scan, Cargo inventory check, Armory security protocol, Cryo Bay crew wake sequence.
-- **Bulkhead controls** — Click between rooms to lock/unlock bulkhead doors for atmosphere containment
-- **Crew manifest** — 6 crew members with roles, locations, heart rates, and status (including one in cryo)
-- **Exterior cameras** — 4 camera feeds (Forward, Port, Starboard, Aft) with directional star drift and occasional static on Camera 4
-- **PIP aft camera** — Draggable picture-in-picture window showing stars streaming away
-- **Mission objectives** — Checklist with completed, active, and pending objectives
+Per-system: restart, component deep-dive (8 components), bypass routing, efficiency tuning, alert thresholds, maintenance history, recommendations.
+Repair Mini-Games (7 Unique Puzzles)
+Coolant (leak detection), Thruster (bolt tightening), Sensor (frequency alignment), Deflector (sequence memory), Comms (wire matching), Air Recycler (thermal management), Default (pressure balancing). Crew assistance after 2 failures.
+Weapons System
 
-### 🔫 Weapons
+Tactical viewport — full targeting display with grid overlay, center crosshair, and mouse-tracking reticle
+Target lock — click contacts for animated corner brackets, pulsing ring, and lock tone
+Laser array — adjustable intensity (10–100%), frequency (IR through Gamma), mode (Pulse/Beam), heat management with overheat cooldown, visual beam/pulse effects
+Torpedo bay — 8-tube rack with visual loaded/empty indicators, torpedo trails, 85% hit chance, 300-second auto-reload per tube with countdown display
+Shield distribution — 3×3 directional grid, click to reinforce sectors
+Weapons log — timestamped record of hits, misses, launches, destructions
 
-- **Tactical viewport** — Full targeting display with grid overlay, center crosshair, and mouse-tracking reticle
-- **Target lock** — Click contacts to acquire lock with animated corner brackets, pulsing ring, and lock tone
-- **Laser array** — Adjustable intensity (10–100%), frequency (IR through Gamma), and mode (Pulse/Beam). Heat management system with overheat cooldown. Visual beam/pulse effects with impact flashes.
-- **Torpedo bay** — 8-tube rack with visual loaded/fired indicators. Torpedoes travel visually to target with green trail and explosion effect on impact. 85% hit chance, heavy damage.
-- **Shield distribution** — 3×3 directional grid (8 sectors). Click to reinforce any sector by drawing from adjacent ones.
-- **Weapons log** — Timestamped record of all hits, misses, launches, and destructions
+Shuttle Bay (LSO Experience)
+Stay on the bridge as Landing Signal Officer: mission select (Recon/Salvage/Repair/SAR), random pilot assignment, 6-step pre-launch checklist, catapult launch with countdown and screen shake, deployed tracking radar, recovery approach with guide lights and approach indicator, "Call the Ball" trap timing, auto-recovery after 3 wave-offs. Salvage missions add cargo to the cargo bay.
+Cargo Module
+Full cargo bay with 24-bay isometric grid, 16 pre-loaded items across 7 types (supply/equipment/biological/hazardous/classified/personal/salvage), mass distribution indicator, environment monitoring, animated forklift bot, and 4 mini-games:
 
-### 🛡️ Emergency Systems
+Cargo Loading — place 3 incoming containers in 60 seconds
+Contraband Scanner — X-ray inspection, flag anomalies, choose Quarantine/Jettison/Ignore
+Emergency Jettison — hull breach, jettison containers to reach target mass in 30 seconds
+Cargo Crane — mouse-controlled crane with swinging physics, grab and place salvage
 
-- **Emergency override panel** — Reactor Scram (dims all systems for 8s), Emergency Vent (drops pressure with rushing air sound), Thruster Override (ship shakes for 5s with thruster bursts)
-- **Maintenance events** — Periodically a system degrades with notification. Ignore for 60s and it goes critical with cascading failures. Run a 4-step diagnostic repair sequence to fix.
-- **Proximity alerts** — Amber bezel flash with two-tone alarm when asteroids pass close
-- **Tractor beam** — Arm and lock onto asteroids or bio creatures. Visible beam connects ship to target. Release to cargo bay or set adrift.
+Ship Schematic
+5 decks (Bridge, Deck 1-3, Hangar) with 22 rooms. Click for details, room-specific actions (bio-scan, cargo ops, security, cryo wake, shuttle bay ops). Lockable bulkheads.
+Exterior Cameras & PIP
 
-### ⚙️ Configuration
+4 camera feeds (Forward, Port, Starboard, Aft) with directional star drift and occasional static on Camera 4
+Draggable PIP window — picture-in-picture aft camera showing stars streaming away
 
-- **Ship naming** — Name your vessel on first load. Persists via localStorage. Replaces "ISS Artemis" throughout all interfaces, radio callsigns, and database entries.
-- **Difficulty presets:**
-  - **Peaceful Cruise** — No malfunctions, no burnout risk. Pure ambient experience.
-  - **Standard Patrol** — Balanced events and maintenance.
-  - **Deep Frontier** — Frequent events, faster escalation, higher burnout risk.
-- **Audio mixer** — Individual sliders for engine hum, air circulation, console blips, radio chatter frequency, and ambient drone
-- **End of watch summary** — Formatted session report covering navigation, operations, communications, engineering, and mission stats
+Crew Manifest
 
----
+6 crew members with roles, locations, heart rates, and status (including one in cryo)
 
-## Controls
+Fuel Management
+Dual gauges, burn rate, projected range, consumption history, spectrograph, phase diagram, efficiency grading, rationing presets, eco throttle, jettison, route costs, event log.
+Power Allocation
+5 systems sharing 500 reactor units with real effects. Overload >130% risks burnout.
+Ship Database
+Ship specs, Star Systems, Mission Brief with interactive objectives (add/complete/delete), Crew Bios, Captain's Notes (localStorage-persisted).
+Cosmo the Ship's Cat
+17 crew log events every 2-5 minutes. Occasionally appears in Rec Room with purring sound button. Cargo bay appearances.
+Narrative Systems
 
-| Action | Control |
-|--------|---------|
-| Full screen | Press `F` or double-click |
-| Pan starfield | Click and drag |
-| Scanner ping | Click starfield |
-| Scan object | Hover object → click "Scan" |
-| Hail ship | Hover ship → click "Hail" |
-| Volume | Bottom-right slider |
-| Throttle | Bottom-right amber slider |
-| Warp | Bottom-right "Warp" button |
-| Engine mute | Bottom-right "Engine" button |
-| Captain's log | Type in bottom-right input, press Enter |
-| All screens | Toggle bar above bottom console |
+The Signal — 12-phase slow-burn mystery over 30-60 minutes, never resolves
+Ship's AI Dreams — philosophical musings after 45+ minutes, 10 unique dreams
+Idle Captain Mode — AI assumes watch after 10 minutes idle, auto-manages ship, summary on return
 
----
+Environmental Events
 
-## Technical Details
+Solar flare warnings — 30-second countdown, shield-dependent radiation impact, crew screening
+Gravitational anomalies — 30 seconds of instrument haywire, viewport hue warp, screen shake, discovery logged
+Bioluminescent organism encounters — crew wonder reactions, scannable specimens
+Distant supernova — 3-phase visual (flash → expanding ring → fade) with bass rumble
+Encrypted signal interceptions — periodic with decrypt puzzle and lore fragments
+Starfield density variation — star count gradually shifts, simulating denser and sparser regions
+Proximity alerts — amber bezel flash with alarm for close asteroid passes
 
-- **Single file** — Everything is contained in one HTML file. No external dependencies, no build tools, no server required.
-- **Web Audio API** — All sound is procedurally generated at runtime using oscillators, noise buffers, and filters.
-- **Canvas rendering** — Starfield, radar, oscilloscope, space weather, cameras, weapons viewport, and all graphs rendered on HTML5 canvas elements.
-- **CSS-only cockpit** — Bezel, panels, glows, and UI elements are pure CSS with clamp() responsive sizing.
-- **~5,700 lines** — Entirely self-contained HTML/CSS/JavaScript.
-- **60fps animation** — Uses requestAnimationFrame with efficient rendering.
-- **localStorage** — Ship name and difficulty persist across sessions.
-- **No frameworks** — Vanilla JavaScript throughout. No React, no libraries, no dependencies.
+End of Watch Report
+24 metrics across 11 sections including Cargo Operations. Email feature opens mail client with full plain-text report.
+Configuration
+Ship naming (localStorage), difficulty presets, audio mixer, custom scrollbars.
 
-### Browser Compatibility
+Controls
+ActionControlFull screenPress F or double-clickPan starfieldClick and dragScanner pingClick starfieldScan objectHover object, click ScanHail shipHover ship, click HailVolume / ThrottleBottom-right slidersHUD toggleHUD button in toggle barAll screensToggle bar above bottom console
+Toggle Bar: Ship, Comms, Scanner, Data, Engr, Crew, Nav, Cams, Misn, Mix, PIP, AI, Fuel, Disc, Fly, Hail, Power, Watch, Wpns, Bay, Cargo, HUD
 
-Tested and working in:
-- Chrome 90+
-- Firefox 90+
-- Edge 90+
-- Safari 15+
+Technical Details
 
----
+Single file — ~9,400 lines, ~560KB of self-contained HTML/CSS/JavaScript
+Web Audio API — all sound procedurally generated
+Canvas rendering — starfield, engineering gauges, hull wireframe, shield bubble, radar, weapons, shuttle bay, cargo grid, glide slope
+CSS-only cockpit with clamp() responsive sizing
+60fps requestAnimationFrame rendering
+localStorage persistence for ship name, difficulty, captain's notes
+No frameworks — vanilla JavaScript throughout
 
-## Recommended Setup
+Browser compatibility: Chrome 90+, Firefox 90+, Edge 90+, Safari 15+
 
-For the best experience:
+Recommended Setup
 
-1. Use a large monitor or TV
-2. Go full screen (`F` key)
-3. Dim your room lights
-4. Put on headphones
-5. Open the [recommended audio](https://www.youtube.com/watch?v=-q4XwtdSxDE) in another tab
-6. Adjust the in-simulator volume to complement the external audio
-7. Select **Peaceful Cruise** for pure relaxation, or **Standard Patrol** if you want occasional ship activity
+Large monitor or TV
+Full screen (F key)
+Dim room lights
+Headphones
+Open the recommended audio in another tab
+Peaceful Cruise for relaxation, Standard Patrol for activity
 
----
-
-## For Filmmakers
-
+For Filmmakers
 If you're using this as a prop display for film or video production:
 
-- The cockpit adapts to any screen aspect ratio via responsive CSS
-- Ship name is customizable to match your production
-- All UI text uses monospace fonts for a consistent sci-fi aesthetic
-- The starfield, HUD, and system readouts look convincing on camera
-- Radio chatter provides natural ambient dialogue
-- The oscilloscope, radar, and status grid add visual interest to cockpit shots
-- Run in full screen and frame your shot around the viewport for a "looking out the window" perspective
-- Use **Peaceful Cruise** mode to prevent disruptive maintenance alerts during takes
+The cockpit adapts to any screen aspect ratio via responsive CSS
+Ship name is customizable to match your production
+All UI text uses monospace fonts for a consistent sci-fi aesthetic
+The starfield, HUD, and system readouts look convincing on camera
+Radio chatter provides natural ambient dialogue
+The oscilloscope, radar, and status grid add visual interest to cockpit shots
+Run in full screen and frame your shot around the viewport for a "looking out the window" perspective
+Use Peaceful Cruise mode to prevent disruptive maintenance alerts during takes
 
----
-
-## License
-
+License
 This project is provided as-is for personal, creative, and educational use.
 
----
-
-*Built with care for anyone who's ever looked up at the stars and imagined what it would be like to be out there.*
+Painted with care for anyone who's ever looked up at the stars and imagined what it would be like to be out there.agined what it would be like to be out there.*
