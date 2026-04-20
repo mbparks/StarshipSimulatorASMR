@@ -310,9 +310,9 @@ canvas#c{position:fixed;inset:0;z-index:0}
 
 /* === CREW ACTIVITY LOG === */
 .crew-log{position:fixed;bottom:clamp(132px,22vh,242px);left:clamp(42px,5.6vw,92px);z-index:5;pointer-events:none;overflow:hidden;
-  width:clamp(220px,25vw,360px);height:clamp(70px,9vh,110px)}
+  width:clamp(320px,40vw,560px);height:clamp(70px,9vh,110px)}
 .crew-log-inner{display:flex;flex-direction:column;gap:3px}
-.crew-log-entry{font-size:clamp(9px,.85vw,12px);color:#2a4a5a;letter-spacing:1px;white-space:nowrap;transition:opacity 1s,transform 1s;opacity:0;transform:translateY(6px)}
+.crew-log-entry{font-size:clamp(9px,.85vw,12px);color:#2a4a5a;letter-spacing:1px;white-space:normal;transition:opacity 1s,transform 1s;opacity:0;transform:translateY(6px);line-height:1.4}
 .crew-log-entry.visible{opacity:1;transform:translateY(0)}
 .crew-log-entry .cle-time{color:#1a3a4a;margin-right:6px}
 .crew-log-entry .cle-text{color:#3a5a6a}
@@ -728,6 +728,52 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .fuel-log-title{font-size:clamp(9px,.8vw,11px);color:#2a4a5a;letter-spacing:2px;padding:6px 8px;border-bottom:1px solid rgba(94,196,212,.04);text-transform:uppercase}
 .fuel-log-entry{font-size:clamp(8px,.7vw,10px);padding:3px 8px;border-bottom:1px solid rgba(94,196,212,.02);color:#3a6a7a}
 .fuel-time-btns{display:flex;gap:3px;margin-bottom:4px}
+
+/* === HUD OVERLAY === */
+.hud-overlay{position:fixed;top:clamp(90px,14vh,160px);bottom:clamp(130px,22vh,240px);left:clamp(40px,5.5vw,90px);right:clamp(40px,5.5vw,90px);z-index:3;pointer-events:none;display:none;font-family:'Courier New',monospace}
+.hud-overlay.show{display:block}
+.hud-corner{position:absolute;padding:clamp(6px,1vh,10px) clamp(8px,1.2vw,14px)}
+.hud-tl{top:38%;left:6%}
+.hud-tr{top:8%;right:22%}
+.hud-bl{bottom:38%;left:22%}
+.hud-br{bottom:38%;right:22%;text-align:right}
+.hud-tc{top:4%;left:50%;transform:translateX(-50%);text-align:center}
+.hud-bc{bottom:32%;left:50%;transform:translateX(-50%);text-align:center}
+.hud-row{font-size:clamp(9px,.8vw,12px);line-height:1.8;letter-spacing:1px;white-space:nowrap}
+.hud-label{color:rgba(160,180,190,.5);font-weight:bold}
+.hud-val{color:rgba(46,204,113,.75);font-weight:bold}
+.hud-val.warn{color:rgba(255,200,50,.8)}
+.hud-val.crit{color:rgba(255,70,70,.85)}
+.hud-val.good{color:rgba(46,230,113,.8)}
+.hud-val.cyan{color:rgba(94,210,230,.75)}
+.hud-val.cyan{color:rgba(94,196,212,.7)}
+.hud-title{font-size:clamp(8px,.7vw,10px);color:rgba(212,160,60,.5);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;font-weight:bold}
+.hud-status{font-size:clamp(9px,.8vw,12px);letter-spacing:4px;text-transform:uppercase;font-weight:bold}
+.hud-throttle-track{width:clamp(140px,14vw,220px);height:4px;background:rgba(94,196,212,.12);border-radius:2px;position:relative;margin:3px auto 0}
+.hud-throttle-fill{height:100%;border-radius:2px;background:rgba(46,204,113,.5);transition:width .3s}
+.hud-course{position:absolute;left:8%;right:8%;top:28%;transform:translateY(-50%)}
+.hud-course-track{position:relative;height:50px;margin-bottom:4px}
+.hud-course-line{position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(46,255,100,.06)}
+.hud-course-leg{position:absolute;top:50%;height:3px;transform:translateY(-50%);border-radius:2px}
+.hud-course-leg.completed{background:rgba(46,230,113,.35);box-shadow:0 0 6px rgba(46,230,113,.2),0 0 12px rgba(46,230,113,.08)}
+.hud-course-leg.current{background:linear-gradient(90deg,rgba(46,230,113,.4),rgba(255,200,50,.5));box-shadow:0 0 8px rgba(255,200,50,.25),0 0 16px rgba(255,200,50,.1);animation:hud-pulse-leg 2s ease-in-out infinite}
+.hud-course-leg.future{background:rgba(160,180,190,.06);box-shadow:none}
+@keyframes hud-pulse-leg{0%,100%{opacity:.8}50%{opacity:1}}
+.hud-course-wp{position:absolute;top:50%;transform:translate(-50%,-50%);width:10px;height:10px;border-radius:50%;border:2px solid rgba(94,196,212,.4)}
+.hud-course-wp.visited{background:rgba(46,230,113,.3);border-color:rgba(46,230,113,.6);box-shadow:0 0 6px rgba(46,230,113,.25)}
+.hud-course-wp.current{background:rgba(255,200,50,.45);border-color:rgba(255,200,50,.8);box-shadow:0 0 10px rgba(255,200,50,.4),0 0 20px rgba(255,200,50,.15);animation:hud-pulse-wp 1.5s ease-in-out infinite}
+.hud-course-wp.future{background:rgba(160,180,190,.06);border-color:rgba(160,180,190,.2)}
+.hud-course-wp.station{width:12px;height:12px;border-radius:2px;transform:translate(-50%,-50%) rotate(45deg);border-color:rgba(212,160,60,.7);box-shadow:0 0 8px rgba(212,160,60,.3)}
+@keyframes hud-pulse-wp{0%,100%{box-shadow:0 0 10px rgba(255,200,50,.4),0 0 20px rgba(255,200,50,.15)}50%{box-shadow:0 0 14px rgba(255,200,50,.6),0 0 28px rgba(255,200,50,.2)}}
+.hud-course-label{position:absolute;font-size:clamp(7px,.6vw,9px);font-weight:bold;white-space:nowrap;font-family:'Courier New',monospace}
+.hud-course-label.above{bottom:100%;margin-bottom:8px;transform:translateX(-50%);color:rgba(46,230,113,.5)}
+.hud-course-label.below{top:100%;margin-top:8px;transform:translateX(-50%);color:rgba(255,200,50,.45)}
+.hud-course-ship{position:absolute;top:50%;transform:translate(-50%,-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:11px solid rgba(255,200,50,.85);filter:drop-shadow(0 0 6px rgba(255,200,50,.5)) drop-shadow(0 0 12px rgba(255,200,50,.2));transition:left .5s;animation:hud-ship-glow 2s ease-in-out infinite}
+@keyframes hud-ship-glow{0%,100%{filter:drop-shadow(0 0 6px rgba(255,200,50,.5))}50%{filter:drop-shadow(0 0 10px rgba(255,200,50,.7)) drop-shadow(0 0 18px rgba(255,200,50,.3))}}
+.hud-course-eta{font-size:clamp(8px,.7vw,10px);color:rgba(160,180,190,.4);font-family:'Courier New',monospace;text-align:center;letter-spacing:2px;font-weight:bold}
+.hud-course-dist{position:absolute;top:50%;transform:translateY(10px);font-size:clamp(6px,.5vw,8px);font-family:'Courier New',monospace;color:rgba(94,196,212,.25);text-align:center}
+.hud-gs{position:absolute;left:50%;bottom:5%;transform:translateX(-50%);width:clamp(300px,40vw,550px);height:clamp(160px,22vh,300px)}
+.hud-gs canvas{width:100%;height:100%}
 
 /* === SHUTTLE BAY === */
 .shuttle-panel{position:fixed;inset:0;z-index:14;display:none;background:rgba(4,8,12,.9);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);pointer-events:auto}
@@ -1299,7 +1345,7 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
 <div class="scope-panel"><div class="scope-label">Sys Waveform</div><canvas id="scope" width="160" height="40"></canvas></div>
 
 <!-- Radar -->
-<div class="radar-panel" style="bottom:clamp(300px,40vh,460px);right:clamp(42px,5.6vw,92px)"><div class="radar-label">Lidar</div><canvas id="radar" width="210" height="210"></canvas></div>
+<div class="radar-panel" style="bottom:clamp(280px,38vh,440px);right:clamp(42px,5.6vw,92px)"><div class="radar-label">Lidar</div><canvas id="radar" width="210" height="210"></canvas></div>
 
 <!-- Condensation drips -->
 <div class="drip" id="drip1"></div>
@@ -1327,10 +1373,25 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
   <button class="scr-btn" data-screen="watch" style="border-color:rgba(212,160,60,.2);color:#d4a03c">Watch</button>
   <button class="scr-btn" data-screen="weapons" style="border-color:rgba(231,76,60,.2);color:#e74c3c">Wpns</button>
   <button class="scr-btn" data-screen="shuttle" style="border-color:rgba(94,196,212,.25)">Bay</button>
+  <button class="scr-btn" id="hud-toggle" style="border-color:rgba(46,204,113,.2);color:#2ecc71">HUD</button>
 </div>
 
 <!-- WATCH SUMMARY -->
 <div class="watch-modal" id="watch-modal"></div>
+
+<!-- HUD OVERLAY -->
+<div class="hud-overlay" id="hud-overlay">
+  <div class="hud-corner hud-tc" id="hud-status"></div>
+  <div class="hud-corner hud-tl" id="hud-nav"></div>
+  <div class="hud-corner hud-tr" id="hud-shields"></div>
+  <div class="hud-corner hud-bl" id="hud-eng"></div>
+  <div class="hud-corner hud-br" id="hud-fuel"></div>
+  <div class="hud-corner hud-bc" id="hud-throttle"></div>
+  <div class="hud-course" id="hud-course"></div>
+  <div class="hud-gs" id="hud-gs">
+    <canvas id="hud-gs-cv"></canvas>
+  </div>
+</div>
 
 <!-- COMMS INITIATE -->
 
@@ -7386,8 +7447,8 @@ const replyOptions={
     {text:'Negative, our sensors show nominal.',followup:{src:'Science Vessel Curie',msg:'Copy that. Could be localized. We\'ll continue monitoring.'}},
   ],
   'Unknown Signal':[
-    {text:'Attempting to triangulate.',followup:null},
-    {text:'Ignore and log.',followup:null},
+    {text:'Attempting to triangulate.',followup:null,action:'triangulate'},
+    {text:'Ignore and log.',followup:null,action:'log_signal'},
   ],
   '_default':[
     {text:'Copy that.',followup:null},
@@ -7409,6 +7470,25 @@ function showRadioReply(src){
     logComms('Captain',opt.text,true);
     addCaptainEntry(opt.text);
     el.classList.remove('show');
+    // Handle special actions
+    if(opt.action==='triangulate'){
+      setTimeout(()=>{
+        logComms('Science','Triangulation in progress… analyzing signal origin.');
+        addCrewEntry('Dr. Tanaka is running signal triangulation algorithms.');
+      },1500);
+      setTimeout(()=>{
+        const bearing=((hudHeading+30+Math.random()*60)%360).toFixed(1);
+        const dist=(2+Math.random()*15).toFixed(1);
+        logComms('Science','Signal origin: bearing '+bearing+'°, approximate range '+dist+' ly. Source is mobile.');
+        addCrewEntry('Dr. Tanaka: "Got a partial fix. Whatever it is, it\'s moving."');
+        addDiscovery('signal','Triangulated unknown signal: bearing '+bearing+'°, range ~'+dist+' ly');
+      },5000);
+    }
+    if(opt.action==='log_signal'){
+      logComms('Comms','Signal logged to database. Spectral fingerprint archived for analysis.');
+      addCrewEntry('Comms: Unknown signal catalogued. Frequency pattern saved.');
+      addDiscovery('signal','Unknown signal intercepted and logged. Origin unresolved.');
+    }
     // Schedule follow-up
     if(opt.followup){
       setTimeout(()=>{
@@ -7994,6 +8074,258 @@ function scheduleSupernova(){
   setTimeout(()=>{if(engaged)triggerSupernova();scheduleSupernova()},delay);
 }
 scheduleSupernova();
+
+// === HUD OVERLAY ===
+let hudActive=false;
+document.getElementById('hud-toggle').addEventListener('click',()=>{
+  hudActive=!hudActive;
+  document.getElementById('hud-overlay').classList.toggle('show',hudActive);
+  const btn=document.getElementById('hud-toggle');
+  btn.classList.toggle('active',hudActive);
+  if(hudActive)updateHUD();
+  if(engaged)clickSound();
+});
+
+function updateHUD(){
+  if(!hudActive)return;
+  const elapsed=Date.now()-missionStart;
+  const n=performance.now()*.001;
+  const ms=elapsed*100;const ts=Math.floor(ms/1000);
+  const mh=Math.floor(ts/3600)%24,mm=Math.floor(ts/60)%60,mss=ts%60;
+  const clock=String(mh).padStart(2,'0')+':'+String(mm).padStart(2,'0')+':'+String(mss).padStart(2,'0');
+
+  // Status — top center
+  const anyFault=engSystems.some(s=>{const v=s.data.length?s.data[s.data.length-1]:100;return v<s.alertAmber});
+  const anyCrit=engSystems.some(s=>{const v=s.data.length?s.data[s.data.length-1]:100;return v<s.alertRed});
+  const isRedAlert=document.body.classList.contains('red-alert');
+  let statusText,statusClass;
+  if(isRedAlert){statusText='⚠ RED ALERT';statusClass='crit'}
+  else if(anyCrit){statusText='⚠ SYSTEM CRITICAL';statusClass='crit'}
+  else if(anyFault){statusText='SYSTEM DEGRADED';statusClass='warn'}
+  else{statusText='ALL SYSTEMS NOMINAL';statusClass='good'}
+  document.getElementById('hud-status').innerHTML=`<div class="hud-status hud-val ${statusClass}">${statusText}</div>`;
+
+  // Nav — top left
+  const courseBearing=document.getElementById('course-bearing');
+  const brgVal=courseBearing?courseBearing.value:'274.8';
+  document.getElementById('hud-nav').innerHTML=`<div class="hud-title" style="color:rgba(46,204,113,.5)">Navigation</div>
+    <div class="hud-row"><span class="hud-label">HDG </span><span class="hud-val good">${hudHeading.toFixed(1)}°</span></div>
+    <div class="hud-row"><span class="hud-label">VEL </span><span class="hud-val cyan">${hudSpeed.toFixed(4)}c</span></div>
+    <div class="hud-row"><span class="hud-label">MET </span><span class="hud-val">${clock}</span></div>
+    <div class="hud-row"><span class="hud-label">BRG </span><span class="hud-val good">${brgVal}°</span></div>`;
+
+  // Shields & Weapons — top right
+  const sys=engSystems.find(s=>s.id==='shields');
+  const fwd=sys&&sys.fwdData.length?sys.fwdData[sys.fwdData.length-1].toFixed(0):'-';
+  const prt=sys&&sys.portData.length?sys.portData[sys.portData.length-1].toFixed(0):'-';
+  const stb=sys&&sys.stbdData.length?sys.stbdData[sys.stbdData.length-1].toFixed(0):'-';
+  const aftv=sys&&sys.aftData.length?sys.aftData[sys.aftData.length-1].toFixed(0):'-';
+  const shldClass=shieldsVal<50?'crit':shieldsVal<75?'warn':'';
+  const torpReady=typeof wpnTorpedoes!=='undefined'?wpnTorpedoes:'-';
+  const torpTotal=typeof wpnTorpMax!=='undefined'?wpnTorpMax:'-';
+  const heatPct=typeof wpnHeat!=='undefined'?Math.round(wpnHeat):'0';
+  const heatClass=heatPct>80?'crit':heatPct>50?'warn':'';
+  const hasLock=typeof wpnLockedTarget!=='undefined'&&wpnLockedTarget;
+  document.getElementById('hud-shields').innerHTML=`<div class="hud-title" style="color:rgba(255,70,70,.5)">Shields / Weapons</div>
+    <div class="hud-row"><span class="hud-label">SHD </span><span class="hud-val ${shldClass||'cyan'}">${Math.round(shieldsVal)}%</span> <span class="hud-label">F</span><span class="hud-val good">${fwd}</span> <span class="hud-label">P</span><span class="hud-val good">${prt}</span> <span class="hud-label">S</span><span class="hud-val warn">${stb}</span> <span class="hud-label">A</span><span class="hud-val warn">${aftv}</span></div>
+    <div class="hud-row"><span class="hud-label">TRP </span><span class="hud-val ${torpReady<3?'crit':torpReady<6?'warn':'good'}">${torpReady}/${torpTotal}</span></div>
+    <div class="hud-row"><span class="hud-label">LAS </span><span class="hud-val ${heatClass||'good'}">${heatPct}% heat</span></div>
+    <div class="hud-row"><span class="hud-label">WPN </span><span class="hud-val ${hasLock?'crit':'good'}">${hasLock?'● LOCKED — '+wpnLockedTarget.name:'○ SAFE'}</span></div>`;
+
+  // Engineering — bottom left
+  const reactor=engSystems.find(s=>s.id==='reactor');const rVal=reactor&&reactor.data.length?reactor.data[reactor.data.length-1]:0;
+  const hull=engSystems.find(s=>s.id==='hull');const hVal=hull&&hull.data.length?hull.data[hull.data.length-1]:0;
+  const ls=engSystems.find(s=>s.id==='lifesup');const lVal=ls&&ls.data.length?ls.data[ls.data.length-1]:0;
+  const cool=engSystems.find(s=>s.id==='coolant');const cVal=cool&&cool.data.length?cool.data[cool.data.length-1]:0;
+  const rClass=rVal<reactor.alertRed?'crit':rVal<reactor.alertAmber?'warn':'';
+  const hClass=hVal<hull.alertRed?'crit':hVal<hull.alertAmber?'warn':'';
+  const lClass=lVal<ls.alertRed?'crit':lVal<ls.alertAmber?'warn':'';
+  const cClass=cVal<cool.alertRed?'crit':cVal<cool.alertAmber?'warn':'';
+  document.getElementById('hud-eng').innerHTML=`<div class="hud-title" style="color:rgba(255,200,50,.5)">Engineering</div>
+    <div class="hud-row"><span class="hud-label">RCT </span><span class="hud-val ${rClass||'good'}">${rVal.toFixed(1)}%</span></div>
+    <div class="hud-row"><span class="hud-label">HUL </span><span class="hud-val ${hClass||'good'}">${hVal.toFixed(1)}%</span></div>
+    <div class="hud-row"><span class="hud-label">O₂  </span><span class="hud-val ${lClass||'cyan'}">${Math.round(o2Val)}%</span></div>
+    <div class="hud-row"><span class="hud-label">CLT </span><span class="hud-val ${cClass||'warn'}">${cVal.toFixed(0)} kPa</span></div>`;
+
+  // Fuel — bottom right
+  const burnRate=(throttle*2.4).toFixed(2);
+  const projRange=hudFuel>0?(hudFuel/Math.max(.01,throttle*2.4)*hudSpeed*3600).toFixed(1):'0.0';
+  const fuelClass=hudFuel<15?'crit':hudFuel<30?'warn':'';
+  const resClass=fuelReserve<10?'crit':fuelReserve<20?'warn':'';
+  document.getElementById('hud-fuel').innerHTML=`<div class="hud-title" style="color:rgba(94,210,230,.5)">Fuel</div>
+    <div class="hud-row"><span class="hud-label">PRI </span><span class="hud-val ${fuelClass||'good'}">${hudFuel.toFixed(1)}%</span></div>
+    <div class="hud-row"><span class="hud-label">RSV </span><span class="hud-val ${resClass||'cyan'}">${fuelReserve.toFixed(1)}%</span></div>
+    <div class="hud-row"><span class="hud-label">BRN </span><span class="hud-val warn">${burnRate}%/hr</span></div>
+    <div class="hud-row"><span class="hud-label">RNG </span><span class="hud-val good">${projRange} ly</span></div>`;
+
+  // Throttle bar — bottom center
+  const tPct=Math.round(throttle*100);
+  const tColor=tPct>80?'rgba(255,70,70,.6)':tPct>50?'rgba(255,200,50,.5)':'rgba(46,204,113,.5)';
+  document.getElementById('hud-throttle').innerHTML=`<div class="hud-row"><span class="hud-label">THR </span><span class="hud-val ${tPct>80?'crit':tPct>50?'warn':'good'}">${tPct}%</span></div>
+    <div class="hud-throttle-track"><div class="hud-throttle-fill" style="width:${tPct}%;background:${tColor}"></div></div>`;
+
+  // Course track
+  const courseEl=document.getElementById('hud-course');
+  if(navRoute.length>=2){
+    // Calculate total route distance and per-leg distances
+    let legs=[];let totalDist=0;
+    for(let i=1;i<navRoute.length;i++){
+      const a=navWaypoints[navRoute[i-1]],b=navWaypoints[navRoute[i]];
+      const d=Math.sqrt((b.x-a.x)**2+(b.y-a.y)**2);
+      legs.push({from:navRoute[i-1],to:navRoute[i],dist:d});
+      totalDist+=d;
+    }
+    // Ship is on leg 0 at npShipProgress
+    let cumDist=0;
+    const shipGlobalProgress=(legs[0].dist*npShipProgress)/totalDist;
+    let trackHTML='<div class="hud-course-track"><div class="hud-course-line"></div>';
+    // Draw legs with distance labels
+    let pos=0;
+    legs.forEach((leg,li)=>{
+      const legPct=(leg.dist/totalDist)*100;
+      const cls=li===0?(npShipProgress>=1?'completed':'current'):'future';
+      trackHTML+=`<div class="hud-course-leg ${cls}" style="left:${pos}%;width:${legPct}%"></div>`;
+      // Distance label centered on each leg
+      const legDist=(leg.dist*120).toFixed(0);
+      const midPos=pos+legPct/2;
+      trackHTML+=`<div class="hud-course-dist" style="left:${midPos}%;transform:translateX(-50%) translateY(10px)">${legDist} ly</div>`;
+      pos+=legPct;
+    });
+    // Draw waypoint markers
+    pos=0;
+    for(let i=0;i<navRoute.length;i++){
+      const wp=navWaypoints[navRoute[i]];
+      const isStation=wp.type==='Station';
+      const isVisited=wp.visited||i===0;
+      const isCurrent=i===0;
+      const wpCls=isCurrent?'current':isVisited?'visited':'future';
+      const staCls=isStation?' station':'';
+      // Alternate labels above/below to prevent overlap
+      const labelCls=i%2===0?'above':'below';
+      trackHTML+=`<div class="hud-course-wp ${wpCls}${staCls}" style="left:${pos}%"></div>`;
+      trackHTML+=`<div class="hud-course-label ${labelCls}" style="left:${pos}%">${wp.name}</div>`;
+      if(i<legs.length)pos+=(legs[i].dist/totalDist)*100;
+    }
+    // Ship marker
+    const shipPct=shipGlobalProgress*100;
+    trackHTML+=`<div class="hud-course-ship" style="left:${shipPct}%"></div>`;
+    trackHTML+='</div>';
+    // ETA line
+    const nextWp=navWaypoints[navRoute[1]];
+    const distToNext=legs[0].dist*(1-npShipProgress)*120;// ly scale
+    const etaDays=Math.max(1,Math.round(distToNext/(hudSpeed+.0001)*2.4));
+    trackHTML+=`<div class="hud-course-eta"><span class="hud-val warn">${nextWp.name}</span> <span class="hud-label">— </span><span class="hud-val cyan">${distToNext.toFixed(1)} ly</span> <span class="hud-label">— </span><span class="hud-val good">${etaDays}d</span></div>`;
+    courseEl.innerHTML=trackHTML;
+    courseEl.style.display='block';
+    // Glide slope indicator — 3D approach tunnel
+    const gsCv=document.getElementById('hud-gs-cv');
+    const gsContainer=document.getElementById('hud-gs');
+    if(gsCv){
+      gsCv.width=gsContainer.offsetWidth*2||400;
+      gsCv.height=gsContainer.offsetHeight*2||240;
+      const gc=gsCv.getContext('2d');
+      const gw=gsCv.width,gh=gsCv.height,gcx=gw/2,gcy=gh/2;
+      gc.clearRect(0,0,gw,gh);
+
+      const idealHdg=Math.atan2(nextWp.x-navWaypoints[navRoute[0]].x,nextWp.y-navWaypoints[navRoute[0]].y)*180/Math.PI;
+      const deviation=((hudHeading-idealHdg+540)%360-180);
+      const vertDev=Math.sin(n*.4)*4+(Math.random()-.5)*.3;
+      const devX=Math.max(-1,Math.min(1,deviation/20));
+      const devY=Math.max(-1,Math.min(1,vertDev/10));
+      const devMag=Math.sqrt(devX*devX+devY*devY);
+
+      // 3D perspective tunnel rings receding into center
+      for(let i=8;i>=0;i--){
+        const t=i/8;
+        const sz=.15+t*.85;// inner rings smaller
+        const rw=gw*.42*sz,rh=gh*.42*sz;
+        const depth=1-t;// 0=far, 1=near
+        const offX=devX*depth*gw*.15;
+        const offY=devY*depth*gh*.15;
+        // Neon green rings with depth glow
+        const bright=.12+depth*.18;
+        const glow=bright*.4;
+        // Outer glow
+        gc.strokeStyle=`rgba(46,255,100,${glow})`;
+        gc.lineWidth=4+depth*3;
+        gc.beginPath();gc.ellipse(gcx+offX,gcy+offY,rw,rh,0,0,6.283);gc.stroke();
+        // Core ring
+        gc.strokeStyle=`rgba(46,255,100,${bright})`;
+        gc.lineWidth=1+depth*1.5;
+        gc.beginPath();gc.ellipse(gcx+offX,gcy+offY,rw,rh,0,0,6.283);gc.stroke();
+      }
+
+      // Crosshair at center (vanishing point)
+      gc.strokeStyle='rgba(46,255,100,.1)';gc.lineWidth=1;
+      gc.beginPath();gc.moveTo(0,gcy);gc.lineTo(gw,gcy);gc.stroke();
+      gc.beginPath();gc.moveTo(gcx,0);gc.lineTo(gcx,gh);gc.stroke();
+
+      // Horizon reference marks
+      gc.strokeStyle='rgba(46,255,100,.2)';gc.lineWidth=1.5;
+      gc.beginPath();gc.moveTo(gcx-gw*.35,gcy);gc.lineTo(gcx-gw*.2,gcy);gc.stroke();
+      gc.beginPath();gc.moveTo(gcx+gw*.2,gcy);gc.lineTo(gcx+gw*.35,gcy);gc.stroke();
+      // Pitch ladder
+      [-1,1].forEach(dir=>{
+        gc.strokeStyle='rgba(46,255,100,.08)';gc.lineWidth=1;
+        gc.beginPath();gc.moveTo(gcx-gw*.12,gcy+dir*gh*.25);gc.lineTo(gcx+gw*.12,gcy+dir*gh*.25);gc.stroke();
+        gc.strokeStyle='rgba(46,255,100,.04)';
+        gc.beginPath();gc.moveTo(gcx-gw*.08,gcy+dir*gh*.4);gc.lineTo(gcx+gw*.08,gcy+dir*gh*.4);gc.stroke();
+      });
+
+      // Flight path marker (where you're actually pointed)
+      const fpX=gcx+devX*gw*.3;
+      const fpY=gcy+devY*gh*.3;
+
+      // Trail — history of positions
+      if(!gsCv._trail)gsCv._trail=[];
+      gsCv._trail.push({x:fpX,y:fpY});
+      if(gsCv._trail.length>12)gsCv._trail.shift();
+      gsCv._trail.forEach((pt,ti)=>{
+        const ta=ti/gsCv._trail.length;
+        const tSize=2+ta*2;
+        const tr=devMag<.3?46:devMag<.7?255:255;
+        const tg=devMag<.3?230:devMag<.7?200:70;
+        const tb=devMag<.3?113:devMag<.7?50:70;
+        gc.fillStyle=`rgba(${tr},${tg},${tb},${ta*.2})`;
+        gc.beginPath();gc.arc(pt.x,pt.y,tSize,0,6.283);gc.fill();
+      });
+
+      // Flight path vector — diamond marker
+      const fpColor=devMag<.3?[46,230,113]:devMag<.7?[255,200,50]:[255,70,70];
+      const fpAlpha=.6+Math.sin(n*3)*.15;
+      // Glow
+      gc.fillStyle=`rgba(${fpColor[0]},${fpColor[1]},${fpColor[2]},.1)`;
+      gc.beginPath();gc.arc(fpX,fpY,14,0,6.283);gc.fill();
+      // Diamond
+      const ds=8;
+      gc.fillStyle=`rgba(${fpColor[0]},${fpColor[1]},${fpColor[2]},${fpAlpha})`;
+      gc.beginPath();gc.moveTo(fpX,fpY-ds);gc.lineTo(fpX+ds,fpY);gc.lineTo(fpX,fpY+ds);gc.lineTo(fpX-ds,fpY);gc.closePath();gc.fill();
+      gc.strokeStyle=`rgba(${fpColor[0]},${fpColor[1]},${fpColor[2]},.8)`;gc.lineWidth=1.5;
+      gc.beginPath();gc.moveTo(fpX,fpY-ds);gc.lineTo(fpX+ds,fpY);gc.lineTo(fpX,fpY+ds);gc.lineTo(fpX-ds,fpY);gc.closePath();gc.stroke();
+
+      // Velocity vector line from center to marker
+      gc.strokeStyle=`rgba(${fpColor[0]},${fpColor[1]},${fpColor[2]},.15)`;gc.lineWidth=1;gc.setLineDash([4,4]);
+      gc.beginPath();gc.moveTo(gcx,gcy);gc.lineTo(fpX,fpY);gc.stroke();gc.setLineDash([]);
+
+      // Labels
+      gc.fillStyle='rgba(46,255,100,.25)';gc.font=`bold ${Math.max(9,gw*.03)}px 'Courier New'`;gc.textAlign='center';
+      gc.fillText('GLIDE SLOPE',gcx,gh-4);
+      // Deviation readout
+      const devLabel=devMag<.3?'ON COURSE':devMag<.7?'DRIFT':'OFF COURSE';
+      gc.fillStyle=`rgba(${fpColor[0]},${fpColor[1]},${fpColor[2]},.5)`;
+      gc.font=`bold ${Math.max(8,gw*.025)}px 'Courier New'`;
+      gc.fillText(devLabel,gcx,16);
+      gc.textAlign='start';
+    }
+    document.getElementById('hud-gs').style.display='block';
+  } else {
+    courseEl.innerHTML='<div class="hud-course-eta"><span class="hud-label" style="color:rgba(255,200,50,.3)">NO ROUTE — Plot course in Nav</span></div>';
+    courseEl.style.display='block';
+    document.getElementById('hud-gs').style.display='none';
+  }
+
+  requestAnimationFrame(updateHUD);
+}
 
 // === IDLE CAPTAIN MODE ===
 let lastInteraction=Date.now(),idleMode=false;
