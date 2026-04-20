@@ -775,6 +775,36 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .hud-gs{position:absolute;left:50%;bottom:5%;transform:translateX(-50%);width:clamp(300px,40vw,550px);height:clamp(160px,22vh,300px)}
 .hud-gs canvas{width:100%;height:100%}
 
+/* === CARGO MODULE === */
+.cargo-panel{position:fixed;inset:0;z-index:16;display:none;background:rgba(4,8,12,.92);backdrop-filter:blur(4px);pointer-events:auto}
+.cargo-panel.show{display:flex}
+.cargo-layout{display:flex;width:100%;height:100%;padding:clamp(10px,1.5vh,16px);gap:12px}
+.cargo-main{flex:1;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.cargo-sidebar{width:clamp(240px,22vw,340px);display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.cargo-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:6px;border-bottom:1px solid rgba(212,160,60,.08)}
+.cargo-header .ch-title{font-size:clamp(12px,1.1vw,16px);color:#d4a03c;letter-spacing:4px;text-transform:uppercase}
+.cargo-grid{flex:1;position:relative;border:1px solid rgba(212,160,60,.08);border-radius:3px;overflow:hidden}
+.cargo-grid canvas{width:100%;height:100%}
+.cargo-card{border:1px solid rgba(212,160,60,.08);border-radius:3px;padding:8px 10px;background:rgba(4,8,12,.4)}
+.cargo-card-title{font-size:clamp(8px,.7vw,10px);color:#d4a03c;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
+.cargo-item{display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(212,160,60,.03);font-size:clamp(8px,.7vw,10px)}
+.cargo-item .ci-dot{width:6px;height:6px;border-radius:1px;flex-shrink:0}
+.cargo-item .ci-name{flex:1;color:#4a7a8a}
+.cargo-item .ci-mass{color:#3a5a6a;font-size:clamp(7px,.6vw,9px)}
+.cargo-btn{background:none;border:1px solid rgba(212,160,60,.2);color:#d4a03c;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:5px 10px;cursor:pointer;border-radius:3px;letter-spacing:1px;transition:all .2s;width:100%;margin-top:4px}
+.cargo-btn:hover{border-color:#d4a03c;background:rgba(212,160,60,.06)}
+.cargo-btn:disabled{opacity:.3;pointer-events:none}
+.cargo-env{display:flex;gap:8px;margin-top:4px}
+.cargo-env-item{flex:1;text-align:center;padding:4px;border:1px solid rgba(94,196,212,.06);border-radius:2px}
+.cargo-env-label{font-size:clamp(7px,.55vw,8px);color:#2a4a5a;letter-spacing:1px;text-transform:uppercase}
+.cargo-env-val{font-size:clamp(9px,.8vw,11px);color:#5ec4d4;font-weight:bold}
+.cargo-mini{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:18;width:clamp(400px,42vw,580px);background:rgba(6,10,14,.96);border:1px solid rgba(212,160,60,.2);border-radius:5px;display:none;pointer-events:auto}
+.cargo-mini.show{display:block}
+.cargo-mini-header{padding:10px 14px;border-bottom:1px solid rgba(212,160,60,.1);display:flex;justify-content:space-between;align-items:center}
+.cargo-mini-header .cm-title{font-size:clamp(10px,.9vw,13px);color:#d4a03c;letter-spacing:3px;text-transform:uppercase}
+.cargo-mini-body{padding:12px 14px}
+.cargo-mini canvas{width:100%;border:1px solid rgba(212,160,60,.06);border-radius:3px;background:rgba(4,8,12,.5)}
+
 /* === SHUTTLE BAY === */
 .shuttle-panel{position:fixed;inset:0;z-index:14;display:none;background:rgba(4,8,12,.9);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);pointer-events:auto}
 .shuttle-panel.show{display:flex}
@@ -1373,6 +1403,7 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
   <button class="scr-btn" data-screen="watch" style="border-color:rgba(212,160,60,.2);color:#d4a03c">Watch</button>
   <button class="scr-btn" data-screen="weapons" style="border-color:rgba(231,76,60,.2);color:#e74c3c">Wpns</button>
   <button class="scr-btn" data-screen="shuttle" style="border-color:rgba(94,196,212,.25)">Bay</button>
+  <button class="scr-btn" data-screen="cargo" style="border-color:rgba(212,160,60,.2);color:#d4a03c">Cargo</button>
   <button class="scr-btn" id="hud-toggle" style="border-color:rgba(46,204,113,.2);color:#2ecc71">HUD</button>
 </div>
 
@@ -1408,6 +1439,31 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
 </div>
 
 <!-- POWER ALLOCATION -->
+
+<!-- CARGO MODULE -->
+<div class="cargo-panel" id="cargo-panel">
+<div class="cargo-layout">
+  <div class="cargo-main">
+    <div class="cargo-header"><span class="ch-title">◈ Cargo Bay</span><button class="pwr-close" id="cargo-close">Close</button></div>
+    <div class="cargo-grid"><canvas id="cargo-cv"></canvas></div>
+  </div>
+  <div class="cargo-sidebar">
+    <div class="cargo-card"><div class="cargo-card-title">Mass Distribution</div><canvas id="cargo-mass-cv" height="60" style="width:100%;height:60px;border:1px solid rgba(212,160,60,.06);border-radius:2px;background:rgba(4,8,12,.3)"></canvas>
+    <div style="display:flex;justify-content:space-between;font-size:clamp(8px,.7vw,10px);margin-top:4px"><span style="color:#3a5a6a">Total Mass</span><span style="color:#d4a03c" id="cargo-total-mass">0 kg</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:clamp(8px,.7vw,10px)"><span style="color:#3a5a6a">Capacity</span><span style="color:#3a5a6a">18,000 kg</span></div></div>
+    <div class="cargo-card"><div class="cargo-card-title">Environment</div>
+    <div class="cargo-env"><div class="cargo-env-item"><div class="cargo-env-label">Temp</div><div class="cargo-env-val" id="cargo-temp">18°C</div></div><div class="cargo-env-item"><div class="cargo-env-label">Press</div><div class="cargo-env-val" id="cargo-press">1.00</div></div><div class="cargo-env-item"><div class="cargo-env-label">Rad</div><div class="cargo-env-val" id="cargo-rad">0.2 mSv</div></div></div></div>
+    <div class="cargo-card"><div class="cargo-card-title">Manifest</div><div id="cargo-manifest"></div></div>
+    <div class="cargo-card"><div class="cargo-card-title">Operations</div>
+    <button class="cargo-btn" id="cargo-inspect-btn">◈ Run Inspection</button>
+    <button class="cargo-btn" id="cargo-load-btn">◈ Load New Cargo</button>
+    <button class="cargo-btn" id="cargo-jettison-btn" style="border-color:rgba(231,76,60,.2);color:#e74c3c">⚠ Emergency Jettison</button>
+    <button class="cargo-btn" id="cargo-crane-btn">◈ Operate Crane</button></div>
+    <div class="cargo-card" id="cargo-detail" style="display:none"><div class="cargo-card-title">Container Detail</div><div id="cargo-detail-body"></div></div>
+  </div>
+</div>
+</div>
+<div class="cargo-mini" id="cargo-mini"><div class="cargo-mini-header"><span class="cm-title" id="cargo-mini-title">Mini-Game</span><button class="pwr-close" id="cargo-mini-close">×</button></div><div class="cargo-mini-body" id="cargo-mini-body"></div></div>
 
 <!-- SHUTTLE BAY -->
 <div class="shuttle-panel" id="shuttle-panel">
@@ -2230,7 +2286,8 @@ let difficulty=localStorage.getItem('difficulty')||'standard';
 const sessionStats={scans:0,repairs:0,commsExchanged:0,courseChanges:0,probesLaunched:0,signalsDecrypted:0,nebulaSamples:0,hails:0,powerEvents:0,startTime:Date.now(),
   lasersFired:0,torpedoesFired:0,targetsDestroyed:0,shuttleLaunches:0,shuttleRecoveries:0,waveOffs:0,
   solarFlares:0,gravAnomalies:0,supernovae:0,bioEncounters:0,tractorLocks:0,
-  fuelTransferred:0,fuelJettisoned:0,filterCycles:0,objectivesCompleted:0,idleAutoRepairs:0};
+  fuelTransferred:0,fuelJettisoned:0,filterCycles:0,objectivesCompleted:0,idleAutoRepairs:0,
+  cargoLoaded:0,cargoJettisoned:0,inspections:0,contrabandFound:0,craneOps:0};
 
 // Pre-fill name input
 document.getElementById('ship-name-input').value=shipName==='ISS Artemis'?'':shipName;
@@ -2404,6 +2461,16 @@ function showWatchSummary(){
       ${signalPhase>0?`<div class="watch-row"><span class="wr-label">The Signal</span><span class="wr-val warn">Phase ${signalPhase} / 12</span></div>`:''}
       ${sessionStats.idleAutoRepairs>0?`<div class="watch-row"><span class="wr-label">Idle Auto-Repairs</span><span class="wr-val">${sessionStats.idleAutoRepairs}</span></div>`:''}
     </div>
+    <div class="watch-section">
+      <div class="ws-title">Cargo Operations</div>
+      <div class="watch-row"><span class="wr-label">Bays Occupied</span><span class="wr-val">${cargoBays.filter(b=>b).length} / ${CARGO_COLS*CARGO_ROWS}</span></div>
+      <div class="watch-row"><span class="wr-label">Total Mass</span><span class="wr-val">${cargoBays.filter(b=>b).reduce((s,b)=>s+b.mass,0).toLocaleString()} kg</span></div>
+      ${sessionStats.cargoLoaded>0?`<div class="watch-row"><span class="wr-label">Containers Loaded</span><span class="wr-val highlight">${sessionStats.cargoLoaded}</span></div>`:''}
+      ${sessionStats.cargoJettisoned>0?`<div class="watch-row"><span class="wr-label">Containers Jettisoned</span><span class="wr-val warn">${sessionStats.cargoJettisoned}</span></div>`:''}
+      <div class="watch-row"><span class="wr-label">Inspections</span><span class="wr-val">${sessionStats.inspections}</span></div>
+      ${sessionStats.contrabandFound>0?`<div class="watch-row"><span class="wr-label">Contraband Found</span><span class="wr-val warn">${sessionStats.contrabandFound}</span></div>`:''}
+      ${sessionStats.craneOps>0?`<div class="watch-row"><span class="wr-label">Crane Operations</span><span class="wr-val">${sessionStats.craneOps}</span></div>`:''}
+    </div>
     <div class="watch-email">
       <div class="watch-email-label">Email this report</div>
       <div class="watch-email-row">
@@ -2475,6 +2542,14 @@ function showWatchSummary(){
     body+='Crew Status: 5 Active / 1 Cryo\n';
     if(signalPhase>0)body+='The Signal: Phase '+signalPhase+' / 12\n';
     if(sessionStats.idleAutoRepairs>0)body+='Idle Auto-Repairs: '+sessionStats.idleAutoRepairs+'\n';
+    body+='\n=== CARGO OPERATIONS ===\n';
+    body+='Bays Occupied: '+cargoBays.filter(b=>b).length+' / '+(CARGO_COLS*CARGO_ROWS)+'\n';
+    body+='Total Mass: '+cargoBays.filter(b=>b).reduce((s,b)=>s+b.mass,0).toLocaleString()+' kg\n';
+    if(sessionStats.cargoLoaded>0)body+='Containers Loaded: '+sessionStats.cargoLoaded+'\n';
+    if(sessionStats.cargoJettisoned>0)body+='Containers Jettisoned: '+sessionStats.cargoJettisoned+'\n';
+    body+='Inspections: '+sessionStats.inspections+'\n';
+    if(sessionStats.contrabandFound>0)body+='Contraband Found: '+sessionStats.contrabandFound+'\n';
+    if(sessionStats.craneOps>0)body+='Crane Operations: '+sessionStats.craneOps+'\n';
     body+='\n— Report generated by Starship ASMR Simulator —\n';
     window.open('mailto:'+encodeURIComponent(addr)+'?subject='+subj+'&body='+encodeURIComponent(body));
     const btn=document.getElementById('watch-email-btn');
@@ -2633,6 +2708,9 @@ const crewEvents=[
   'Air filtration module 2B cycled',
   'Lt. Vasquez filed watch report — all clear',
   'Automated hull integrity scan — nominal',
+  'Cpl. Reyes is reorganizing the cargo bay',
+  'Cargo environmental sensors recalibrated',
+  'Forklift bot completed scheduled bay sweep',
 ];
 const logEl=document.getElementById('crew-log');
 let logCount=0;
@@ -3080,6 +3158,12 @@ document.querySelectorAll('.scr-btn').forEach(btn=>{
       else{sp.classList.add('show');btn.classList.add('active');initShuttleBay();drawShuttleBay()}
       if(engaged)clickSound();return;
     }
+    if(id==='cargo'){
+      const cp=document.getElementById('cargo-panel');
+      if(cp.classList.contains('show')){cp.classList.remove('show');btn.classList.remove('active')}
+      else{cp.classList.add('show');btn.classList.add('active');initCargo();renderCargo()}
+      if(engaged)clickSound();return;
+    }
     if(id==='power'){
       const pp=document.getElementById('power-panel');
       if(pp.classList.contains('show')){pp.classList.remove('show');btn.classList.remove('active')}
@@ -3268,14 +3352,12 @@ function showRoomDetail(name){
         },3000);
       }
       if(action==='inventory'){
-        btn.textContent='Checking…';btn.disabled=true;
-        logComms('Cargo','Running cargo manifest inventory check.');
-        setTimeout(()=>{
-          const items=Math.floor(40+Math.random()*60);
-          const mass=Math.floor(800+Math.random()*1200);
-          btn.textContent='✓ Inventory Complete';btn.style.borderColor='#2ecc71';btn.style.color='#2ecc71';
-          logComms('Cargo','Inventory complete. '+items+' items catalogued. Total mass: '+mass+' tonnes. Capacity: 82%.');
-        },2000);
+        const cp=document.getElementById('cargo-panel');
+        if(cp){cp.classList.add('show');
+        document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='cargo')b.classList.add('active')});
+        initCargo();setTimeout(()=>renderCargo(),50)}// delay to let panel become visible
+        btn.textContent='✓ Cargo Bay Open';btn.style.borderColor='#2ecc71';btn.style.color='#2ecc71';
+        logComms('Cargo','Cargo manifest accessed.');
       }
       if(action==='security'){
         btn.textContent='Arming…';btn.disabled=true;
@@ -5908,6 +5990,499 @@ function openRepairModal(sys){
   renderPuzzle();
 }
 
+// === CARGO MODULE ===
+const CARGO_COLS=6,CARGO_ROWS=4,CARGO_MAX_MASS=18000;
+const cargoTypes={supply:{color:'#5ec4d4',label:'Supply'},equip:{color:'#d4a03c',label:'Equipment'},bio:{color:'#2ecc71',label:'Biological'},hazard:{color:'#e74c3c',label:'Hazardous'},classified:{color:'#9b59b6',label:'Classified'},salvage:{color:'#7f8c8d',label:'Salvage'},personal:{color:'#e8c060',label:'Personal'}};
+let cargoBays=[],cargoInited=false,cargoSelected=-1,cargoAnimFrame=0;
+const cargoItems=[
+  {name:'Water Filtration Units',type:'supply',mass:420,origin:'Earth Station',notes:'Essential — 6 month supply',temp:[2,30]},
+  {name:'Meal Pack Crate (x200)',type:'supply',mass:180,origin:'Waypoint Delta',notes:'Assorted rations',temp:[0,40]},
+  {name:'Medical Kit Alpha',type:'supply',mass:85,origin:'UESA Medical',notes:'Surgical suite consumables',temp:[4,22]},
+  {name:'Replacement Fuel Rods',type:'equip',mass:1200,origin:'Orbital Foundry',notes:'Tokamak compatible — handle with care',temp:[-20,60]},
+  {name:'Sensor Array Spares',type:'equip',mass:340,origin:'Kepler Station',notes:'Includes 4 calibration units',temp:[-40,80]},
+  {name:'EVA Suit (Reserve)',type:'equip',mass:95,origin:'UESA Outfitters',notes:'Size: Universal',temp:[-10,50]},
+  {name:'Nebula Gas Sample NB-7',type:'bio',mass:12,origin:'Sector 7 Transit',notes:'FRAGILE — pressurized containment',temp:[15,25]},
+  {name:'Bioluminescent Specimen',type:'bio',mass:8,origin:'Deep Space',notes:'Living organism — maintain 20°C',temp:[18,23]},
+  {name:'Soil Core — Kepler-442b',type:'bio',mass:45,origin:'Probe Return',notes:'Sealed biohazard container',temp:[0,30]},
+  {name:'Refined Tritanium (2T)',type:'equip',mass:2000,origin:'Mining Guild',notes:'Trade goods — high value',temp:[-200,500]},
+  {name:'Data Crystal Archive',type:'equip',mass:5,origin:'Trappist Colony',notes:'Cultural records — irreplaceable',temp:[10,35]},
+  {name:'Sealed Container 7-α',type:'classified',mass:340,origin:'Unknown',notes:'DO NOT OPEN — UESA eyes only',temp:[-10,40]},
+  {name:'Object Sigma',type:'classified',mass:28,origin:'Redacted',notes:'Mass readings inconsistent. Handle with care.',temp:[0,50]},
+  {name:'Cosmo — Toys & Treats',type:'personal',mass:3,origin:'Earth',notes:'1 feather wand, 4 bags treats, 1 tiny sweater',temp:[15,30]},
+  {name:'Guitar Case (Reyes)',type:'personal',mass:6,origin:'Mars Colony',notes:'He never plays it',temp:[10,35]},
+  {name:'Pressed Flowers (Okafor)',type:'personal',mass:1,origin:'Mars Botanical',notes:'Sealed in resin. Sentimental.',temp:[10,35]},
+];
+
+function initCargo(){
+  if(cargoInited)return;cargoInited=true;
+  cargoBays=Array(CARGO_COLS*CARGO_ROWS).fill(null);
+  // Place initial cargo randomly
+  const shuffled=[...cargoItems].sort(()=>Math.random()-.5);
+  shuffled.forEach((item,i)=>{
+    if(i<CARGO_COLS*CARGO_ROWS){
+      // Find random empty bay
+      let bay;do{bay=Math.floor(Math.random()*cargoBays.length)}while(cargoBays[bay]);
+      cargoBays[bay]={...item,condition:95+Math.random()*5,led:'green',id:i};
+    }
+  });
+}
+
+function renderCargo(){
+  if(!document.getElementById('cargo-panel').classList.contains('show'))return;
+  drawCargoGrid();drawCargoMass();renderManifest();updateCargoEnv();
+  cargoAnimFrame=requestAnimationFrame(renderCargo);
+}
+
+function drawCargoGrid(){
+  const cv=document.getElementById('cargo-cv');if(!cv)return;
+  const cx=cv.getContext('2d');
+  cv.width=cv.parentElement.offsetWidth*2;cv.height=cv.parentElement.offsetHeight*2;
+  if(cv.width<10||cv.height<10)return;// panel not visible yet
+  const w=cv.width,h=cv.height,n=performance.now()*.001;
+  cx.fillStyle='rgba(4,8,12,.95)';cx.fillRect(0,0,w,h);
+  const padX=w*.06,padY=h*.06;
+  const cellW=(w-padX*2)/CARGO_COLS,cellH=(h-padY*2)/CARGO_ROWS;
+  const isoSkew=.12;// slight isometric offset
+  // Floor grid
+  cx.strokeStyle='rgba(212,160,60,.04)';cx.lineWidth=.5;
+  for(let r=0;r<=CARGO_ROWS;r++){const y=padY+r*cellH;cx.beginPath();cx.moveTo(padX+r*cellH*isoSkew,y);cx.lineTo(w-padX+r*cellH*isoSkew,y);cx.stroke()}
+  for(let c=0;c<=CARGO_COLS;c++){const x=padX+c*cellW;cx.beginPath();cx.moveTo(x+padY*isoSkew,padY);cx.lineTo(x+(padY+CARGO_ROWS*cellH)*isoSkew,padY+CARGO_ROWS*cellH);cx.stroke()}
+  // Deck markings
+  cx.strokeStyle='rgba(212,160,60,.06)';cx.lineWidth=1.5;cx.setLineDash([6,4]);
+  cx.strokeRect(padX+2,padY+2,cellW*CARGO_COLS-4+CARGO_ROWS*cellH*isoSkew,cellH*CARGO_ROWS-4);cx.setLineDash([]);
+  // Draw containers
+  cargoBays.forEach((item,i)=>{
+    const col=i%CARGO_COLS,row=Math.floor(i/CARGO_COLS);
+    const x=padX+col*cellW+row*cellH*isoSkew+4;
+    const y=padY+row*cellH+4;
+    const cw=cellW-8,ch=cellH-8;
+    if(!item){
+      cx.strokeStyle='rgba(212,160,60,.04)';cx.lineWidth=.5;cx.strokeRect(x,y,cw,ch);
+      cx.fillStyle='rgba(212,160,60,.015)';cx.fillRect(x,y,cw,ch);
+      // Bay label
+      cx.fillStyle='rgba(212,160,60,.08)';cx.font=`${Math.max(9,w*.012)}px 'Courier New'`;cx.textAlign='center';
+      cx.fillText(String.fromCharCode(65+row)+'-'+(col+1),x+cw/2,y+ch/2+3);cx.textAlign='start';
+      return;
+    }
+    const tc=cargoTypes[item.type]||cargoTypes.supply;
+    const sel=i===cargoSelected;
+    // Container body — 3D effect
+    const depth=6;
+    // Side face
+    cx.fillStyle=tc.color+'18';cx.beginPath();
+    cx.moveTo(x+cw,y);cx.lineTo(x+cw+depth,y-depth);cx.lineTo(x+cw+depth,y+ch-depth);cx.lineTo(x+cw,y+ch);cx.fill();
+    // Top face
+    cx.fillStyle=tc.color+'10';cx.beginPath();
+    cx.moveTo(x,y);cx.lineTo(x+depth,y-depth);cx.lineTo(x+cw+depth,y-depth);cx.lineTo(x+cw,y);cx.fill();
+    // Front face
+    cx.fillStyle=tc.color+(sel?'25':'15');cx.fillRect(x,y,cw,ch);
+    cx.strokeStyle=tc.color+(sel?'60':'30');cx.lineWidth=sel?1.5:1;cx.strokeRect(x,y,cw,ch);
+    // Hazard stripes for hazardous
+    if(item.type==='hazard'){
+      cx.strokeStyle='rgba(231,76,60,.08)';cx.lineWidth=1;
+      for(let s=0;s<cw+ch;s+=8){cx.beginPath();cx.moveTo(x+Math.min(s,cw),y+Math.max(0,s-cw));cx.lineTo(x+Math.max(0,s-ch),y+Math.min(s,ch));cx.stroke()}
+    }
+    // Bio containment ring
+    if(item.type==='bio'){
+      cx.strokeStyle='rgba(46,204,113,.1)';cx.lineWidth=1;cx.beginPath();cx.arc(x+cw/2,y+ch/2,Math.min(cw,ch)*.35,0,6.283);cx.stroke();
+    }
+    // Classified redaction
+    if(item.type==='classified'){
+      cx.fillStyle='rgba(155,89,182,.06)';
+      for(let b=0;b<3;b++)cx.fillRect(x+6,y+ch*.25+b*ch*.18,cw-12,ch*.1);
+    }
+    // LED indicator
+    const ledColor=item.condition>90?'rgba(46,204,113,.5)':item.condition>70?'rgba(212,160,60,.5)':'rgba(231,76,60,.5)';
+    cx.fillStyle=ledColor;cx.beginPath();cx.arc(x+cw-8,y+8,2.5,0,6.283);cx.fill();
+    // Container label
+    cx.fillStyle=tc.color+(sel?'80':'40');cx.font=`${Math.max(8,w*.011)}px 'Courier New'`;cx.textAlign='center';
+    const label=item.name.length>14?item.name.substring(0,13)+'…':item.name;
+    cx.fillText(label,x+cw/2,y+ch/2+3);
+    // Mass below
+    cx.fillStyle='rgba(160,180,190,.15)';cx.font=`${Math.max(7,w*.009)}px 'Courier New'`;
+    cx.fillText(item.mass+'kg',x+cw/2,y+ch-6);cx.textAlign='start';
+    // Selection glow
+    if(sel){
+      cx.strokeStyle=tc.color+'40';cx.lineWidth=3;cx.strokeRect(x-2,y-2,cw+4,ch+4);
+    }
+  });
+  // Dust particles
+  for(let d=0;d<8;d++){
+    const dx=padX+Math.sin(n*.2+d*7)*w*.4+w*.3;
+    const dy=padY+Math.cos(n*.15+d*11)*h*.3+h*.3;
+    cx.fillStyle=`rgba(212,160,60,${.02+Math.sin(n+d)*.01})`;cx.beginPath();cx.arc(dx,dy,1,0,6.283);cx.fill();
+  }
+  // Forklift bot
+  const botX=padX+((n*.3)%(CARGO_COLS*cellW));const botY=padY+CARGO_ROWS*cellH+10;
+  cx.fillStyle='rgba(212,160,60,.15)';cx.fillRect(botX,botY,12,8);
+  cx.fillStyle='rgba(212,160,60,.1)';cx.fillRect(botX+2,botY-4,3,4);cx.fillRect(botX+7,botY-4,3,4);
+  // Labels
+  cx.fillStyle='rgba(212,160,60,.12)';cx.font=`${Math.max(9,w*.012)}px 'Courier New'`;
+  cx.fillText('CARGO BAY — DECK 3',padX,padY-8);
+  // Click handler attaches once
+  if(!cv._clickBound){
+    cv._clickBound=true;
+    cv.addEventListener('click',e=>{
+      const rect=cv.getBoundingClientRect();const mx=(e.clientX-rect.left)/rect.width*cv.width;const my=(e.clientY-rect.top)/rect.height*cv.height;
+      const padX2=cv.width*.06,padY2=cv.height*.06;
+      const cw2=(cv.width-padX2*2)/CARGO_COLS,ch2=(cv.height-padY2*2)/CARGO_ROWS;
+      let found=-1;
+      for(let i=0;i<cargoBays.length;i++){
+        const col=i%CARGO_COLS,row=Math.floor(i/CARGO_COLS);
+        const bx=padX2+col*cw2+row*ch2*.12,by=padY2+row*ch2;
+        if(mx>=bx&&mx<=bx+cw2&&my>=by&&my<=by+ch2){found=i;break}
+      }
+      cargoSelected=found===cargoSelected?-1:found;
+      showCargoDetail(cargoSelected);
+      if(engaged)clickSound();
+    });
+  }
+}
+
+function drawCargoMass(){
+  const cv=document.getElementById('cargo-mass-cv');if(!cv)return;
+  const tmEl=document.getElementById('cargo-total-mass');
+  const cx=cv.getContext('2d');cv.width=cv.offsetWidth*2||400;cv.height=120;
+  if(cv.width<10)return;// panel not visible yet
+  cx.fillStyle='rgba(4,8,12,.3)';cx.fillRect(0,0,cv.width,cv.height);
+  const w=cv.width,h=cv.height,cX=w/2,cY=h/2;
+  // Ship silhouette
+  cx.strokeStyle='rgba(212,160,60,.12)';cx.lineWidth=1;
+  cx.beginPath();cx.moveTo(cX,cY-22);cx.lineTo(cX-20,cY+15);cx.lineTo(cX+20,cY+15);cx.closePath();cx.stroke();
+  cx.beginPath();cx.moveTo(cX-20,cY+5);cx.lineTo(cX-35,cY+15);cx.lineTo(cX-20,cY+15);cx.fill();
+  cx.beginPath();cx.moveTo(cX+20,cY+5);cx.lineTo(cX+35,cY+15);cx.lineTo(cX+20,cY+15);cx.fill();
+  // Calculate center of mass
+  let totalMass=0,comX=0,comY=0;
+  cargoBays.forEach((item,i)=>{
+    if(!item)return;totalMass+=item.mass;
+    const col=i%CARGO_COLS,row=Math.floor(i/CARGO_COLS);
+    comX+=item.mass*(col/(CARGO_COLS-1)*2-1);comY+=item.mass*(row/(CARGO_ROWS-1)*2-1);
+  });
+  document.getElementById('cargo-total-mass')&&(document.getElementById('cargo-total-mass').textContent=totalMass.toLocaleString()+' / '+CARGO_MAX_MASS.toLocaleString()+' kg');
+  if(totalMass>0){comX/=totalMass;comY/=totalMass}
+  const dotX=cX+comX*15,dotY=cY+comY*10;
+  const dev=Math.sqrt(comX*comX+comY*comY);
+  const dotColor=dev<.3?'rgba(46,204,113,.6)':dev<.6?'rgba(212,160,60,.6)':'rgba(231,76,60,.6)';
+  cx.fillStyle=dotColor;cx.beginPath();cx.arc(dotX,dotY,4,0,6.283);cx.fill();
+  cx.fillStyle=dotColor.replace('.6)','.15)');cx.beginPath();cx.arc(dotX,dotY,10,0,6.283);cx.fill();
+  if(dev>.5){cx.fillStyle='rgba(231,76,60,.4)';cx.font=`bold ${Math.max(8,w*.02)}px 'Courier New'`;cx.textAlign='center';cx.fillText('TRIM WARNING',cX,h-4);cx.textAlign='start'}
+}
+
+function renderManifest(){
+  const el=document.getElementById('cargo-manifest');if(!el)return;
+  const items=cargoBays.filter(b=>b);
+  el.innerHTML=items.map(item=>{
+    const tc=cargoTypes[item.type];
+    return`<div class="cargo-item"><div class="ci-dot" style="background:${tc.color}"></div><span class="ci-name">${item.name}</span><span class="ci-mass">${item.mass}kg</span></div>`;
+  }).join('')||'<div style="color:#2a4a5a;font-size:clamp(8px,.7vw,10px);font-style:italic">Bay empty</div>';
+}
+
+function updateCargoEnv(){
+  const n=performance.now()*.001;
+  const t=document.getElementById('cargo-temp'),p=document.getElementById('cargo-press'),r=document.getElementById('cargo-rad');
+  if(t)t.textContent=Math.round(18+Math.sin(n*.1)*.5)+'°C';
+  if(p)p.textContent=(1.00+Math.sin(n*.07)*.005).toFixed(2);
+  if(r)r.textContent=(0.2+Math.sin(n*.05)*.02).toFixed(1)+' mSv';
+}
+
+function showCargoDetail(idx){
+  const det=document.getElementById('cargo-detail');const body=document.getElementById('cargo-detail-body');
+  if(idx<0||!cargoBays[idx]){det.style.display='none';return}
+  const item=cargoBays[idx];const tc=cargoTypes[item.type];
+  const col=idx%CARGO_COLS,row=Math.floor(idx/CARGO_COLS);
+  det.style.display='block';
+  body.innerHTML=`<div style="color:${tc.color};font-size:clamp(9px,.8vw,11px);margin-bottom:4px">${item.name}</div>
+    <div class="cargo-item"><span class="ci-name">Bay</span><span class="ci-mass">${String.fromCharCode(65+row)}-${col+1}</span></div>
+    <div class="cargo-item"><span class="ci-name">Type</span><span class="ci-mass" style="color:${tc.color}">${tc.label}</span></div>
+    <div class="cargo-item"><span class="ci-name">Mass</span><span class="ci-mass">${item.mass} kg</span></div>
+    <div class="cargo-item"><span class="ci-name">Origin</span><span class="ci-mass">${item.origin}</span></div>
+    <div class="cargo-item"><span class="ci-name">Condition</span><span class="ci-mass" style="color:${item.condition>90?'#2ecc71':item.condition>70?'#d4a03c':'#e74c3c'}">${item.condition.toFixed(0)}%</span></div>
+    <div class="cargo-item"><span class="ci-name">Temp Range</span><span class="ci-mass">${item.temp[0]}°C — ${item.temp[1]}°C</span></div>
+    <div style="color:#3a5a6a;font-size:clamp(7px,.6vw,9px);margin-top:4px;font-style:italic">${item.notes}</div>`;
+}
+
+// Close handlers
+document.getElementById('cargo-close').addEventListener('click',()=>{
+  document.getElementById('cargo-panel').classList.remove('show');
+  document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='cargo')b.classList.remove('active')});
+  cancelAnimationFrame(cargoAnimFrame);if(engaged)clickSound();
+});
+document.getElementById('cargo-mini-close').addEventListener('click',()=>{document.getElementById('cargo-mini').classList.remove('show');const ccv=document.getElementById('cargo-cv');if(ccv)ccv._tetrisMode=false;if(engaged)clickSound()});
+
+// === MINI-GAME 1: CARGO TETRIS ===
+document.getElementById('cargo-load-btn').addEventListener('click',()=>{
+  if(!engaged)return;
+  const mini=document.getElementById('cargo-mini');const body=document.getElementById('cargo-mini-body');
+  document.getElementById('cargo-mini-title').textContent='Load Incoming Cargo';
+  const empties=cargoBays.reduce((a,b,i)=>b?a:[...a,i],[]);
+  if(empties.length<3){body.innerHTML='<div style="color:#e74c3c;font-size:clamp(9px,.8vw,11px);text-align:center;padding:20px">Insufficient bay space. Jettison cargo first.</div>';mini.classList.add('show');return}
+  const shapes=[{name:'Supply Crate',type:'supply',mass:150+Math.floor(Math.random()*200),cells:[0]},
+    {name:'Equipment Module',type:'equip',mass:300+Math.floor(Math.random()*400),cells:[0,1]},
+    {name:'Bio Container',type:'bio',mass:20+Math.floor(Math.random()*40),cells:[0]},
+    {name:'Salvage Piece',type:'salvage',mass:500+Math.floor(Math.random()*800),cells:[0,1,CARGO_COLS]}];
+  const incoming=shapes.sort(()=>Math.random()-.5).slice(0,3);
+  let placed=0,timeLeft=60;
+  body.innerHTML=`<div style="text-align:center;margin-bottom:8px"><span style="color:#d4a03c;font-size:clamp(9px,.8vw,11px)">Place ${incoming.length} containers — </span><span style="color:#e74c3c" id="tetris-timer">${timeLeft}s</span></div>
+    <div id="tetris-items" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:8px"></div>
+    <div style="font-size:clamp(8px,.7vw,10px);color:#3a5a6a;text-align:center" id="tetris-status">Click an item, then click an empty bay to place it</div>`;
+  const itemsEl=document.getElementById('tetris-items');
+  let selectedItem=null;
+  incoming.forEach((s,si)=>{
+    const tc=cargoTypes[s.type];
+    const btn=document.createElement('button');btn.className='cargo-btn';btn.style.cssText=`width:auto;border-color:${tc.color}40;color:${tc.color};padding:6px 12px;margin:0`;
+    btn.textContent=s.name+' ('+s.mass+'kg)';btn.dataset.idx=si;
+    btn.addEventListener('click',()=>{selectedItem=si;document.getElementById('tetris-status').textContent='Now click an empty bay on the grid';document.getElementById('tetris-status').style.color='#d4a03c';if(engaged)clickSound()});
+    itemsEl.appendChild(btn);
+  });
+  const timer=setInterval(()=>{timeLeft--;const te=document.getElementById('tetris-timer');if(te)te.textContent=timeLeft+'s';
+    if(timeLeft<=0||placed>=incoming.length){clearInterval(timer);
+      if(placed>=incoming.length){document.getElementById('tetris-status').textContent='All cargo loaded! Cpl. Reyes: "Tight fit, Captain."';document.getElementById('tetris-status').style.color='#2ecc71';logComms('Cargo Bay','All incoming cargo loaded successfully.');sessionStats.cargoLoaded+=placed}
+      else{document.getElementById('tetris-status').textContent='Time up! '+placed+'/'+incoming.length+' loaded. Remaining left at dock.';document.getElementById('tetris-status').style.color='#e74c3c';logComms('Cargo Bay',placed+' of '+incoming.length+' containers loaded. Docking clamp released.')}
+      addCrewEntry('Cpl. Reyes is securing cargo bay after loading operation.');
+      document.getElementById('cargo-cv')._tetrisMode=false;
+      setTimeout(()=>mini.classList.remove('show'),3000);
+    }
+  },1000);
+  // Override grid click temporarily
+  const origClick=document.getElementById('cargo-cv')._tetrisMode;
+  document.getElementById('cargo-cv')._tetrisPlace=function(bayIdx){
+    if(selectedItem===null||!incoming[selectedItem])return;
+    if(cargoBays[bayIdx])return;
+    const s=incoming[selectedItem];
+    cargoBays[bayIdx]={name:s.name,type:s.type,mass:s.mass,origin:'Incoming',notes:'Recently loaded',temp:[-20,60],condition:100,led:'green',id:Date.now()};
+    incoming[selectedItem]=null;placed++;selectedItem=null;
+    itemsEl.children[parseInt(document.querySelectorAll('#tetris-items button')[0]?.dataset.idx)]?.remove();
+    // Remove used button
+    const btns=itemsEl.querySelectorAll('button');btns.forEach(b=>{if(incoming[parseInt(b.dataset.idx)]===null){b.disabled=true;b.style.opacity='.3'}});
+    document.getElementById('tetris-status').textContent='Placed! '+(incoming.length-placed)+' remaining';document.getElementById('tetris-status').style.color='#2ecc71';
+    if(engaged)clickSound();
+  };
+  document.getElementById('cargo-cv')._tetrisMode=true;
+  mini.classList.add('show');clickSound();
+});
+// Patch grid click for tetris
+const origCargoClick=document.getElementById('cargo-cv');
+if(origCargoClick)origCargoClick.addEventListener('click',e=>{
+  if(!origCargoClick._tetrisMode)return;
+  const rect=origCargoClick.getBoundingClientRect();const mx=(e.clientX-rect.left)/rect.width*origCargoClick.width;const my=(e.clientY-rect.top)/rect.height*origCargoClick.height;
+  const padX2=origCargoClick.width*.06,padY2=origCargoClick.height*.06;
+  const cw2=(origCargoClick.width-padX2*2)/CARGO_COLS,ch2=(origCargoClick.height-padY2*2)/CARGO_ROWS;
+  for(let i=0;i<cargoBays.length;i++){
+    const col=i%CARGO_COLS,row=Math.floor(i/CARGO_COLS);
+    const bx=padX2+col*cw2+row*ch2*.12,by=padY2+row*ch2;
+    if(mx>=bx&&mx<=bx+cw2&&my>=by&&my<=by+ch2){if(origCargoClick._tetrisPlace)origCargoClick._tetrisPlace(i);break}
+  }
+});
+
+// === MINI-GAME 2: CONTRABAND SCANNER ===
+document.getElementById('cargo-inspect-btn').addEventListener('click',()=>{
+  if(!engaged)return;
+  const mini=document.getElementById('cargo-mini');const body=document.getElementById('cargo-mini-body');
+  document.getElementById('cargo-mini-title').textContent='Cargo Inspection — X-Ray Scan';sessionStats.inspections++;
+  const occupied=cargoBays.map((b,i)=>b?i:null).filter(x=>x!==null);
+  if(occupied.length===0){body.innerHTML='<div style="color:#3a5a6a;padding:20px;text-align:center">No cargo to inspect.</div>';mini.classList.add('show');return}
+  const targetBay=occupied[Math.floor(Math.random()*occupied.length)];
+  const item=cargoBays[targetBay];
+  const hasContraband=Math.random()<.35;
+  const contrabandType=hasContraband?['Dense metallic object — possible weapons component','Unregistered biological agent','Encrypted data device — origin unknown','Chemical compound not on manifest'][Math.floor(Math.random()*4)]:'';
+  body.innerHTML=`<div style="color:#d4a03c;font-size:clamp(9px,.8vw,11px);text-align:center;margin-bottom:6px">Scanning: ${item.name}</div>
+    <canvas id="inspect-cv" height="200" style="height:200px"></canvas>
+    <div style="text-align:center;margin-top:8px;font-size:clamp(8px,.7vw,10px);color:#3a5a6a" id="inspect-status">Click on any suspicious objects</div>
+    <div style="display:flex;gap:4px;margin-top:8px" id="inspect-actions" style="display:none"></div>`;
+  mini.classList.add('show');
+  setTimeout(()=>{
+    const cv=document.getElementById('inspect-cv');if(!cv)return;
+    cv.width=cv.offsetWidth*2||500;cv.height=400;
+    const cx=cv.getContext('2d');const w=cv.width,h=cv.height;
+    cx.fillStyle='rgba(4,8,12,.8)';cx.fillRect(0,0,w,h);
+    // Draw X-ray objects
+    const objects=[];
+    for(let i=0;i<5+Math.floor(Math.random()*4);i++){
+      const ox=w*.1+Math.random()*w*.8,oy=h*.1+Math.random()*h*.8;
+      const ow=20+Math.random()*40,oh=10+Math.random()*30;
+      const isNormal=true;
+      cx.fillStyle='rgba(94,196,212,.08)';cx.strokeStyle='rgba(94,196,212,.15)';cx.lineWidth=1;
+      if(Math.random()>.5){cx.fillRect(ox,oy,ow,oh);cx.strokeRect(ox,oy,ow,oh)}
+      else{cx.beginPath();cx.ellipse(ox+ow/2,oy+oh/2,ow/2,oh/2,0,0,6.283);cx.fill();cx.stroke()}
+      objects.push({x:ox,y:oy,w:ow,h:oh,suspicious:false});
+    }
+    // Add contraband object
+    if(hasContraband){
+      const ox=w*.2+Math.random()*w*.6,oy=h*.2+Math.random()*h*.6;
+      cx.fillStyle='rgba(231,76,60,.12)';cx.strokeStyle='rgba(231,76,60,.2)';cx.lineWidth=1.5;
+      const shape=Math.random();
+      if(shape<.33){cx.beginPath();cx.moveTo(ox,oy-15);cx.lineTo(ox+12,oy+10);cx.lineTo(ox-12,oy+10);cx.closePath();cx.fill();cx.stroke()}
+      else if(shape<.66){cx.fillRect(ox-8,oy-8,16,16);cx.strokeRect(ox-8,oy-8,16,16);cx.fillStyle='rgba(231,76,60,.06)';cx.beginPath();cx.arc(ox,oy,6,0,6.283);cx.fill()}
+      else{cx.beginPath();cx.arc(ox,oy,12,0,6.283);cx.fill();cx.stroke();cx.fillStyle='rgba(231,76,60,.08)';cx.fillRect(ox-3,oy-10,6,20)}
+      objects.push({x:ox-15,y:oy-15,w:30,h:30,suspicious:true});
+    }
+    // Scan line animation
+    let scanY=0;const scanInt=setInterval(()=>{
+      cx.fillStyle='rgba(46,204,113,.03)';cx.fillRect(0,scanY,w,2);scanY+=3;
+      if(scanY>h){clearInterval(scanInt);document.getElementById('inspect-status').textContent=hasContraband?'Anomaly detected — click to flag':'Scan complete — click suspicious areas or approve'}
+    },20);
+    // Click handler
+    cv.addEventListener('click',e=>{
+      const rect=cv.getBoundingClientRect();const mx=(e.clientX-rect.left)/rect.width*w;const my=(e.clientY-rect.top)/rect.height*h;
+      let foundSuspicious=false;
+      objects.forEach(o=>{
+        if(mx>=o.x&&mx<=o.x+o.w&&my>=o.y&&my<=o.y+o.h&&o.suspicious){foundSuspicious=true}
+      });
+      const actEl=document.getElementById('inspect-actions');
+      if(foundSuspicious){
+        cx.strokeStyle='rgba(255,70,70,.5)';cx.lineWidth=2;cx.strokeRect(mx-20,my-20,40,40);
+        document.getElementById('inspect-status').innerHTML=`<span style="color:#e74c3c">⚠ ${contrabandType}</span>`;
+        actEl.innerHTML='<button class="cargo-btn" id="insp-quarantine" style="flex:1">Quarantine</button><button class="cargo-btn" id="insp-jettison" style="flex:1;border-color:rgba(231,76,60,.3);color:#e74c3c">Jettison</button><button class="cargo-btn" id="insp-ignore" style="flex:1">Ignore</button>';
+        actEl.style.display='flex';
+        document.getElementById('insp-quarantine').addEventListener('click',()=>{sessionStats.contrabandFound++;logComms('Cargo Bay','Contraband quarantined in isolation bay. Flagged for review.');mini.classList.remove('show');addCrewEntry('Cpl. Reyes has quarantined a suspicious item from '+item.name+'.');if(engaged)clickSound()});
+        document.getElementById('insp-jettison').addEventListener('click',()=>{sessionStats.contrabandFound++;logComms('Cargo Bay','Contraband jettisoned to space. Container integrity maintained.');mini.classList.remove('show');addCrewEntry('Unauthorized material jettisoned from cargo bay.');if(engaged)clickSound()});
+        document.getElementById('insp-ignore').addEventListener('click',()=>{logComms('Cargo Bay','Anomaly noted but no action taken.');mini.classList.remove('show');if(engaged)clickSound()});
+      } else {
+        cx.strokeStyle='rgba(46,204,113,.3)';cx.lineWidth=1;cx.strokeRect(mx-15,my-15,30,30);
+        cx.fillStyle='rgba(46,204,113,.15)';cx.font=`${Math.max(9,w*.02)}px 'Courier New'`;cx.textAlign='center';cx.fillText('CLEAR',mx,my+3);cx.textAlign='start';
+      }
+      if(engaged)clickSound();
+    });
+  },100);
+  clickSound();
+});
+
+// === MINI-GAME 3: EMERGENCY JETTISON ===
+document.getElementById('cargo-jettison-btn').addEventListener('click',()=>{
+  if(!engaged)return;
+  const occupied=cargoBays.filter(b=>b);
+  if(occupied.length===0)return;
+  const mini=document.getElementById('cargo-mini');const body=document.getElementById('cargo-mini-body');
+  document.getElementById('cargo-mini-title').textContent='⚠ Emergency Jettison';
+  let timeLeft=30,jettisoned=0,massSaved=0;
+  const breachBay=Math.floor(Math.random()*cargoBays.length);
+  const targetMass=2000+Math.random()*3000;
+  body.innerHTML=`<div style="color:#e74c3c;font-size:clamp(9px,.8vw,11px);text-align:center;margin-bottom:4px">HULL BREACH — Jettison ${Math.round(targetMass)}kg to seal!</div>
+    <div style="display:flex;justify-content:space-between;font-size:clamp(9px,.8vw,11px);margin-bottom:6px"><span style="color:#3a5a6a">Jettisoned: <span id="jett-mass" style="color:#e74c3c">0</span> / ${Math.round(targetMass)} kg</span><span style="color:#e74c3c" id="jett-timer">${timeLeft}s</span></div>
+    <div style="width:100%;height:8px;background:rgba(231,76,60,.1);border-radius:4px;margin-bottom:8px"><div id="jett-bar" style="width:0%;height:100%;background:rgba(231,76,60,.5);border-radius:4px;transition:width .3s"></div></div>
+    <div id="jett-grid" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center"></div>
+    <div style="text-align:center;margin-top:6px;font-size:clamp(8px,.7vw,10px);color:#3a5a6a" id="jett-status">Click containers to jettison — choose wisely!</div>`;
+  const gridEl=document.getElementById('jett-grid');
+  cargoBays.forEach((item,i)=>{
+    if(!item)return;
+    const tc=cargoTypes[item.type];
+    const btn=document.createElement('button');btn.className='cargo-btn';
+    btn.style.cssText=`width:auto;padding:4px 8px;margin:0;border-color:${tc.color}30;color:${tc.color};font-size:clamp(7px,.6vw,9px)`;
+    btn.textContent=item.name.substring(0,12)+' '+item.mass+'kg';btn.dataset.bay=i;
+    btn.addEventListener('click',()=>{
+      const bay=parseInt(btn.dataset.bay);
+      massSaved+=cargoBays[bay].mass;jettisoned++;
+      logComms('Cargo Bay','Jettisoned: '+cargoBays[bay].name+' ('+cargoBays[bay].mass+'kg)');
+      cargoBays[bay]=null;btn.disabled=true;btn.style.opacity='.2';btn.textContent='JETTISONED';
+      document.getElementById('jett-mass').textContent=Math.round(massSaved);
+      document.getElementById('jett-bar').style.width=Math.min(100,massSaved/targetMass*100)+'%';
+      if(massSaved>=targetMass){clearInterval(timer);document.getElementById('jett-status').textContent='Breach sealed! Reyes: "That\'ll hold. Good calls, Captain."';document.getElementById('jett-status').style.color='#2ecc71';
+        sessionStats.cargoJettisoned+=jettisoned;logComms('Engineering','Hull breach sealed. '+jettisoned+' containers jettisoned ('+Math.round(massSaved)+'kg).');addCrewEntry('Cpl. Reyes sealed the hull breach. Cargo bay pressure stabilizing.');
+        setTimeout(()=>mini.classList.remove('show'),3000)}
+      if(engaged)clickSound();
+    });
+    gridEl.appendChild(btn);
+  });
+  const timer=setInterval(()=>{timeLeft--;const te=document.getElementById('jett-timer');if(te)te.textContent=timeLeft+'s';
+    if(timeLeft<=0){clearInterval(timer);
+      if(massSaved<targetMass){document.getElementById('jett-status').textContent='Section auto-sealed. Remaining cargo in breach zone lost.';document.getElementById('jett-status').style.color='#e74c3c';
+        logComms('Engineering','⚠ Emergency bulkhead sealed. Some cargo lost to vacuum.');addCrewEntry('Cpl. Reyes: "We lost some gear but the ship\'s intact."')}
+      setTimeout(()=>mini.classList.remove('show'),3000)}
+  },1000);
+  mini.classList.add('show');clickSound();
+});
+
+// === MINI-GAME 4: CARGO CRANE ===
+document.getElementById('cargo-crane-btn').addEventListener('click',()=>{
+  if(!engaged)return;
+  const empties=cargoBays.reduce((a,b,i)=>b?a:[...a,i],[]);
+  if(empties.length===0)return;
+  const mini=document.getElementById('cargo-mini');const body=document.getElementById('cargo-mini-body');
+  document.getElementById('cargo-mini-title').textContent='Cargo Crane — Precision Docking';
+  body.innerHTML=`<canvas id="crane-cv" height="280" style="height:280px"></canvas>
+    <div style="text-align:center;margin-top:6px;font-size:clamp(8px,.7vw,10px);color:#3a5a6a" id="crane-status">Move mouse to position crane. Click to grab/release.</div>`;
+  mini.classList.add('show');
+  setTimeout(()=>{
+    const cv=document.getElementById('crane-cv');if(!cv)return;
+    cv.width=cv.offsetWidth*2||500;cv.height=560;
+    const cx=cv.getContext('2d');const w=cv.width,h=cv.height;
+    let craneX=w/2,craneY=h*.2,holding=false,grabbed=false,bumps=0;
+    const salvageName='Salvage — '+['Alien Alloy Fragment','Derelict Hull Plate','Unknown Device','Sensor Module'][Math.floor(Math.random()*4)];
+    const salvageX=w*.3+Math.random()*w*.4,salvageY=h*.7;
+    const targetX=w*.5,targetY=h*.35;
+    const swing={x:0,y:0,vx:0,vy:0};
+    // Mouse tracking
+    cv.addEventListener('mousemove',e=>{
+      const rect=cv.getBoundingClientRect();
+      craneX=(e.clientX-rect.left)/rect.width*w;
+      craneY=Math.max(h*.1,Math.min(h*.85,(e.clientY-rect.top)/rect.height*h));
+    });
+    cv.addEventListener('click',()=>{
+      if(!grabbed){
+        const dx=craneX-salvageX-swing.x,dy=craneY-salvageY-swing.y;
+        if(Math.sqrt(dx*dx+dy*dy)<30){holding=true;grabbed=true;document.getElementById('crane-status').textContent='Holding! Move to the target bay (green zone) and click to release.';document.getElementById('crane-status').style.color='#d4a03c';if(engaged)clickSound()}
+      } else if(holding){
+        const dx=craneX+swing.x-targetX,dy=craneY+swing.y-targetY;
+        if(Math.sqrt(dx*dx+dy*dy)<35){
+          holding=false;
+          const bay=empties[0];
+          cargoBays[bay]={name:salvageName,type:'salvage',mass:200+Math.floor(Math.random()*600),origin:'Shuttle Recovery',notes:'Recently recovered — condition unknown',temp:[-40,80],condition:60+Math.random()*30,led:'amber',id:Date.now()};
+          document.getElementById('crane-status').textContent='Placed! Reyes: "Smooth hands, Captain." '+bumps+' collision'+(bumps!==1?'s':'')+'.';document.getElementById('crane-status').style.color='#2ecc71';
+          sessionStats.craneOps++;logComms('Cargo Bay','Salvage secured: '+salvageName);addCrewEntry('Cpl. Reyes logged new salvage in cargo manifest.');
+          setTimeout(()=>mini.classList.remove('show'),3000);
+          if(engaged)clickSound();return;
+        } else {bumps++;document.getElementById('crane-status').textContent='Missed target! '+bumps+' bump'+(bumps!==1?'s':'')+(bumps>=3?' — FRAGILE cargo at risk!':'');document.getElementById('crane-status').style.color='#e74c3c'}
+        if(engaged)clickSound();
+      }
+    });
+    function drawCrane(){
+      if(!document.getElementById('cargo-mini').classList.contains('show'))return;
+      cx.fillStyle='rgba(4,8,12,.95)';cx.fillRect(0,0,w,h);
+      const n=performance.now()*.001;
+      // Rail at top
+      cx.strokeStyle='rgba(212,160,60,.2)';cx.lineWidth=3;cx.beginPath();cx.moveTo(0,h*.08);cx.lineTo(w,h*.08);cx.stroke();
+      // Crane arm
+      cx.strokeStyle='rgba(212,160,60,.15)';cx.lineWidth=2;cx.beginPath();cx.moveTo(craneX,h*.08);cx.lineTo(craneX,craneY);cx.stroke();
+      // Crane magnet
+      cx.fillStyle=holding?'rgba(94,196,212,.3)':'rgba(212,160,60,.2)';
+      cx.fillRect(craneX-12,craneY-4,24,8);
+      if(holding){cx.fillStyle='rgba(94,196,212,.08)';cx.beginPath();cx.arc(craneX,craneY,18,0,6.283);cx.fill()}
+      // Swing physics
+      if(holding){
+        swing.vx+=(0-swing.x)*.05;swing.vy+=(0-swing.y)*.05;
+        swing.vx*=.92;swing.vy*=.92;
+        swing.vx+=(Math.random()-.5)*.3;
+        swing.x+=swing.vx;swing.y+=swing.vy;
+      }
+      // Salvage piece
+      if(!grabbed){
+        cx.fillStyle='rgba(160,180,190,.2)';cx.strokeStyle='rgba(160,180,190,.3)';cx.lineWidth=1;
+        cx.fillRect(salvageX-15,salvageY-10,30,20);cx.strokeRect(salvageX-15,salvageY-10,30,20);
+        cx.fillStyle='rgba(160,180,190,.1)';cx.font=`${Math.max(7,w*.014)}px 'Courier New'`;cx.textAlign='center';
+        cx.fillText('SALVAGE',salvageX,salvageY+3);
+      } else if(holding){
+        const sx=craneX+swing.x,sy=craneY+20+swing.y;
+        cx.strokeStyle='rgba(94,196,212,.1)';cx.lineWidth=1;cx.beginPath();cx.moveTo(craneX,craneY+4);cx.lineTo(sx,sy-10);cx.stroke();
+        cx.fillStyle='rgba(94,196,212,.2)';cx.strokeStyle='rgba(94,196,212,.3)';cx.lineWidth=1;
+        cx.fillRect(sx-15,sy-10,30,20);cx.strokeRect(sx-15,sy-10,30,20);
+        // Check wall collision
+        if(sx<20||sx>w-20||sy<20||sy>h-20){bumps++;swing.vx*=-0.5;swing.vy*=-0.5;
+          document.getElementById('crane-status').textContent='COLLISION! '+bumps+' bump'+(bumps!==1?'s':'');document.getElementById('crane-status').style.color='#e74c3c'}
+      }
+      // Target bay
+      cx.strokeStyle='rgba(46,204,113,.15)';cx.lineWidth=1.5;cx.setLineDash([4,4]);
+      cx.strokeRect(targetX-25,targetY-15,50,30);cx.setLineDash([]);
+      cx.fillStyle='rgba(46,204,113,.06)';cx.fillRect(targetX-25,targetY-15,50,30);
+      cx.fillStyle='rgba(46,204,113,.2)';cx.font=`${Math.max(8,w*.016)}px 'Courier New'`;cx.textAlign='center';
+      cx.fillText('TARGET',targetX,targetY+3);
+      cx.textAlign='start';
+      requestAnimationFrame(drawCrane);
+    }
+    drawCrane();
+  },100);
+  clickSound();
+});
+
 // === SHUTTLE BAY OPERATIONS ===
 const shuttleCv=document.getElementById('shuttle-cv');
 const shuttleCtx=shuttleCv.getContext('2d');
@@ -6259,6 +6834,16 @@ document.getElementById('shuttle-call-ball').addEventListener('click',()=>{
     setTimeout(()=>{
       shuttleComm('Bay Control','Welcome home, '+shuttlePilot+'. '+shuttleMission+' mission complete.','lso');
       addCrewEntry(shuttlePilot+' has returned to the ship. Mission: '+shuttleMission+'.');
+      // Add salvage to cargo bay from shuttle missions
+      if(shuttleMission==='salvage'&&cargoInited){
+        const empties=cargoBays.reduce((a,b,i)=>b?a:[...a,i],[]);
+        if(empties.length>0){
+          const bay=empties[Math.floor(Math.random()*empties.length)];
+          const salvNames=['Alien Alloy Fragment','Derelict Hull Plate','Unknown Device','Sensor Module','Data Core','Power Cell'];
+          cargoBays[bay]={name:'Salvage — '+salvNames[Math.floor(Math.random()*salvNames.length)],type:'salvage',mass:100+Math.floor(Math.random()*500),origin:'Shuttle Recovery',notes:'Recovered by '+shuttlePilot,temp:[-40,80],condition:50+Math.random()*40,led:'amber',id:Date.now()};
+          logComms('Cargo Bay','Salvage transferred to bay '+String.fromCharCode(65+Math.floor(bay/CARGO_COLS))+'-'+(bay%CARGO_COLS+1)+'.');
+        }
+      }
       sessionStats.probesLaunched++;
     },4000);
     setTimeout(()=>{
@@ -8384,6 +8969,8 @@ const cosmoEvents=[
   'Cosmo has found a warm spot near the engineering console.',
   'Cosmo brought a cable tie to the bridge. No one knows where he got it.',
   'Cosmo is asleep in the captain\'s chair. No one has the heart to move him.',
+  'Cosmo is sleeping on container B-7 in the cargo bay. Reyes left a blanket.',
+  'Cosmo somehow got into a sealed cargo crate. Again.',
 ];
 let cosmoInRecRoom=false;
 function scheduleCosmo(){
