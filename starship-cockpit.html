@@ -786,18 +786,18 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .cargo-grid{flex:1;position:relative;border:1px solid rgba(212,160,60,.08);border-radius:3px;overflow:hidden}
 .cargo-grid canvas{width:100%;height:100%}
 .cargo-card{border:1px solid rgba(212,160,60,.08);border-radius:3px;padding:8px 10px;background:rgba(4,8,12,.4)}
-.cargo-card-title{font-size:clamp(8px,.7vw,10px);color:#d4a03c;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
-.cargo-item{display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(212,160,60,.03);font-size:clamp(8px,.7vw,10px)}
+.cargo-card-title{font-size:clamp(9px,.8vw,12px);color:#e8b84c;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
+.cargo-item{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(212,160,60,.03);font-size:clamp(9px,.8vw,12px)}
 .cargo-item .ci-dot{width:6px;height:6px;border-radius:1px;flex-shrink:0}
-.cargo-item .ci-name{flex:1;color:#4a7a8a}
-.cargo-item .ci-mass{color:#3a5a6a;font-size:clamp(7px,.6vw,9px)}
-.cargo-btn{background:none;border:1px solid rgba(212,160,60,.2);color:#d4a03c;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:5px 10px;cursor:pointer;border-radius:3px;letter-spacing:1px;transition:all .2s;width:100%;margin-top:4px}
+.cargo-item .ci-name{flex:1;color:#6a9aaa}
+.cargo-item .ci-mass{color:#5a8a9a;font-size:clamp(8px,.7vw,11px)}
+.cargo-btn{background:none;border:1px solid rgba(212,160,60,.2);color:#d4a03c;font-family:inherit;font-size:clamp(9px,.8vw,12px);padding:5px 10px;cursor:pointer;border-radius:3px;letter-spacing:1px;transition:all .2s;width:100%;margin-top:4px}
 .cargo-btn:hover{border-color:#d4a03c;background:rgba(212,160,60,.06)}
 .cargo-btn:disabled{opacity:.3;pointer-events:none}
 .cargo-env{display:flex;gap:8px;margin-top:4px}
 .cargo-env-item{flex:1;text-align:center;padding:4px;border:1px solid rgba(94,196,212,.06);border-radius:2px}
-.cargo-env-label{font-size:clamp(7px,.55vw,8px);color:#2a4a5a;letter-spacing:1px;text-transform:uppercase}
-.cargo-env-val{font-size:clamp(9px,.8vw,11px);color:#5ec4d4;font-weight:bold}
+.cargo-env-label{font-size:clamp(8px,.7vw,10px);color:#5a8a9a;letter-spacing:1px;text-transform:uppercase}
+.cargo-env-val{font-size:clamp(10px,.9vw,13px);color:#5ec4d4;font-weight:bold}
 .cargo-mini{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:18;width:clamp(400px,42vw,580px);background:rgba(6,10,14,.96);border:1px solid rgba(212,160,60,.2);border-radius:5px;display:none;pointer-events:auto}
 .cargo-mini.show{display:block}
 .cargo-mini-header{padding:10px 14px;border-bottom:1px solid rgba(212,160,60,.1);display:flex;justify-content:space-between;align-items:center}
@@ -1449,8 +1449,8 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
   </div>
   <div class="cargo-sidebar">
     <div class="cargo-card"><div class="cargo-card-title">Mass Distribution</div><canvas id="cargo-mass-cv" height="60" style="width:100%;height:60px;border:1px solid rgba(212,160,60,.06);border-radius:2px;background:rgba(4,8,12,.3)"></canvas>
-    <div style="display:flex;justify-content:space-between;font-size:clamp(8px,.7vw,10px);margin-top:4px"><span style="color:#3a5a6a">Total Mass</span><span style="color:#d4a03c" id="cargo-total-mass">0 kg</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:clamp(8px,.7vw,10px)"><span style="color:#3a5a6a">Capacity</span><span style="color:#3a5a6a">18,000 kg</span></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:clamp(8px,.7vw,10px);margin-top:4px"><span style="color:#5a8a9a">Total Mass</span><span style="color:#d4a03c" id="cargo-total-mass">0 kg</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:clamp(8px,.7vw,10px)"><span style="color:#5a8a9a">Capacity</span><span style="color:#3a5a6a">18,000 kg</span></div></div>
     <div class="cargo-card"><div class="cargo-card-title">Environment</div>
     <div class="cargo-env"><div class="cargo-env-item"><div class="cargo-env-label">Temp</div><div class="cargo-env-val" id="cargo-temp">18°C</div></div><div class="cargo-env-item"><div class="cargo-env-label">Press</div><div class="cargo-env-val" id="cargo-press">1.00</div></div><div class="cargo-env-item"><div class="cargo-env-label">Rad</div><div class="cargo-env-val" id="cargo-rad">0.2 mSv</div></div></div></div>
     <div class="cargo-card"><div class="cargo-card-title">Manifest</div><div id="cargo-manifest"></div></div>
@@ -6058,9 +6058,9 @@ function drawCargoGrid(){
     const cw=cellW-8,ch=cellH-8;
     if(!item){
       cx.strokeStyle='rgba(212,160,60,.04)';cx.lineWidth=.5;cx.strokeRect(x,y,cw,ch);
-      cx.fillStyle='rgba(212,160,60,.015)';cx.fillRect(x,y,cw,ch);
+      cx.fillStyle='rgba(212,160,60,.04)';cx.fillRect(x,y,cw,ch);
       // Bay label
-      cx.fillStyle='rgba(212,160,60,.08)';cx.font=`${Math.max(9,w*.012)}px 'Courier New'`;cx.textAlign='center';
+      cx.fillStyle='rgba(212,160,60,.45)';cx.font=`bold ${Math.max(12,w*.018)}px 'Courier New'`;cx.textAlign='center';
       cx.fillText(String.fromCharCode(65+row)+'-'+(col+1),x+cw/2,y+ch/2+3);cx.textAlign='start';
       return;
     }
@@ -6069,14 +6069,14 @@ function drawCargoGrid(){
     // Container body — 3D effect
     const depth=6;
     // Side face
-    cx.fillStyle=tc.color+'18';cx.beginPath();
+    cx.fillStyle=tc.color+'25';cx.beginPath();
     cx.moveTo(x+cw,y);cx.lineTo(x+cw+depth,y-depth);cx.lineTo(x+cw+depth,y+ch-depth);cx.lineTo(x+cw,y+ch);cx.fill();
     // Top face
-    cx.fillStyle=tc.color+'10';cx.beginPath();
+    cx.fillStyle=tc.color+'1a';cx.beginPath();
     cx.moveTo(x,y);cx.lineTo(x+depth,y-depth);cx.lineTo(x+cw+depth,y-depth);cx.lineTo(x+cw,y);cx.fill();
     // Front face
-    cx.fillStyle=tc.color+(sel?'25':'15');cx.fillRect(x,y,cw,ch);
-    cx.strokeStyle=tc.color+(sel?'60':'30');cx.lineWidth=sel?1.5:1;cx.strokeRect(x,y,cw,ch);
+    cx.fillStyle=tc.color+(sel?'30':'1a');cx.fillRect(x,y,cw,ch);
+    cx.strokeStyle=tc.color+(sel?'80':'45');cx.lineWidth=sel?1.5:1;cx.strokeRect(x,y,cw,ch);
     // Hazard stripes for hazardous
     if(item.type==='hazard'){
       cx.strokeStyle='rgba(231,76,60,.08)';cx.lineWidth=1;
@@ -6092,14 +6092,14 @@ function drawCargoGrid(){
       for(let b=0;b<3;b++)cx.fillRect(x+6,y+ch*.25+b*ch*.18,cw-12,ch*.1);
     }
     // LED indicator
-    const ledColor=item.condition>90?'rgba(46,204,113,.5)':item.condition>70?'rgba(212,160,60,.5)':'rgba(231,76,60,.5)';
+    const ledColor=item.condition>90?'rgba(46,204,113,.7)':item.condition>70?'rgba(212,160,60,.7)':'rgba(231,76,60,.7)';
     cx.fillStyle=ledColor;cx.beginPath();cx.arc(x+cw-8,y+8,2.5,0,6.283);cx.fill();
     // Container label
-    cx.fillStyle=tc.color+(sel?'80':'40');cx.font=`${Math.max(8,w*.011)}px 'Courier New'`;cx.textAlign='center';
+    cx.fillStyle=tc.color+(sel?'ee':'aa');cx.font=`bold ${Math.max(11,w*.016)}px 'Courier New'`;cx.textAlign='center';
     const label=item.name.length>14?item.name.substring(0,13)+'…':item.name;
     cx.fillText(label,x+cw/2,y+ch/2+3);
     // Mass below
-    cx.fillStyle='rgba(160,180,190,.15)';cx.font=`${Math.max(7,w*.009)}px 'Courier New'`;
+    cx.fillStyle='rgba(160,180,190,.6)';cx.font=`${Math.max(10,w*.013)}px 'Courier New'`;
     cx.fillText(item.mass+'kg',x+cw/2,y+ch-6);cx.textAlign='start';
     // Selection glow
     if(sel){
@@ -6117,7 +6117,7 @@ function drawCargoGrid(){
   cx.fillStyle='rgba(212,160,60,.15)';cx.fillRect(botX,botY,12,8);
   cx.fillStyle='rgba(212,160,60,.1)';cx.fillRect(botX+2,botY-4,3,4);cx.fillRect(botX+7,botY-4,3,4);
   // Labels
-  cx.fillStyle='rgba(212,160,60,.12)';cx.font=`${Math.max(9,w*.012)}px 'Courier New'`;
+  cx.fillStyle='rgba(212,160,60,.5)';cx.font=`bold ${Math.max(12,w*.016)}px 'Courier New'`;
   cx.fillText('CARGO BAY — DECK 3',padX,padY-8);
   // Click handler attaches once
   if(!cv._clickBound){
@@ -6198,7 +6198,7 @@ function showCargoDetail(idx){
     <div class="cargo-item"><span class="ci-name">Origin</span><span class="ci-mass">${item.origin}</span></div>
     <div class="cargo-item"><span class="ci-name">Condition</span><span class="ci-mass" style="color:${item.condition>90?'#2ecc71':item.condition>70?'#d4a03c':'#e74c3c'}">${item.condition.toFixed(0)}%</span></div>
     <div class="cargo-item"><span class="ci-name">Temp Range</span><span class="ci-mass">${item.temp[0]}°C — ${item.temp[1]}°C</span></div>
-    <div style="color:#3a5a6a;font-size:clamp(7px,.6vw,9px);margin-top:4px;font-style:italic">${item.notes}</div>`;
+    <div style="color:#5a8a9a;font-size:clamp(7px,.6vw,9px);margin-top:4px;font-style:italic">${item.notes}</div>`;
 }
 
 // Close handlers
