@@ -380,6 +380,9 @@ canvas#c{position:fixed;inset:0;z-index:0}
 
 /* === RADAR === */
 .radar-panel{position:fixed;z-index:5;pointer-events:none}
+.waterfall-panel{position:fixed;bottom:clamp(600px,70vh,780px);right:clamp(42px,5.6vw,92px);z-index:5;pointer-events:none}
+.waterfall-label{font-size:clamp(5px,.5vw,7px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
+#waterfall-cv{border:1px solid rgba(94,196,212,.08);border-radius:2px;background:rgba(4,8,12,.4)}
 .radar-label{font-size:clamp(5px,.5vw,7px);color:#2a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
 #radar{border:1px solid rgba(94,196,212,.1);border-radius:50%;background:rgba(4,8,12,.5)}
 
@@ -1379,6 +1382,7 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
 <div class="scope-panel"><div class="scope-label">Sys Waveform</div><canvas id="scope" width="160" height="40"></canvas></div>
 
 <!-- Radar -->
+<div class="waterfall-panel"><div class="waterfall-label">Comms RF</div><canvas id="waterfall-cv" width="210" height="80"></canvas></div>
 <div class="radar-panel" style="bottom:clamp(280px,38vh,440px);right:clamp(42px,5.6vw,92px)"><div class="radar-label">Lidar</div><canvas id="radar" width="210" height="210"></canvas></div>
 
 <!-- Condensation drips -->
@@ -3039,6 +3043,81 @@ function drawRadar(){
 }
 drawRadar();
 
+// === RADIO WATERFALL ===
+const wfCv=document.getElementById('waterfall-cv');
+const wfCtx=wfCv.getContext('2d');
+let wfSignalLevel=0,wfLastCommsTime=0;
+const wfRows=80,wfCols=210;
+const wfBuffer=new Float32Array(wfRows*wfCols);
+// Hook into logComms to detect activity
+const _origLogCommsWF=typeof logComms==='function'?logComms:null;
+function wfCommsHook(){wfLastCommsTime=performance.now();wfSignalLevel=.7+Math.random()*.3}
+function drawWaterfall(){
+  const w=wfCv.width,h=wfCv.height;
+  const n=performance.now();
+  // Decay signal level
+  const timeSinceComms=(n-wfLastCommsTime)/1000;
+  if(timeSinceComms>3)wfSignalLevel=Math.max(0,wfSignalLevel-.008);
+  // Also check if radio panel is showing
+  const radioEl=document.getElementById('radio');
+  if(radioEl&&radioEl.classList.contains('show'))wfSignalLevel=Math.max(wfSignalLevel,.5+Math.sin(n*.003)*.2);
+  // Shift buffer down (scroll)
+  wfBuffer.copyWithin(wfCols,0,(wfRows-1)*wfCols);
+  // Generate new top row
+  for(let x=0;x<wfCols;x++){
+    const freq=x/wfCols;
+    // Base noise floor — random colorful static
+    let val=Math.random()*.12;
+    // Occasional bright noise speckle
+    if(Math.random()<.08)val=.15+Math.random()*.25;
+    // Wandering interference band
+    const band=Math.sin(n*.0007+freq*12)*.5+.5;
+    val+=band*.04;
+    // Signal peaks when active
+    if(wfSignalLevel>.05){
+      const s1=Math.exp(-((freq-.3)**2)/.002)*wfSignalLevel;
+      const s2=Math.exp(-((freq-.55)**2)/.003)*wfSignalLevel*.7;
+      const s3=Math.exp(-((freq-.78)**2)/.001)*wfSignalLevel*.5;
+      val+=s1+s2+s3;
+      val+=Math.random()*wfSignalLevel*.15;
+    }
+    wfBuffer[x]=Math.min(1,val);
+  }
+  // Render
+  const imgData=wfCtx.createImageData(w,h);
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      const val=wfBuffer[y*wfCols+x]||0;
+      const idx=(y*w+x)*4;
+      // Hash for per-pixel color variation
+      const px=(x*7+y*13)&255;
+      if(val<.08){
+        // Dark with colored speckles
+        imgData.data[idx]=6+px*.02;imgData.data[idx+1]=10+val*60;imgData.data[idx+2]=18+val*80;
+      } else if(val<.2){
+        // Colorful noise — mix of cyan, magenta, green
+        const hue=px%3;
+        if(hue===0){imgData.data[idx]=20+val*100;imgData.data[idx+1]=60+val*300;imgData.data[idx+2]=80+val*400}
+        else if(hue===1){imgData.data[idx]=40+val*250;imgData.data[idx+1]=20+val*80;imgData.data[idx+2]=60+val*300}
+        else{imgData.data[idx]=10+val*50;imgData.data[idx+1]=70+val*350;imgData.data[idx+2]=30+val*100}
+      } else if(val<.5){
+        // Signal — bright cyan to green
+        imgData.data[idx]=20+val*140;imgData.data[idx+1]=100+val*280;imgData.data[idx+2]=60+val*120;
+      } else {
+        // Strong signal — bright yellow-white
+        imgData.data[idx]=200+val*55;imgData.data[idx+1]=210+val*45;imgData.data[idx+2]=80+val*100;
+      }
+      imgData.data[idx+3]=255;
+    }
+  }
+  wfCtx.putImageData(imgData,0,0);
+  // Frequency axis labels
+  wfCtx.fillStyle='rgba(94,196,212,.15)';wfCtx.font='7px Courier New';
+  wfCtx.fillText('1.4G',2,h-2);wfCtx.fillText('21cm',w/2-10,h-2);wfCtx.fillText('2.8G',w-22,h-2);
+  requestAnimationFrame(drawWaterfall);
+}
+drawWaterfall();
+
 // === CONDENSATION DRIPS ===
 function scheduleDrip(){
   setTimeout(()=>{
@@ -3223,6 +3302,7 @@ document.querySelectorAll('.s-close').forEach(btn=>btn.addEventListener('click',
 // === COMMS LOG ===
 const commsLog=[];
 function logComms(src,msg,isCaptain){
+  if(!isCaptain&&typeof wfCommsHook==='function')wfCommsHook();
   const elapsed=Date.now()-missionStart;const ms=elapsed*100;const ts=Math.floor(ms/1000);
   const h=Math.floor(ts/3600)%24,m=Math.floor(ts/60)%60;
   const time=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
