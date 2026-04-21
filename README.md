@@ -281,7 +281,7 @@ This project is provided as-is for personal, creative, and educational use.
 
 *Drawn with care for anyone who's ever looked up at the stars and imagined what it would be like to be out there.*
 
-Like what you see? [Buy me a coffee to keep the energy going.] (https://ko-fi.com/mbparks)
+Like what you see? [Buy me a coffee to keep the energy going.](https://ko-fi.com/mbparks)
 
 
 
