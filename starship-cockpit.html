@@ -312,14 +312,14 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .crew-log{position:fixed;bottom:clamp(132px,22vh,242px);left:clamp(42px,5.6vw,92px);z-index:5;pointer-events:none;overflow:hidden;
   width:clamp(320px,40vw,560px);height:clamp(70px,9vh,110px)}
 .crew-log-inner{display:flex;flex-direction:column;gap:3px}
-.crew-log-entry{font-size:clamp(9px,.85vw,12px);color:#2a4a5a;letter-spacing:1px;white-space:normal;transition:opacity 1s,transform 1s;opacity:0;transform:translateY(6px);line-height:1.4}
+.crew-log-entry{font-size:clamp(9px,.85vw,12px);color:#2a4a5a;letter-spacing:1px;white-space:normal;transition:opacity 1s,transform 1s;opacity:0;transform:translateY(-6px);line-height:1.4}
 .crew-log-entry.visible{opacity:1;transform:translateY(0)}
 .crew-log-entry .cle-time{color:#1a3a4a;margin-right:6px}
 .crew-log-entry .cle-text{color:#3a5a6a}
 .crew-log-entry.captain .cle-text{color:#5ec4d4}
 
 /* === CAPTAIN INPUT === */
-.captain-input{position:fixed;bottom:clamp(132px,22vh,242px);right:clamp(42px,5.6vw,92px);z-index:6;display:flex;gap:6px;align-items:center}
+.captain-input{position:fixed;bottom:clamp(240px,36vh,380px);left:clamp(42px,5.6vw,92px);z-index:6;display:flex;gap:6px;align-items:center}
 .captain-input input{background:rgba(10,18,24,.85);border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:clamp(8px,.75vw,11px);letter-spacing:1px;padding:4px 8px;width:clamp(140px,16vw,220px);outline:none;border-radius:3px;transition:border-color .3s}
 .captain-input input:focus{border-color:rgba(94,196,212,.5)}
 .captain-input input::placeholder{color:#2a4a5a}
@@ -804,6 +804,10 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .cargo-mini-header .cm-title{font-size:clamp(10px,.9vw,13px);color:#d4a03c;letter-spacing:3px;text-transform:uppercase}
 .cargo-mini-body{padding:12px 14px}
 .cargo-mini canvas{width:100%;border:1px solid rgba(212,160,60,.06);border-radius:3px;background:rgba(4,8,12,.5)}
+
+/* === ATTITUDE GIMBAL === */
+.gimbal-panel{position:fixed;bottom:clamp(140px,24.5vh,265px);right:clamp(40px,4vw,60px);z-index:5;pointer-events:none}
+.gimbal-panel canvas{width:clamp(90px,9vw,130px);height:clamp(90px,9vw,130px);border:1.5px solid rgba(94,196,212,.2);border-radius:50%;background:rgba(4,8,12,.55)}
 
 /* === SHUTTLE BAY === */
 .shuttle-panel{position:fixed;inset:0;z-index:14;display:none;background:rgba(4,8,12,.9);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);pointer-events:auto}
@@ -1930,6 +1934,9 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
   </div>
 </div>
 
+<!-- ATTITUDE GIMBAL -->
+<div class="gimbal-panel"><canvas id="gimbal-cv"></canvas></div>
+
 <script>
 const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
 let W,H,audioCtx,masterGain,engineGain,hissGain,engaged=false,warping=false,warpT=0;
@@ -2251,9 +2258,12 @@ function scheduleRadio(){
       setTimeout(()=>{document.body.classList.remove('screen-flicker');document.getElementById('interference').classList.remove('active')},3000);
       // Show decrypt option in reply area
       const replyEl=document.getElementById('radio-reply');
-      const existingHTML=replyEl.innerHTML;
-      replyEl.innerHTML=existingHTML+'<button class="reply-btn" id="decrypt-trigger" style="border-color:rgba(212,160,60,.4);color:#d4a03c">◈ Attempt Decrypt</button>';
-      document.getElementById('decrypt-trigger').addEventListener('click',()=>{
+      const decryptBtn=document.createElement('button');
+      decryptBtn.className='reply-btn';decryptBtn.id='decrypt-trigger';
+      decryptBtn.style.cssText='border-color:rgba(212,160,60,.4);color:#d4a03c';
+      decryptBtn.textContent='◈ Attempt Decrypt';
+      replyEl.appendChild(decryptBtn);
+      decryptBtn.addEventListener('click',()=>{
         replyEl.classList.remove('show');
         triggerDecrypt();
         if(engaged)clickSound();
@@ -2723,11 +2733,11 @@ function addCrewEntry(customMsg){
   const entry=document.createElement('div');
   entry.className='crew-log-entry';
   entry.innerHTML='<span class="cle-time">['+timeStr+']</span><span class="cle-text">'+msg+'</span>';
-  logEl.appendChild(entry);
+  logEl.insertBefore(entry, logEl.firstChild);
   requestAnimationFrame(()=>requestAnimationFrame(()=>entry.classList.add('visible')));
   logCount++;
   // Keep max 5 entries
-  while(logEl.children.length>5){logEl.removeChild(logEl.firstChild)}
+  while(logEl.children.length>5){logEl.removeChild(logEl.lastChild)}
   if(!customMsg)setTimeout(addCrewEntry,12000+Math.random()*18000);
 }
 setTimeout(addCrewEntry,4000);
@@ -2742,9 +2752,9 @@ function addCaptainEntry(msg){
   const entry=document.createElement('div');
   entry.className='crew-log-entry captain';
   entry.innerHTML='<span class="cle-time">['+timeStr+']</span><span class="cle-text">Captain: '+msg+'</span>';
-  logEl.appendChild(entry);
+  logEl.insertBefore(entry, logEl.firstChild);
   requestAnimationFrame(()=>requestAnimationFrame(()=>entry.classList.add('visible')));
-  while(logEl.children.length>5)logEl.removeChild(logEl.firstChild);
+  while(logEl.children.length>5)logEl.removeChild(logEl.lastChild);
   if(typeof logComms==='function')logComms('Captain',msg,true);
   if(engaged)clickSound();
 }
@@ -3653,12 +3663,14 @@ lrsCanvas.addEventListener('contextmenu',e=>{
   const ctxMenu=document.getElementById('lrs-context');
   const canHail=found.type==='ship'||found.type==='beacon'||found.type==='planet';
   const canTractor=found.type==='asteroid';
+  const canMine=found.type==='asteroid';
   ctxMenu.innerHTML=`
     <div class="lrs-ctx-item" data-action="scan">◎ Scan</div>
     <div class="lrs-ctx-item ${canHail?'':'disabled'}" data-action="hail">⟐ Hail</div>
     <div class="lrs-ctx-item" data-action="course">► Set Intercept</div>
     <div class="lrs-ctx-item" data-action="probe">◈ Launch Probe</div>
     <div class="lrs-ctx-item ${canTractor?'':'disabled'}" data-action="tractor">◉ Tractor Beam</div>
+    <div class="lrs-ctx-item ${canMine?'':'disabled'}" data-action="mine">⛏ Deploy Mining Laser</div>
     <div class="lrs-ctx-item" data-action="track">${lrsTrackTarget===found?'✕ Stop Tracking':'◎ Track'}</div>`;
   ctxMenu.style.left=(e.clientX-document.getElementById('scr-lrs').getBoundingClientRect().left)+'px';
   ctxMenu.style.top=(e.clientY-document.getElementById('scr-lrs').getBoundingClientRect().top)+'px';
@@ -3676,6 +3688,7 @@ lrsCanvas.addEventListener('contextmenu',e=>{
       }
       if(action==='probe'&&!probeActive){document.getElementById('probe-btn').click()}
       if(action==='tractor'&&canTractor){tractorMode=true;tractorBtn.classList.add('active');logComms('Engineering','Tractor beam armed, targeting '+found.name+'.')}
+      if(action==='mine'&&canMine){startAsteroidMining(found)}
       if(action==='track'){
         lrsTrackTarget=lrsTrackTarget===found?null:found;
         logComms('Sensors',lrsTrackTarget?'Now tracking '+found.name+'.':'Tracking disengaged.');
@@ -3931,6 +3944,8 @@ function addEngMaintEntry(sys,action,detail){
 
 function renderEngineering(){
   const el=document.getElementById('eng-body');
+  const scrollParent=document.getElementById('scr-engineering');
+  const savedScroll=scrollParent?scrollParent.scrollTop:0;
   el.innerHTML='';
   engSystems.forEach((s,si)=>{
     const curVal=s.data.length?s.data[s.data.length-1]:0;
@@ -3951,6 +3966,7 @@ function renderEngineering(){
         <div class="eng-actions">
           <button class="eng-sm-btn" data-action="expand" data-idx="${si}">${s.expanded?'▲ Collapse':'▼ Details'}</button>
           <button class="eng-sm-btn" data-action="restart" data-idx="${si}" ${s.restarting?'disabled':''}>↻ Restart</button>
+          <button class="eng-sm-btn" data-action="deepdiag" data-idx="${si}">◈ Deep Diag</button>
           ${isDegraded||isCritical?`<button class="eng-sm-btn warn-btn" data-action="bypass" data-idx="${si}">${s.bypassed?'✕ End Bypass':'⤮ Bypass'}</button>`:''}
         </div>
       </div>
@@ -4003,6 +4019,7 @@ function renderEngineering(){
       const action=btn.dataset.action;
       if(action==='expand'){engSystems[idx].expanded=!engSystems[idx].expanded;renderEngineering()}
       if(action==='restart')restartSystem(idx);
+      if(action==='deepdiag')startDeepDiagnostic(idx);
       if(action==='bypass'){engSystems[idx].bypassed=!engSystems[idx].bypassed;
         addEngMaintEntry(engSystems[idx].label,engSystems[idx].bypassed?'Bypass Engaged':'Bypass Disengaged',engSystems[idx].bypassInfo);
         logComms('Engineering',engSystems[idx].label+' '+(engSystems[idx].bypassed?'bypass engaged: '+engSystems[idx].bypassInfo:'bypass disengaged.'));
@@ -4038,6 +4055,7 @@ function renderEngineering(){
     if(repairCount>=3)recs.push('► '+s.label+': repaired '+repairCount+'× this watch — consider replacement');
   });
   recBody.innerHTML=recs.length?recs.map(r=>`<div class="eng-ml-entry" style="color:#d4a03c">${r}</div>`).join(''):'<div class="eng-ml-entry" style="color:#2ecc71">All systems nominal. No recommendations.</div>';
+  if(scrollParent)requestAnimationFrame(()=>{scrollParent.scrollTop=savedScroll});
 }
 
 function drawEngGraph(id,data,color,amber,red){
@@ -5019,7 +5037,10 @@ npCanvas.addEventListener('click',e=>{
     if(navRoute.length>1){
       const lastWp=navWaypoints[navRoute[navRoute.length-1]];
       const prevWp=navWaypoints[navRoute[navRoute.length-2]];
-      if(lastWp.faction!==prevWp.faction)logComms('Nav','Route crosses into '+lastWp.faction+' space. Jurisdiction protocols may apply.');
+      if(lastWp.faction!==prevWp.faction){
+        logComms('Nav','Route crosses into '+lastWp.faction+' space. Jurisdiction protocols may apply.');
+        if(lastWp.faction==='Colonial Territory')setTimeout(()=>{if(engaged&&!boardingActive)triggerBoardingInspection()},15000);
+      }
       // Comm relay check
       if(!lastWp.relay)logComms('Nav','⚠ '+lastWp.name+' has no comm relay. You will be out of contact.');
     }
@@ -6207,7 +6228,7 @@ document.getElementById('cargo-close').addEventListener('click',()=>{
   document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='cargo')b.classList.remove('active')});
   cancelAnimationFrame(cargoAnimFrame);if(engaged)clickSound();
 });
-document.getElementById('cargo-mini-close').addEventListener('click',()=>{document.getElementById('cargo-mini').classList.remove('show');const ccv=document.getElementById('cargo-cv');if(ccv)ccv._tetrisMode=false;if(engaged)clickSound()});
+document.getElementById('cargo-mini-close').addEventListener('click',()=>{document.getElementById('cargo-mini').classList.remove('show');const ccv=document.getElementById('cargo-cv');if(ccv)ccv._tetrisMode=false;miningActive=false;if(engaged)clickSound()});
 
 // === MINI-GAME 1: CARGO TETRIS ===
 document.getElementById('cargo-load-btn').addEventListener('click',()=>{
@@ -6336,7 +6357,7 @@ document.getElementById('cargo-inspect-btn').addEventListener('click',()=>{
         actEl.style.display='flex';
         document.getElementById('insp-quarantine').addEventListener('click',()=>{sessionStats.contrabandFound++;logComms('Cargo Bay','Contraband quarantined in isolation bay. Flagged for review.');mini.classList.remove('show');addCrewEntry('Cpl. Reyes has quarantined a suspicious item from '+item.name+'.');if(engaged)clickSound()});
         document.getElementById('insp-jettison').addEventListener('click',()=>{sessionStats.contrabandFound++;logComms('Cargo Bay','Contraband jettisoned to space. Container integrity maintained.');mini.classList.remove('show');addCrewEntry('Unauthorized material jettisoned from cargo bay.');if(engaged)clickSound()});
-        document.getElementById('insp-ignore').addEventListener('click',()=>{logComms('Cargo Bay','Anomaly noted but no action taken.');mini.classList.remove('show');if(engaged)clickSound()});
+        document.getElementById('insp-ignore').addEventListener('click',()=>{boardingContrabandIgnored=true;logComms('Cargo Bay','Anomaly noted but no action taken.');mini.classList.remove('show');if(engaged)clickSound()});
       } else {
         cx.strokeStyle='rgba(46,204,113,.3)';cx.lineWidth=1;cx.strokeRect(mx-15,my-15,30,30);
         cx.fillStyle='rgba(46,204,113,.15)';cx.font=`${Math.max(9,w*.02)}px 'Courier New'`;cx.textAlign='center';cx.fillText('CLEAR',mx,my+3);cx.textAlign='start';
@@ -6949,6 +6970,15 @@ function renderTargetList(){
   el.querySelectorAll('.wpn-tgt').forEach(tgt=>{
     tgt.addEventListener('click',()=>{
       const idx=parseInt(tgt.dataset.idx);
+      if(wpnTargets[idx].locked){
+        wpnTargets[idx].locked=false;
+        wpnLockedTarget=null;
+        renderTargetList();
+        wpnLogEntry('Target lock released','');
+        logComms('Tactical','Weapons lock disengaged.');
+        if(engaged)clickSound();
+        return;
+      }
       wpnTargets.forEach(t=>t.locked=false);
       wpnTargets[idx].locked=true;
       wpnLockedTarget=wpnTargets[idx];
@@ -8579,6 +8609,15 @@ function triggerGravAnomaly(){
   logComms('Science','◈ Gravitational anomaly detected! Instruments fluctuating.');
   addCrewEntry('Dr. Tanaka: "Fascinating — gravitational lensing! Recording everything."');
   addCrewEntry('Lt. Park: "Helm is sluggish — compensating."');
+  // Show investigate option
+  const mn=document.getElementById('maint-notif');
+  if(mn&&!mn.classList.contains('show')){
+    document.getElementById('maint-text').innerHTML='Gravitational anomaly detected. <span style="color:#5ec4d4">Investigate for potential discovery?</span>';
+    document.getElementById('maint-repair-btn').textContent='◈ Investigate';
+    document.getElementById('maint-repair-btn').onclick=()=>{mn.classList.remove('show');startAnomalyInvestigation()};
+    document.getElementById('maint-dismiss').onclick=()=>{mn.classList.remove('show')};
+    mn.classList.add('show');
+  }
   // Save original values
   const origHeading=hudHeading,origDrift=driftVal;
   const duration=30000;const startTime=Date.now();
@@ -9111,6 +9150,454 @@ function scheduleSignalPhase(){
 }
 scheduleSignalPhase();
 
+// === DEEP DIAGNOSTIC ===
+function startDeepDiagnostic(sysIdx){
+  const sys=engSystems[sysIdx];
+  const mini=document.getElementById('cargo-mini');const body=document.getElementById('cargo-mini-body');
+  document.getElementById('cargo-mini-title').textContent='Deep Diagnostic — '+sys.label;
+  body.innerHTML=`<canvas id="diag-cv" height="220" style="height:220px"></canvas>
+    <div style="text-align:center;margin-top:6px;font-size:clamp(9px,.8vw,11px);color:#d4a03c" id="diag-status">Scanning…</div>
+    <div style="width:100%;height:4px;background:rgba(94,196,212,.1);border-radius:2px;margin-top:4px"><div id="diag-bar" style="width:0%;height:100%;background:rgba(94,196,212,.4);border-radius:2px;transition:width .5s"></div></div>`;
+  mini.classList.add('show');
+  logComms('Engineering','Deep diagnostic initiated on '+sys.label+'.');
+  setTimeout(()=>{
+    const cv=document.getElementById('diag-cv');if(!cv)return;
+    cv.width=cv.offsetWidth*2||500;cv.height=440;
+    const cx=cv.getContext('2d');const w=cv.width,h=cv.height;
+    let scanY=0,elapsed=0;
+    const weakPoints=[];
+    for(let i=0;i<2+Math.floor(Math.random()*3);i++){weakPoints.push({x:w*.15+Math.random()*w*.7,y:h*.15+Math.random()*h*.7,severity:Math.random()})}
+    const diagInt=setInterval(()=>{
+      elapsed++;const pct=Math.min(100,elapsed*100/30);
+      document.getElementById('diag-bar').style.width=pct+'%';
+      cx.fillStyle='rgba(4,8,12,.15)';cx.fillRect(0,0,w,h);
+      // System wireframe
+      cx.strokeStyle='rgba(94,196,212,.1)';cx.lineWidth=.5;
+      if(sys.id==='reactor'){// Reactor cross-section
+        cx.beginPath();cx.arc(w/2,h/2,h*.35,0,6.283);cx.stroke();cx.beginPath();cx.arc(w/2,h/2,h*.25,0,6.283);cx.stroke();cx.beginPath();cx.arc(w/2,h/2,h*.15,0,6.283);cx.stroke();
+        for(let a=0;a<6;a++){const ang=a*Math.PI/3;cx.beginPath();cx.moveTo(w/2+Math.cos(ang)*h*.15,h/2+Math.sin(ang)*h*.15);cx.lineTo(w/2+Math.cos(ang)*h*.35,h/2+Math.sin(ang)*h*.35);cx.stroke()}
+        cx.fillStyle='rgba(94,196,212,.04)';cx.beginPath();cx.arc(w/2,h/2,h*.15,0,6.283);cx.fill();
+      } else if(sys.id==='coolant'){// Pipe network
+        const pipes=[[.1,.2,.1,.8],[.1,.8,.9,.8],[.9,.8,.9,.2],[.9,.2,.1,.2],[.3,.2,.3,.6],[.3,.6,.7,.6],[.7,.6,.7,.2],[.5,.4,.5,.8]];
+        pipes.forEach(p=>{cx.beginPath();cx.moveTo(p[0]*w,p[1]*h);cx.lineTo(p[2]*w,p[3]*h);cx.stroke()});
+        [.1,.3,.5,.7,.9].forEach(x=>[.2,.6,.8].forEach(y=>{cx.strokeStyle='rgba(94,196,212,.06)';cx.beginPath();cx.arc(x*w,y*h,6,0,6.283);cx.stroke()}));
+      } else if(sys.id==='hull'){// Hull plate map
+        for(let r=0;r<4;r++)for(let c=0;c<6;c++){cx.strokeRect(w*.1+c*w*.13,h*.1+r*h*.2,w*.12,h*.18)}
+      } else {// Generic grid
+        for(let x=0;x<8;x++)for(let y=0;y<6;y++){cx.strokeRect(w*.05+x*w*.115,h*.05+y*h*.15,w*.1,h*.13)}
+      }
+      // Scan line
+      scanY=(scanY+h*.03)%h;
+      cx.strokeStyle='rgba(94,196,212,.2)';cx.lineWidth=1;cx.beginPath();cx.moveTo(0,scanY);cx.lineTo(w,scanY);cx.stroke();
+      const grad=cx.createLinearGradient(0,scanY-20,0,scanY);grad.addColorStop(0,'transparent');grad.addColorStop(1,'rgba(94,196,212,.04)');
+      cx.fillStyle=grad;cx.fillRect(0,scanY-20,w,20);
+      // Reveal weak points as scan passes
+      weakPoints.forEach(wp=>{
+        if(scanY>wp.y-10){
+          const col=wp.severity>.6?'rgba(231,76,60,':'rgba(212,160,60,';
+          cx.fillStyle=col+'.2)';cx.beginPath();cx.arc(wp.x,wp.y,8+wp.severity*6,0,6.283);cx.fill();
+          cx.strokeStyle=col+'.4)';cx.lineWidth=1;cx.beginPath();cx.arc(wp.x,wp.y,8+wp.severity*6,0,6.283);cx.stroke();
+          cx.fillStyle=col+'.5)';cx.font=`${Math.max(8,w*.016)}px 'Courier New'`;cx.fillText(wp.severity>.6?'FAULT':'WEAR',wp.x+12,wp.y+3);
+        }
+      });
+      if(elapsed>=30){
+        clearInterval(diagInt);
+        const faults=weakPoints.filter(w=>w.severity>.6).length;
+        const wear=weakPoints.filter(w=>w.severity<=.6).length;
+        document.getElementById('diag-status').textContent=`Complete: ${faults} fault${faults!==1?'s':''}, ${wear} wear point${wear!==1?'s':''}`;
+        document.getElementById('diag-status').style.color=faults>0?'#e74c3c':'#2ecc71';
+        logComms('Engineering','Deep diagnostic complete on '+sys.label+': '+faults+' fault(s), '+wear+' wear point(s) detected.');
+        addDiscovery('diagnostic','Deep diagnostic — '+sys.label+': '+faults+' faults, '+wear+' wear points. '+(faults>0?'Immediate attention recommended.':'System within tolerance.'));
+        setTimeout(()=>mini.classList.remove('show'),4000);
+      }
+    },1000);
+  },100);
+  if(engaged)clickSound();
+}
+
+// === DEPARTMENT REPORTS ===
+const deptReports=[
+  ()=>{const v=engSystems[0].data.length?engSystems[0].data[engSystems[0].data.length-1].toFixed(0):'-';return'Engineering: Reactor output at '+v+'%. Coolant loop pressure holding steady. All systems nominal.'},
+  ()=>'Science: Spectral analysis '+(40+Math.floor(Math.random()*55))+'% complete. '+(Math.random()>.7?'Anomalous readings on band 7 — investigating.':'No anomalies.'),
+  ()=>'Medical: Crew health nominal. '+(Math.random()>.5?'Vitamin D supplements distributed.':'Sleep cycle monitoring active. All crew within parameters.'),
+  ()=>'Security: Perimeter secure. '+(lrsObjects.filter(o=>o.type==='ship').length)+' contacts in sensor range. No hostile activity.',
+  ()=>'Navigation: On course, bearing '+hudHeading.toFixed(1)+'°. '+(navRoute.length>1?'Next waypoint: '+navWaypoints[navRoute[1]].name+'.':'No route plotted. Free navigation.'),
+  ()=>'Cargo: '+cargoBays.filter(b=>b).length+'/'+CARGO_COLS*CARGO_ROWS+' bays occupied. Environmental controls nominal. Temperature stable.',
+  ()=>'Shuttle Bay: Shuttle One '+(shuttleState==='ready'?'secured and ready':'on deployment')+'. Launch tube pressurized.',
+  ()=>{const f=hudFuel.toFixed(0);return'Fuel Management: Primary at '+f+'%. Reserve at '+fuelReserve.toFixed(0)+'%. Burn rate nominal.'},
+];
+function scheduleDeptReport(){
+  setTimeout(()=>{
+    if(engaged){
+      const report=deptReports[Math.floor(Math.random()*deptReports.length)]();
+      logComms('Dept Report',report);
+    }
+    scheduleDeptReport();
+  },300000+Math.random()*300000);// 5-10 min
+}
+scheduleDeptReport();
+
+// === BOARDING INSPECTION ===
+let boardingActive=false,boardingContrabandIgnored=false;
+function triggerBoardingInspection(){
+  if(boardingActive)return;boardingActive=true;
+  logComms('Patrol Vessel','Attention '+shipName+'. You are entering Colonial jurisdiction. Heave to for inspection.');
+  addCrewEntry('A Colonial patrol vessel is approaching on an intercept course.');
+  setTimeout(()=>{
+    logComms('Patrol Vessel','Boarding party away. Stand by to receive inspectors.');
+    addCrewEntry('Armed inspectors have boarded via docking port.');
+    const rooms=['Engineering','Cargo Bay','Armory','Med Bay','Quarters A','Quarters B','Cryo Bay'];
+    let ri=0;
+    const inspInt=setInterval(()=>{
+      if(ri>=rooms.length){
+        clearInterval(inspInt);
+        // Check cargo for contraband
+        if(boardingContrabandIgnored){
+          logComms('Patrol Vessel','⚠ Undeclared material found in cargo. Jurisdiction warning issued. This will be reported.');
+          addCrewEntry('Inspectors found undeclared cargo. A formal warning has been logged.');
+          addDiscovery('incident','Colonial jurisdiction warning — undeclared cargo found during inspection');
+        } else {
+          logComms('Patrol Vessel','Inspection complete. Your vessel is clear. Safe travels, '+shipName+'.');
+          addCrewEntry('Inspectors have departed. Ship cleared for transit.');
+        }
+        boardingActive=false;
+        return;
+      }
+      addCrewEntry('Inspectors are checking '+rooms[ri]+'.');
+      logComms('Security','Boarding party in '+rooms[ri]+'. Proceeding.');
+      ri++;
+    },4000);
+  },5000);
+}
+// Hook into nav route territorial crossing
+const origNavRouteHandler=typeof handleNavTerritoryEntry==='function'?handleNavTerritoryEntry:null;
+
+// === ASTEROID MINING ===
+let miningActive=false,miningAnimFrame=0;
+function startAsteroidMining(asteroid){
+  if(miningActive)return;miningActive=true;
+  const mini=document.getElementById('cargo-mini');const body=document.getElementById('cargo-mini-body');
+  document.getElementById('cargo-mini-title').textContent='Asteroid Mining — '+asteroid.name;
+  body.innerHTML=`<canvas id="mine-cv" height="250" style="height:250px"></canvas>
+    <div style="text-align:center;margin-top:6px;font-size:clamp(9px,.8vw,11px)" id="mine-status"><span style="color:#d4a03c">Keep the laser on the target for 15 seconds</span></div>
+    <div style="width:100%;height:6px;background:rgba(212,160,60,.1);border-radius:3px;margin-top:4px"><div id="mine-bar" style="width:0%;height:100%;background:rgba(212,160,60,.5);border-radius:3px"></div></div>`;
+  mini.classList.add('show');
+  logComms('Mining','Deploying mining laser on '+asteroid.name+'.');
+  setTimeout(()=>{
+    const cv=document.getElementById('mine-cv');if(!cv){miningActive=false;return}
+    cv.width=cv.offsetWidth*2||500;cv.height=500;
+    const cx=cv.getContext('2d');const w=cv.width,h=cv.height;
+    let mouseX=w/2,mouseY=h/2,totalLock=0,done=false,startTime=performance.now();
+    const targetDriftA=Math.random()*6.283;
+    const moveHandler=e=>{
+      const rect=cv.getBoundingClientRect();
+      mouseX=(e.clientX-rect.left)/rect.width*w;mouseY=(e.clientY-rect.top)/rect.height*h;
+    };
+    cv.addEventListener('mousemove',moveHandler);
+    function drawMining(){
+      if(done||!mini.classList.contains('show')){
+        cv.removeEventListener('mousemove',moveHandler);
+        miningActive=false;return;
+      }
+      const n=performance.now()*.001;
+      const elapsed=(performance.now()-startTime)/1000;
+      cx.fillStyle='rgba(4,8,12,.95)';cx.fillRect(0,0,w,h);
+      // Asteroid body
+      cx.fillStyle='rgba(120,100,80,.15)';cx.beginPath();
+      for(let a=0;a<6.283;a+=.3){const r2=h*.25+Math.sin(a*3+n*.1)*h*.04;cx.lineTo(w/2+Math.cos(a)*r2,h/2+Math.sin(a)*r2)}
+      cx.closePath();cx.fill();cx.strokeStyle='rgba(160,140,120,.2)';cx.lineWidth=1;cx.stroke();
+      // Surface detail
+      for(let i=0;i<8;i++){cx.fillStyle='rgba(100,80,60,.08)';cx.beginPath();cx.arc(w*.3+i*w*.06,h*.35+Math.sin(i)*h*.15,5+i%3*3,0,6.283);cx.fill()}
+      // Moving target — slow drift, large zone
+      const tX=w/2+Math.sin(n*.15+targetDriftA)*w*.08;const tY=h/2+Math.cos(n*.12)*h*.06;
+      cx.strokeStyle='rgba(46,204,113,.4)';cx.lineWidth=2;cx.beginPath();cx.arc(tX,tY,35,0,6.283);cx.stroke();
+      cx.strokeStyle='rgba(46,204,113,.1)';cx.lineWidth=1;cx.beginPath();cx.arc(tX,tY,50,0,6.283);cx.stroke();
+      cx.strokeStyle='rgba(46,204,113,.15)';cx.beginPath();cx.moveTo(tX-45,tY);cx.lineTo(tX+45,tY);cx.moveTo(tX,tY-45);cx.lineTo(tX,tY+45);cx.stroke();
+      // Laser beam
+      cx.strokeStyle='rgba(231,76,60,.3)';cx.lineWidth=2;cx.beginPath();cx.moveTo(w/2,h);cx.lineTo(mouseX,mouseY);cx.stroke();
+      cx.strokeStyle='rgba(231,76,60,.08)';cx.lineWidth=6;cx.beginPath();cx.moveTo(w/2,h);cx.lineTo(mouseX,mouseY);cx.stroke();
+      // Impact point
+      cx.fillStyle='rgba(255,200,60,.3)';cx.beginPath();cx.arc(mouseX,mouseY,4,0,6.283);cx.fill();
+      // Check if on target (smooth per-frame accumulation)
+      const dist=Math.sqrt((mouseX-tX)**2+(mouseY-tY)**2);
+      const dt=1/60;// approximate frame time
+      if(dist<40){totalLock+=dt;cx.fillStyle='rgba(46,204,113,.12)';cx.beginPath();cx.arc(tX,tY,35,0,6.283);cx.fill()}
+      else{totalLock=Math.max(0,totalLock-dt*.3)}
+      const pct=Math.min(100,totalLock/15*100);
+      document.getElementById('mine-bar').style.width=pct+'%';
+      // Timer display
+      const timeLeft=Math.max(0,60-elapsed);
+      document.getElementById('mine-status').innerHTML=`<span style="color:#d4a03c">Lock: ${Math.min(15,totalLock).toFixed(1)}s / 15s — Time: ${Math.ceil(timeLeft)}s</span>`;
+      if(totalLock>=15){
+        done=true;
+        const isExotic=Math.random()<.15;
+        const oreName=isExotic?['Exotic Crystalline','Neutronium Trace','Dark Matter Residue'][Math.floor(Math.random()*3)]:['Iron Ore','Nickel Deposit','Titanium Fragment','Cobalt Chunk'][Math.floor(Math.random()*4)];
+        const mass=isExotic?5+Math.floor(Math.random()*20):100+Math.floor(Math.random()*400);
+        document.getElementById('mine-status').innerHTML=`<span style="color:#2ecc71">Mining complete! Extracted: ${oreName} (${mass}kg)</span>`;
+        logComms('Mining','Extraction complete: '+oreName+' ('+mass+'kg). '+(isExotic?'⚠ Exotic material detected!':'Standard ore.'));
+        if(cargoInited){const empties=cargoBays.reduce((a,b,i)=>b?a:[...a,i],[]);
+          if(empties.length>0){const bay=empties[0];cargoBays[bay]={name:oreName,type:isExotic?'classified':'equip',mass,origin:'Asteroid Mining',notes:isExotic?'Exotic material — handle with extreme care':'Standard mining yield',temp:[-200,500],condition:100,led:'green',id:Date.now()};
+            logComms('Cargo','Ore transferred to bay '+String.fromCharCode(65+Math.floor(bay/CARGO_COLS))+'-'+(bay%CARGO_COLS+1))}}
+        if(isExotic)addDiscovery('mining','Exotic mineral extracted from asteroid: '+oreName);
+        cv.removeEventListener('mousemove',moveHandler);miningActive=false;
+        setTimeout(()=>mini.classList.remove('show'),3000);return;
+      }
+      if(elapsed>60){
+        done=true;
+        document.getElementById('mine-status').innerHTML='<span style="color:#e74c3c">Mining beam lost coherence. Asteroid moved out of range.</span>';
+        logComms('Mining','Mining operation failed — target lost.');
+        cv.removeEventListener('mousemove',moveHandler);miningActive=false;
+        setTimeout(()=>mini.classList.remove('show'),3000);return;
+      }
+      miningAnimFrame=requestAnimationFrame(drawMining);
+    }
+    miningAnimFrame=requestAnimationFrame(drawMining);
+  },100);
+  if(engaged)clickSound();
+}
+
+// === DISTRESS BEACON EVENTS ===
+function scheduleDistressBeacon(){
+  setTimeout(()=>{
+    if(engaged&&!boardingActive){triggerDistressBeacon()}
+    scheduleDistressBeacon();
+  },600000+Math.random()*900000);// 10-25 min
+}
+function triggerDistressBeacon(){
+  const scenarios=[
+    {type:'rescue',msg:'Automated distress — hull breach, life support failing. 3 souls aboard.',result:()=>{logComms('Rescue','Survivors recovered. Two engineers and a medical officer. They report their ship struck an uncharted asteroid.');addCrewEntry('Dr. Okafor is treating rescued crew in Med Bay.');addDiscovery('rescue','Rescued 3 crew from damaged vessel. Ship registry: CSV Meridian.')}},
+    {type:'derelict',msg:'Automated beacon — no life signs. Vessel adrift. Registry unknown.',result:()=>{logComms('Science','Derelict vessel scanned. Registry matches a ship reported lost 12 years ago. Downloading final log entries.');addDiscovery('derelict','Derelict vessel found — last log entry references "the signal" before all systems went dark.')}},
+    {type:'trap',msg:'Distress signal — engine failure, requesting assistance. Please respond.',result:()=>{logComms('Tactical','⚠ Contact is powering weapons! It was a lure!');addCrewEntry('Cpt. Vasquez: "Evasive maneuvers! All hands to stations!"');shieldsVal=Math.max(40,shieldsVal-15);setTimeout(()=>{logComms('Tactical','Hostile contact has disengaged. They were after easy salvage.');addCrewEntry('Crew is shaken but unharmed. Shields took minor damage.')},8000)}},
+    {type:'wreckage',msg:'Automated beacon — collision debris field. Navigation hazard.',result:()=>{logComms('Science','Debris field contains fragments of two vessels. Collision occurred approximately 6 months ago.');addCrewEntry('Dr. Tanaka is cataloguing debris for accident investigation.');addDiscovery('wreckage','Collision debris field — two vessels, unknown cause. Fragments logged.')}},
+  ];
+  const scenario=scenarios[Math.floor(Math.random()*scenarios.length)];
+  const beaconObj={name:'Distress Beacon',x:.3+Math.random()*.4,y:.3+Math.random()*.4,vx:0,vy:0,type:'beacon',brightness:1,scanned:false,firstSeen:Date.now(),trail:[],departed:false,status:'active'};
+  lrsObjects.push(beaconObj);
+  logComms('Comms','⚠ DISTRESS BEACON DETECTED — '+scenario.msg);
+  addCrewEntry('Comms: Distress signal on emergency frequency. Source on sensors.');
+  // Countdown — 90 seconds to respond
+  let countdown=90;
+  const mn=document.getElementById('maint-notif');
+  if(mn&&!mn.classList.contains('show')){
+    document.getElementById('maint-text').innerHTML='⚠ Distress beacon detected. <span style="color:#e74c3c" id="distress-countdown">'+countdown+'s</span> to respond.';
+    document.getElementById('maint-repair-btn').textContent='◈ Investigate';
+    document.getElementById('maint-repair-btn').onclick=()=>{
+      mn.classList.remove('show');clearInterval(cdInt);
+      logComms('Helm','Diverting to distress beacon. ETA 30 seconds.');
+      addCrewEntry('Course adjusted to investigate distress signal.');
+      setTimeout(()=>scenario.result(),8000);
+    };
+    document.getElementById('maint-dismiss').onclick=()=>{mn.classList.remove('show');clearInterval(cdInt);logComms('Command','Distress beacon noted but not investigated.')};
+    mn.classList.add('show');
+  }
+  const cdInt=setInterval(()=>{
+    countdown--;const el=document.getElementById('distress-countdown');
+    if(el)el.textContent=countdown+'s';
+    if(countdown<=0){clearInterval(cdInt);mn.classList.remove('show');
+      logComms('Comms','Distress beacon signal fading. Out of response range.');
+      beaconObj.departed=true;}
+  },1000);
+}
+scheduleDistressBeacon();
+
+// === ANOMALY INVESTIGATION ===
+function startAnomalyInvestigation(){
+  logComms('Science','Initiating anomaly investigation. Diverting sensor power.');
+  addCrewEntry('Dr. Tanaka: "Focusing all instruments on the anomaly. This could be historic."');
+  let elapsed=0;const duration=60;
+  const canvasEl=document.getElementById('c');
+  const aiLog=document.getElementById('ai-log');
+  const readings=['Spacetime curvature: 0.'+Math.floor(Math.random()*99)+'…','Tachyon flux detected — particles traveling backward','Graviton density: 847× baseline','Chronometric distortion: +0.003 seconds per second','Mass shadow detected — no visible source','Subspace resonance at 47.7 kHz — matches no known source'];
+  const invInt=setInterval(()=>{
+    elapsed++;
+    // Random AI terminal readings
+    if(elapsed%8===0&&aiLog){
+      const r=readings[Math.floor(Math.random()*readings.length)];
+      const d=document.createElement('div');d.className='ai-resp';d.style.color='#d4a03c';d.textContent='> ANOMALY: '+r;
+      aiLog.appendChild(d);aiLog.scrollTop=aiLog.scrollHeight;
+    }
+    // Viewport color shift
+    canvasEl.style.filter=`hue-rotate(${Math.sin(elapsed*.2)*20}deg) saturate(${1+Math.sin(elapsed*.15)*.3})`;
+    if(elapsed>=duration){
+      clearInterval(invInt);canvasEl.style.filter='';
+      // Determine result
+      const roll=Math.random();
+      if(roll<.3){
+        logComms('Science','★ Discovery! Anomaly contains a stable wormhole aperture. Mapping coordinates.');
+        addDiscovery('anomaly','Stable wormhole aperture detected — potential shortcut to uncharted space. Coordinates logged.');
+        addCrewEntry('Dr. Tanaka: "This changes everything. A stable wormhole!"');
+      } else if(roll<.55){
+        logComms('Science','★ Alien artifact detected within the anomaly! Non-natural structure confirmed.');
+        addDiscovery('anomaly','Alien artifact — non-natural structure suspended in gravitational anomaly. Material composition unknown.');
+        addCrewEntry('The crew stares at the viewport in stunned silence.');
+      } else if(roll<.75){
+        logComms('Science','Temporal echo detected — we are receiving transmissions from 200 years in the future.');
+        addDiscovery('anomaly','Temporal echo — fragmented transmissions from the future reference '+shipName+' as "legendary."');
+      } else {
+        logComms('Science','Anomaly has dissipated. Residual data captured but inconclusive.');
+        addCrewEntry('Dr. Tanaka: "It\'s gone. But the data we collected… I\'ve never seen readings like these."');
+      }
+      // Risk: low shields = hull damage
+      if(shieldsVal<50){
+        const dmg=5+Math.random()*10;
+        logComms('Engineering','⚠ Hull stress from anomaly proximity. Integrity reduced by '+dmg.toFixed(0)+'%.');
+        addCrewEntry('Cpl. Reyes: "We took some hits. Hull plating stressed."');
+      }
+    }
+  },1000);
+}
+
+// === DEBRIS FIELD EVENT ===
+let debrisFieldActive=false,debrisParticles=[];
+function scheduleDebrisField(){
+  setTimeout(()=>{
+    if(engaged&&!debrisFieldActive)triggerDebrisField();
+    scheduleDebrisField();
+  },900000+Math.random()*600000);// 15-25 min
+}
+function triggerDebrisField(){
+  debrisFieldActive=true;
+  logComms('Sensors','⚠ Debris field ahead. Reducing speed recommended.');
+  addCrewEntry('Lt. Park: "Debris field on scope. Adjusting course to minimize exposure."');
+  addCrewEntry('Cpl. Reyes: "Shields holding. Watch for impacts."');
+  // Populate debris
+  debrisParticles=[];
+  for(let i=0;i<25;i++){debrisParticles.push({x:Math.random(),y:Math.random(),z:.1+Math.random()*.9,rot:Math.random()*6.283,rotV:(Math.random()-.5)*.02,size:3+Math.random()*8,type:Math.random()<.2?'hull':'rock',scanned:false,lore:null})}
+  // Shield impacts
+  const impactInt=setInterval(()=>{
+    if(!debrisFieldActive){clearInterval(impactInt);return}
+    if(Math.random()<.3){
+      shieldsVal=Math.max(30,shieldsVal-.5);
+      panTargetX=(Math.random()-.5)*5;panTargetY=(Math.random()-.5)*3;
+      setTimeout(()=>{panTargetX=0;panTargetY=0},200);
+    }
+  },2000);
+  // Duration: 2-3 minutes
+  setTimeout(()=>{
+    debrisFieldActive=false;debrisParticles=[];
+    logComms('Sensors','Clear of debris field. Resuming normal operations.');
+    addCrewEntry('Lt. Park: "We\'re through. Starfield looks clean."');
+    addDiscovery('navigation','Transited debris field — '+Math.floor(Math.random()*200+50)+' fragments catalogued. Shield impacts: minor.');
+  },120000+Math.random()*60000);
+}
+scheduleDebrisField();
+
+// === ATTITUDE GIMBAL ===
+const gimbalCv=document.getElementById('gimbal-cv');
+const gimbalCtx=gimbalCv.getContext('2d');
+function drawGimbal(){
+  const cv=gimbalCv,cx=gimbalCtx;
+  cv.width=cv.offsetWidth*2||200;cv.height=cv.offsetHeight*2||200;
+  if(cv.width<10)return;
+  const w=cv.width,h=cv.height,cX=w/2,cY=h/2,r=w*.38;
+  const n=performance.now()*.001;
+
+  // Natural idle drift when no helm input
+  const yaw=flightYaw+Math.sin(n*.4)*.3;
+  const pitch=flightPitch+Math.sin(n*.3)*.2;
+  const roll=flightRoll+Math.sin(n*.5)*.15;
+
+  cx.clearRect(0,0,w,h);
+
+  // Outer ring
+  cx.strokeStyle='rgba(94,230,255,.65)';cx.lineWidth=2;
+  cx.beginPath();cx.arc(cX,cY,r,0,6.283);cx.stroke();
+
+  // Degree marks around outer ring
+  cx.strokeStyle='rgba(94,220,240,.35)';cx.lineWidth=1;
+  for(let i=0;i<36;i++){
+    const a=i*Math.PI/18;
+    const inner=i%9===0?r-8:i%3===0?r-5:r-3;
+    cx.beginPath();cx.moveTo(cX+Math.cos(a)*inner,cY+Math.sin(a)*inner);
+    cx.lineTo(cX+Math.cos(a)*r,cY+Math.sin(a)*r);cx.stroke();
+  }
+
+  // Cardinal labels
+  cx.fillStyle='rgba(94,196,212,.55)';cx.font=`bold ${Math.max(8,w*.04)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillText('N',cX,cY-r-4);cx.fillText('S',cX,cY+r+10);
+  cx.fillText('W',cX-r-6,cY+3);cx.fillText('E',cX+r+6,cY+3);
+
+  // Horizon line — tilts with roll, shifts with pitch
+  cx.save();
+  cx.translate(cX,cY);
+  cx.rotate(roll*Math.PI/180);
+
+  const horizonShift=pitch*r/30;// pitch moves horizon up/down
+
+  // Sky/ground split
+  cx.beginPath();
+  cx.rect(-r,-r,r*2,r*2);cx.clip();
+
+  // Ground (below horizon)
+  cx.fillStyle='rgba(140,90,40,.14)';
+  cx.fillRect(-r,horizonShift,r*2,r*2);
+
+  // Sky (above horizon)
+  cx.fillStyle='rgba(40,90,140,.1)';
+  cx.fillRect(-r,-r*2+horizonShift,r*2,r*2);
+
+  // Horizon line
+  cx.strokeStyle='rgba(46,255,113,.55)';cx.lineWidth=2;
+  cx.beginPath();cx.moveTo(-r,horizonShift);cx.lineTo(r,horizonShift);cx.stroke();
+
+  // Pitch ladder lines
+  [-10,-20,10,20].forEach(deg=>{
+    const py=horizonShift-deg*r/30;
+    if(Math.abs(py)>r*.9)return;
+    const lw=deg%20===0?r*.3:r*.2;
+    cx.strokeStyle=`rgba(94,196,212,${deg%20===0?.25:.14})`;cx.lineWidth=1;
+    cx.setLineDash(deg<0?[3,3]:[]);
+    cx.beginPath();cx.moveTo(-lw,py);cx.lineTo(lw,py);cx.stroke();
+    cx.setLineDash([]);
+    // Degree label
+    if(deg%20===0){
+      cx.fillStyle='rgba(94,196,212,.3)';cx.font=`${Math.max(7,w*.03)}px 'Courier New'`;cx.textAlign='start';
+      cx.fillText(Math.abs(deg)+'°',lw+3,py+3);cx.textAlign='center';
+    }
+  });
+
+  cx.restore();
+
+  // Fixed aircraft symbol (center reference)
+  cx.strokeStyle='rgba(255,200,60,.7)';cx.lineWidth=2.5;
+  // Center dot
+  cx.fillStyle='rgba(255,200,60,.8)';cx.beginPath();cx.arc(cX,cY,2.5,0,6.283);cx.fill();
+  // Wings
+  cx.beginPath();cx.moveTo(cX-r*.3,cY);cx.lineTo(cX-r*.12,cY);cx.stroke();
+  cx.beginPath();cx.moveTo(cX+r*.12,cY);cx.lineTo(cX+r*.3,cY);cx.stroke();
+  // Tail
+  cx.beginPath();cx.moveTo(cX,cY+r*.08);cx.lineTo(cX,cY+r*.18);cx.stroke();
+
+  // Yaw indicator — triangle at top
+  const yawAngle=yaw*Math.PI/30;// scale yaw to rotation
+  const triX=cX+Math.sin(yawAngle)*r*.7;
+  const triY=cY-r+6;
+  cx.fillStyle='rgba(94,230,255,.65)';
+  cx.beginPath();cx.moveTo(triX,triY-5);cx.lineTo(triX-3,triY+3);cx.lineTo(triX+3,triY+3);cx.closePath();cx.fill();
+
+  // Roll indicator — arc at bottom with pointer
+  const rollRad=roll*Math.PI/180;
+  cx.strokeStyle='rgba(94,196,212,.35)';cx.lineWidth=1.5;
+  cx.beginPath();cx.arc(cX,cY,r*.85,Math.PI*.6,Math.PI*.4+Math.PI);cx.stroke();
+  // Roll tick marks
+  [-45,-30,-15,0,15,30,45].forEach(deg=>{
+    const a=Math.PI/2+deg*Math.PI/180;
+    cx.strokeStyle='rgba(94,196,212,.35)';cx.lineWidth=1;
+    cx.beginPath();cx.moveTo(cX+Math.cos(a)*r*.8,cY+Math.sin(a)*r*.8);
+    cx.lineTo(cX+Math.cos(a)*r*.88,cY+Math.sin(a)*r*.88);cx.stroke();
+  });
+  // Roll pointer
+  const rpA=Math.PI/2+rollRad;
+  cx.fillStyle='rgba(46,255,113,.7)';
+  cx.beginPath();cx.moveTo(cX+Math.cos(rpA)*r*.75,cY+Math.sin(rpA)*r*.75);
+  cx.lineTo(cX+Math.cos(rpA-.06)*r*.85,cY+Math.sin(rpA-.06)*r*.85);
+  cx.lineTo(cX+Math.cos(rpA+.06)*r*.85,cY+Math.sin(rpA+.06)*r*.85);cx.closePath();cx.fill();
+
+  // Readouts below gimbal
+  cx.fillStyle='rgba(94,230,255,.5)';cx.font=`${Math.max(7,w*.035)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillText('Y '+yaw.toFixed(1)+'°  P '+pitch.toFixed(1)+'°  R '+roll.toFixed(1)+'°',cX,h-3);
+}
+
 // RENDER
 let t=0;
 function draw(now){
@@ -9197,6 +9684,36 @@ function draw(now){
       pg.addColorStop(1,`hsla(${o.hue},20%,10%,0)`);
       ctx.fillStyle=pg;ctx.beginPath();ctx.arc(ox,oy,r,0,6.283);ctx.fill();
     }
+  }
+
+  // Debris field
+  if(debrisFieldActive&&debrisParticles.length>0){
+    debrisParticles.forEach(d=>{
+      d.z-=hudSpeed*.02;d.rot+=d.rotV;
+      if(d.z<=0)d.z=.9+Math.random()*.1;
+      const invZ=1/d.z;
+      const dx=cx+(d.x-.5)*invZ*(W*.6);
+      const dy=cy+(d.y-.5)*invZ*(H*.6);
+      const sc=(1-d.z)*d.size;
+      if(dx<-50||dx>W+50||dy<-50||dy>H+50)return;
+      ctx.save();ctx.translate(dx,dy);ctx.rotate(d.rot);
+      if(d.type==='hull'){
+        ctx.fillStyle=`rgba(80,90,100,${Math.min(.6,(1-d.z)*1.5)})`;
+        ctx.fillRect(-sc,-sc*.4,sc*2,sc*.8);
+        ctx.strokeStyle=`rgba(60,70,80,${Math.min(.3,(1-d.z))})`;ctx.lineWidth=.5;
+        ctx.strokeRect(-sc,-sc*.4,sc*2,sc*.8);
+      } else {
+        ctx.fillStyle=`rgba(90,80,70,${Math.min(.5,(1-d.z)*1.5)})`;
+        ctx.beginPath();
+        for(let v=0;v<5;v++){const a=v*1.257;const r2=sc*(.6+Math.sin(a*3+d.rot)*.4);ctx.lineTo(Math.cos(a)*r2,Math.sin(a)*r2)}
+        ctx.closePath();ctx.fill();
+      }
+      ctx.restore();
+      // Shield impact flash
+      if(d.z<.15&&Math.random()<.02){
+        ctx.fillStyle='rgba(255,255,255,.15)';ctx.beginPath();ctx.arc(dx,dy,sc*2,0,6.283);ctx.fill();
+      }
+    });
   }
 
   // Comet
@@ -9402,6 +9919,7 @@ function draw(now){
   if(Math.abs(flightRoll)>.1)ctx.restore();
   flareOpacity+=(flareTarget-flareOpacity)*.08;
   flareEl.style.opacity=flareOpacity;
+  if(engaged)drawGimbal();
   requestAnimationFrame(draw);
 }
 requestAnimationFrame(draw);
