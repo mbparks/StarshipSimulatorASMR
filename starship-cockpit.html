@@ -314,14 +314,14 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .crew-log-inner{display:flex;flex-direction:column;gap:3px}
 .crew-log-entry{font-size:clamp(9px,.85vw,12px);color:#2a4a5a;letter-spacing:1px;white-space:normal;transition:opacity 1s,transform 1s;opacity:0;transform:translateY(-6px);line-height:1.4}
 .crew-log-entry.visible{opacity:1;transform:translateY(0)}
-.crew-log-entry .cle-time{color:#1a3a4a;margin-right:6px}
+.crew-log-entry .cle-time{color:rgba(255,220,100,.5);margin-right:6px}
 .crew-log-entry .cle-text{color:#3a5a6a}
 .crew-log-entry.captain .cle-text{color:#5ec4d4}
 
 /* === CAPTAIN INPUT === */
 .captain-input{position:fixed;bottom:clamp(240px,36vh,380px);left:clamp(42px,5.6vw,92px);z-index:6;display:flex;gap:6px;align-items:center}
-.captain-input input{background:rgba(10,18,24,.85);border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:clamp(8px,.75vw,11px);letter-spacing:1px;padding:4px 8px;width:clamp(140px,16vw,220px);outline:none;border-radius:3px;transition:border-color .3s}
-.captain-input input:focus{border-color:rgba(94,196,212,.5)}
+.captain-input input{background:rgba(10,18,24,.85);border:1px solid rgba(255,220,60,.5);color:#5ec4d4;font-family:inherit;font-size:clamp(8px,.75vw,11px);letter-spacing:1px;padding:4px 8px;width:clamp(140px,16vw,220px);outline:none;border-radius:3px;transition:border-color .3s}
+.captain-input input:focus{border-color:rgba(255,220,60,.8)}
 .captain-input input::placeholder{color:#2a4a5a}
 .captain-input button{background:none;border:1px solid rgba(94,196,212,.2);color:#4a8a9a;font-family:inherit;font-size:clamp(7px,.65vw,9px);letter-spacing:2px;padding:4px 8px;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .3s}
 .captain-input button:hover{border-color:#5ec4d4;color:#5ec4d4;background:rgba(94,196,212,.06)}
@@ -4806,7 +4806,7 @@ const territories=[
 // Fog of war - cleared positions
 const fogCleared=new Set();fogCleared.add('0.48,0.48');
 const customWaypoints=[];
-let navRoute=[],npZoom=1,npPanX=.48,npPanY=.48,npDragging=false,npDragStartX=0,npDragStartY=0,npSelectedWp=null;
+let navRoute=[0],npZoom=1,npPanX=.48,npPanY=.48,npDragging=false,npDragStartX=0,npDragStartY=0,npSelectedWp=null;
 let npShipProgress=0,npAnimFrame=0;
 
 function npWorldToScreen(wx,wy,w,h){
@@ -5031,7 +5031,8 @@ npCanvas.addEventListener('click',e=>{
   if(closest>=0){
     showWpDetail(navWaypoints[closest]);
     const idx=navRoute.indexOf(closest);
-    if(idx>=0)navRoute.splice(idx,1);else navRoute.push(closest);
+    if(closest===0){/* ship is always first — don't toggle */}
+    else if(idx>=0)navRoute.splice(idx,1);else navRoute.push(closest);
     npShipProgress=0;
     // Comm message on territory crossing
     if(navRoute.length>1){
@@ -5104,7 +5105,7 @@ npCanvas.addEventListener('mouseleave',()=>{npDragging=false});
 
 // Clear route
 document.getElementById('np-clear-route').addEventListener('click',()=>{
-  navRoute=[];npShipProgress=0;npSelectedWp=null;
+  navRoute=[0];npShipProgress=0;npSelectedWp=null;
   document.getElementById('np-detail').style.display='none';
   if(engaged)clickSound();
 });
