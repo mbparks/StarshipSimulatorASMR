@@ -1412,6 +1412,7 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
   <button class="scr-btn" data-screen="weapons" style="border-color:rgba(231,76,60,.2);color:#e74c3c">Wpns</button>
   <button class="scr-btn" data-screen="shuttle" style="border-color:rgba(94,196,212,.25)">Bay</button>
   <button class="scr-btn" data-screen="cargo" style="border-color:rgba(212,160,60,.2);color:#d4a03c">Cargo</button>
+  <button class="scr-btn" id="orbit-toggle" style="border-color:rgba(100,180,255,.2);color:#64b4ff">Orbit</button>
   <button class="scr-btn" id="hud-toggle" style="border-color:rgba(46,204,113,.2);color:#2ecc71">HUD</button>
 </div>
 
@@ -9563,6 +9564,442 @@ function triggerDebrisField(){
 }
 scheduleDebrisField();
 
+// === ORBIT MODULE ===
+let orbitMode=false,orbitPlanet=null,orbitDebris=[],orbitDataExpanded=true,orbitSelectedPOI=null;
+function initOrbit(){
+  const hue=Math.random()*360;
+  const sat=20+Math.random()*40;
+  const dir=Math.random()>.5?1:-1;
+  const hasRings=Math.random()<.25;
+  const hasClouds=Math.random()<.6;
+  const planetNames=['Kepler-442b','Trappist-1e','Proxima b','Gliese 667c','Wolf 1061c','HD 40307g','Tau Ceti f','Kapteyn b'];
+  orbitPlanet={hue,sat,dir,hasRings,hasClouds,name:planetNames[Math.floor(Math.random()*planetNames.length)],
+    radius:.35,// fraction of viewport height
+    surfaceFeatures:[],cloudBands:[],orbitAngle:0,pois:[],data:{}};
+
+  // Generate planet data
+  const grav=(.4+Math.random()*1.8).toFixed(2);
+  const atmoTypes=[
+    {primary:'N₂ 72% O₂ 21% Ar 1%',class:'Terrestrial',breathable:true},
+    {primary:'CO₂ 96% N₂ 3.5%',class:'Venusian',breathable:false},
+    {primary:'H₂ 89% He 11%',class:'Jovian',breathable:false},
+    {primary:'N₂ 85% CH₄ 12% Ar 3%',class:'Cryogenic',breathable:false},
+    {primary:'CO₂ 45% N₂ 30% O₂ 18%',class:'Pre-Biotic',breathable:false},
+    {primary:'O₂ 38% N₂ 55% H₂O 5%',class:'Hyper-Oxygenated',breathable:true},
+  ];
+  const atmo=atmoTypes[Math.floor(Math.random()*atmoTypes.length)];
+  const rotHrs=(6+Math.random()*60).toFixed(1);
+  const tempK=Math.floor(120+Math.random()*400);
+  const pressure=(.01+Math.random()*4).toFixed(2);
+  const magField=Math.random()<.6;
+  const water=Math.random()<.5?Math.floor(Math.random()*85)+'%':'None detected';
+  orbitPlanet.data={gravity:grav+'g',atmo:atmo.primary,atmoClass:atmo.class,breathable:atmo.breathable,
+    rotation:rotHrs+' hrs',temp:tempK+'K ('+(tempK-273).toFixed(0)+'°C)',
+    pressure:pressure+' atm',radius:(4000+Math.random()*10000).toFixed(0)+' km',
+    magField:magField?'Active — '+(5+Math.random()*40).toFixed(1)+' µT':'Negligible',
+    water:water,population:Math.random()<.3?(Math.floor(Math.random()*8)+' billion'):'No intelligent life detected',
+    moons:Math.floor(Math.random()*5)};
+
+  // Generate POIs
+  const cityNames=['Arcadia Prime','New Meridian','Vostok Station','Olympus','Port Serenity','Haven','Terminus','Axiom City','Freehold','Nova Jakarta','Deep Harbor','Crestfall'];
+  const riverNames=['Argent River','Serpentine Flow','Great Rift Channel','Chrysalis Basin','Jade Current','Obsidian Run'];
+  const mtnNames=['Mt. Ascension','Titan Ridge','Shattered Peaks','The Spire','Crimson Range','Frost Crown','Ironback Massif'];
+  const otherPOIs=['Tectonic Fault Zone','Impact Crater (12km)','Ancient Ruins','Thermal Vents','Bioluminescent Forest','Crystal Formations','Anomalous Energy Source','Mining Colony','Research Outpost','Orbital Elevator Base'];
+  const numPOIs=6+Math.floor(Math.random()*6);
+  for(let i=0;i<numPOIs;i++){
+    let label,icon,color;
+    const roll=Math.random();
+    if(roll<.3){label=cityNames.splice(Math.floor(Math.random()*cityNames.length),1)[0]||'Settlement '+(i+1);icon='◆';color='rgba(255,220,100,'}
+    else if(roll<.5){label=riverNames.splice(Math.floor(Math.random()*riverNames.length),1)[0]||'Waterway';icon='≈';color='rgba(100,180,255,'}
+    else if(roll<.7){label=mtnNames.splice(Math.floor(Math.random()*mtnNames.length),1)[0]||'Peak';icon='▲';color='rgba(200,160,120,'}
+    else{label=otherPOIs.splice(Math.floor(Math.random()*otherPOIs.length),1)[0]||'POI-'+(i+1);icon='◎';color='rgba(94,230,200,'}
+    // Generate detail info per POI
+    const elevations=['Sea Level','120m','450m','1,200m','2,800m','5,400m','-80m (below sea level)'];
+    const climates=['Tropical','Arid','Temperate','Continental','Polar','Volcanic','Subterranean'];
+    const resources=[['Titanium deposits','Fresh water aquifer','Geothermal energy'],['Iron ore veins','Rare earth minerals','Silicon formations'],['Deuterium reserves','Crystalline structures','Organic compounds'],['Helium-3 deposits','Volcanic glass','Unknown alloys']];
+    const hazards=['Seismic activity (moderate)','Toxic spore blooms (seasonal)','Electromagnetic interference','Unstable terrain','Radiation pockets','Predatory megafauna','Flash flooding','Extreme UV exposure','None recorded'];
+    const notes=[
+      'First surveyed by the CSV Endeavour, 2247.',
+      'Local flora exhibits bioluminescence at dusk.',
+      'Subsurface caverns detected — extent unknown.',
+      'Faint energy signature detected. Origin unclear.',
+      'Pre-colonial ruins visible from orbit.',
+      'Mineral composition inconsistent with planetary formation models.',
+      'Atmospheric distortion complicates sensor readings.',
+      'Water table unusually close to surface.',
+      'Soil samples requested by UESA Xenobiology Division.',
+      'Automated beacon broadcasting on legacy frequency.',
+      'Structures visible — possibly artificial.',
+      'Magnetic anomaly interferes with navigation at low altitude.',
+    ];
+    const detail={
+      elevation:elevations[Math.floor(Math.random()*elevations.length)],
+      climate:climates[Math.floor(Math.random()*climates.length)],
+      resources:resources[Math.floor(Math.random()*resources.length)].slice(0,1+Math.floor(Math.random()*2)),
+      hazard:hazards[Math.floor(Math.random()*hazards.length)],
+      note:notes[Math.floor(Math.random()*notes.length)],
+      scanned:false,
+    };
+    orbitPlanet.pois.push({label,icon,color,lng:Math.random()*6.283,lat:(Math.random()-.5)*2.2,pop:Math.random()>.5?(.1+Math.random()*5).toFixed(1)+'M':null,detail,sx:0,sy:0,onScreen:false});
+  }
+  // Generate surface features
+  for(let i=0;i<12+Math.floor(Math.random()*10);i++){
+    orbitPlanet.surfaceFeatures.push({lng:Math.random()*6.283,lat:(Math.random()-.5)*2.5,size:.02+Math.random()*.06,hueShift:-20+Math.random()*40,bright:Math.random()*.15})
+  }
+  // Cloud bands
+  if(hasClouds){for(let i=0;i<4+Math.floor(Math.random()*4);i++){
+    orbitPlanet.cloudBands.push({lat:(Math.random()-.5)*2,width:.08+Math.random()*.15,speed:.0002+Math.random()*.0003,offset:Math.random()*6.283,opacity:.1+Math.random()*.15})
+  }}
+  // Orbital debris/objects
+  orbitDebris=[];
+  for(let i=0;i<6;i++){
+    const kind=['satellite','moon','ship','debris'][Math.floor(Math.random()*4)];
+    orbitDebris.push({kind,angle:Math.random()*6.283,dist:.5+Math.random()*.4,speed:(.0003+Math.random()*.0006)*dir*(Math.random()>.3?1:-1),
+      size:kind==='moon'?8+Math.random()*15:kind==='ship'?3+Math.random()*4:1+Math.random()*3,
+      hue:Math.random()*360,blink:Math.random()*6.283,visible:true,nextAppear:0});
+  }
+  logComms('Helm','Entering orbit around '+orbitPlanet.name+'. Orbital insertion complete.');
+  logComms('Science','Planetary scan initiated. Class: '+orbitPlanet.data.atmoClass+'. Gravity: '+orbitPlanet.data.gravity+'. Atmosphere: '+(orbitPlanet.data.breathable?'breathable.':'hostile — EVA suits required.'));
+  addCrewEntry('Lt. Park: "Stable orbit achieved. '+orbitPlanet.name+' below us."');
+  addCrewEntry('Dr. Tanaka: "Surface scan underway. '+orbitPlanet.pois.length+' points of interest identified so far."');
+  addDiscovery('planetary','Orbital survey — '+orbitPlanet.name+': '+orbitPlanet.data.atmoClass+' class, '+orbitPlanet.data.gravity+' gravity, '+orbitPlanet.data.temp+'. '+(orbitPlanet.data.breathable?'Atmosphere breathable.':'Atmosphere hostile.')+' '+orbitPlanet.pois.length+' surface POIs catalogued.');
+}
+
+function drawOrbit(ctx,W,H,t){
+  const p=orbitPlanet;if(!p)return;
+  p.orbitAngle+=.0004*p.dir;
+  const cx=W*.45,cy=H*.55;// planet center — slightly below and left of viewport center
+  const r=p.radius*H;
+
+  // Background stars (slow rotation for orbital feel)
+  ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  for(let i=0;i<200;i++){
+    const sa=i*2.399+p.orbitAngle*.3;
+    const sd=100+i*3;
+    const sx=(W/2+Math.cos(sa)*sd+W)%W;
+    const sy=(H/2+Math.sin(sa)*sd*.7+H)%H;
+    const bright=.3+Math.sin(i+t)*.15;
+    ctx.fillStyle=`rgba(200,210,220,${bright})`;
+    ctx.fillRect(sx,sy,i%5===0?1.5:1,i%5===0?1.5:1);
+  }
+
+  // Planet body
+  const pg=ctx.createRadialGradient(cx-r*.2,cy-r*.25,r*.05,cx,cy,r);
+  pg.addColorStop(0,`hsla(${p.hue},${p.sat}%,45%,1)`);
+  pg.addColorStop(.5,`hsla(${p.hue},${p.sat}%,30%,1)`);
+  pg.addColorStop(.85,`hsla(${p.hue},${p.sat-10}%,18%,1)`);
+  pg.addColorStop(1,`hsla(${p.hue},${p.sat}%,8%,.8)`);
+  ctx.fillStyle=pg;ctx.beginPath();ctx.arc(cx,cy,r,0,6.283);ctx.fill();
+
+  // Surface features (rotate with orbit)
+  ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,6.283);ctx.clip();
+  p.surfaceFeatures.forEach(f=>{
+    const lng=f.lng+p.orbitAngle*2;
+    const fx=cx+Math.cos(lng)*r*.8*Math.cos(f.lat);
+    const fy=cy+Math.sin(f.lat)*r*.6;
+    // Only show features on lit side
+    const litSide=Math.cos(lng);
+    if(litSide<-.2)return;
+    ctx.fillStyle=`hsla(${p.hue+f.hueShift},${p.sat+10}%,${25+f.bright*100}%,${.08+litSide*.08})`;
+    ctx.beginPath();ctx.arc(fx,fy,f.size*r,0,6.283);ctx.fill();
+  });
+  // Cloud bands
+  p.cloudBands.forEach(c=>{
+    const cy2=cy+Math.sin(c.lat)*r*.5;
+    const drift=c.offset+t*c.speed*1000;
+    ctx.fillStyle=`rgba(255,255,255,${c.opacity*(.5+Math.cos(c.lat)*.5)})`;
+    for(let s=0;s<8;s++){
+      const sx=cx+Math.cos(drift+s*.8)*r*.7;
+      ctx.beginPath();ctx.ellipse(sx,cy2,r*c.width,r*.03,0,0,6.283);ctx.fill();
+    }
+  });
+  ctx.restore();
+
+  // Atmosphere glow
+  const ag=ctx.createRadialGradient(cx,cy,r*.95,cx,cy,r*1.12);
+  ag.addColorStop(0,`hsla(${p.hue+20},60%,60%,0)`);
+  ag.addColorStop(.5,`hsla(${p.hue+20},60%,60%,.06)`);
+  ag.addColorStop(1,`hsla(${p.hue+20},60%,60%,0)`);
+  ctx.fillStyle=ag;ctx.beginPath();ctx.arc(cx,cy,r*1.12,0,6.283);ctx.fill();
+
+  // Terminator shadow (dark side)
+  ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,6.283);ctx.clip();
+  const sg=ctx.createLinearGradient(cx-r,cy,cx+r,cy);
+  sg.addColorStop(0,'rgba(0,0,0,0)');sg.addColorStop(.55,'rgba(0,0,0,0)');sg.addColorStop(.75,'rgba(0,0,0,.3)');sg.addColorStop(1,'rgba(0,0,0,.6)');
+  ctx.fillStyle=sg;ctx.fillRect(cx-r,cy-r,r*2,r*2);
+  ctx.restore();
+
+  // Rings
+  if(p.hasRings){
+    ctx.save();
+    ctx.translate(cx,cy);ctx.scale(1,.3);
+    ctx.strokeStyle=`hsla(${p.hue+30},20%,50%,.12)`;ctx.lineWidth=r*.08;
+    ctx.beginPath();ctx.arc(0,0,r*1.5,0,Math.PI);ctx.stroke();// back half
+    ctx.strokeStyle=`hsla(${p.hue+30},20%,50%,.06)`;ctx.lineWidth=r*.05;
+    ctx.beginPath();ctx.arc(0,0,r*1.7,0,Math.PI);ctx.stroke();
+    ctx.restore();
+    // Front rings (drawn after planet)
+    ctx.save();ctx.translate(cx,cy);ctx.scale(1,.3);
+    ctx.strokeStyle=`hsla(${p.hue+30},20%,50%,.1)`;ctx.lineWidth=r*.08;
+    ctx.beginPath();ctx.arc(0,0,r*1.5,Math.PI,6.283);ctx.stroke();
+    ctx.strokeStyle=`hsla(${p.hue+30},20%,50%,.05)`;ctx.lineWidth=r*.05;
+    ctx.beginPath();ctx.arc(0,0,r*1.7,Math.PI,6.283);ctx.stroke();
+    ctx.restore();
+  }
+
+  // Orbital objects
+  orbitDebris.forEach(d=>{
+    d.angle+=d.speed;
+    // Occasional appear/disappear
+    if(!d.visible){if(performance.now()>d.nextAppear){d.visible=true;d.angle=Math.random()*6.283}return}
+    if(Math.random()<.0002){d.visible=false;d.nextAppear=performance.now()+10000+Math.random()*30000;return}
+    const ox=cx+Math.cos(d.angle)*r*d.dist*1.8;
+    const oy=cy+Math.sin(d.angle)*r*d.dist*.6;// compressed for orbital plane
+    // Behind planet? Skip if within planet disc
+    const dx=ox-cx,dy=oy-cy;
+    const behindPlanet=Math.sqrt(dx*dx+dy*dy)<r*.9&&Math.sin(d.angle)<0;
+    if(behindPlanet)return;
+
+    if(d.kind==='moon'){
+      const mg=ctx.createRadialGradient(ox-d.size*.3,oy-d.size*.3,0,ox,oy,d.size);
+      mg.addColorStop(0,`hsla(${d.hue},10%,45%,.5)`);mg.addColorStop(1,`hsla(${d.hue},10%,20%,.2)`);
+      ctx.fillStyle=mg;ctx.beginPath();ctx.arc(ox,oy,d.size,0,6.283);ctx.fill();
+    } else if(d.kind==='satellite'){
+      // Body
+      ctx.fillStyle='rgba(180,190,200,.4)';ctx.fillRect(ox-1.5,oy-1,3,2);
+      // Solar panels
+      ctx.fillStyle='rgba(80,120,200,.3)';ctx.fillRect(ox-d.size*2,oy-.5,d.size*1.5,1);ctx.fillRect(ox+1.5,oy-.5,d.size*1.5,1);
+      // Blink
+      if(Math.sin(t*3+d.blink)>.7){ctx.fillStyle='rgba(255,60,60,.5)';ctx.beginPath();ctx.arc(ox,oy,1,0,6.283);ctx.fill()}
+    } else if(d.kind==='ship'){
+      const sa=Math.min(.6,(1-Math.abs(Math.sin(d.angle)))*.8);
+      ctx.fillStyle=`rgba(160,170,180,${sa})`;
+      ctx.fillRect(ox-d.size,oy-.5,d.size*2,1);
+      // Nav lights
+      if(Math.sin(t*2+d.blink)>.3){
+        ctx.fillStyle=`rgba(255,60,60,${sa})`;ctx.beginPath();ctx.arc(ox-d.size,oy,.8,0,6.283);ctx.fill();
+        ctx.fillStyle=`rgba(60,255,60,${sa})`;ctx.beginPath();ctx.arc(ox+d.size,oy,.8,0,6.283);ctx.fill();
+      }
+    } else {// debris
+      ctx.fillStyle='rgba(140,130,120,.25)';
+      ctx.save();ctx.translate(ox,oy);ctx.rotate(d.angle*5);
+      ctx.fillRect(-d.size/2,-d.size/2,d.size,d.size);
+      ctx.restore();
+    }
+  });
+
+  // === POI LABELS ON PLANET SURFACE ===
+  p.pois.forEach(poi=>{
+    poi.onScreen=false;
+    const lng=poi.lng+p.orbitAngle*2;
+    const litSide=Math.cos(lng);
+    if(litSide<0)return;// behind terminator
+    const px=cx+Math.cos(lng)*r*.75*Math.cos(poi.lat);
+    const py=cy+Math.sin(poi.lat)*r*.55;
+    // Check if inside planet disc
+    const dx2=px-cx,dy2=py-cy;
+    if(Math.sqrt(dx2*dx2+dy2*dy2)>r*.92)return;
+    poi.onScreen=true;poi.sx=px;poi.sy=py;
+    const alpha=.15+litSide*.25;
+    const isSel=orbitSelectedPOI===poi;
+    const fs=Math.max(7,W*.007);
+    // Connector dot
+    ctx.fillStyle=poi.color+(isSel?.8:(.3+litSide*.3))+')';
+    ctx.beginPath();ctx.arc(px,py,isSel?3.5:2,0,6.283);ctx.fill();
+    // Selection ring
+    if(isSel){ctx.strokeStyle=poi.color+'.5)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(px,py,8,0,6.283);ctx.stroke()}
+    // Label line
+    const lx=px+12,ly=py-8;
+    ctx.strokeStyle=poi.color+(isSel?.3:(.1+litSide*.1))+')';ctx.lineWidth=.5;
+    ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(lx-2,ly+4);ctx.stroke();
+    // Label background
+    const labelText=poi.icon+' '+poi.label;
+    ctx.font=`${isSel?'bold ':''}${fs}px 'Courier New'`;
+    const tw=ctx.measureText(labelText).width;
+    ctx.fillStyle='rgba(0,0,0,'+(isSel?.7:(alpha*.6))+')';
+    ctx.fillRect(lx-3,ly-fs+1,tw+6,fs+4);
+    // Label text
+    ctx.fillStyle=poi.color+(isSel?.8:alpha)+')';
+    ctx.textAlign='start';ctx.fillText(labelText,lx,ly);
+    // Population sublabel
+    if(poi.pop){
+      ctx.fillStyle=poi.color+(alpha*.5)+')';ctx.font=`${Math.max(6,W*.005)}px 'Courier New'`;
+      ctx.fillText('Pop: '+poi.pop,lx,ly+fs-1);
+    }
+  });
+
+  // === POI DETAIL BOX ===
+  if(orbitSelectedPOI&&orbitSelectedPOI.onScreen){
+    const poi=orbitSelectedPOI;const d=poi.detail;
+    const bw=Math.min(W*.28,320);const bfs=Math.max(9,W*.009);const blh=bfs+5;
+    const lines=6+(d.resources?d.resources.length:0);
+    const bh=blh*lines+30;
+    // Position box near the POI but not overlapping
+    let bx=poi.sx+25,by=poi.sy-bh/2;
+    if(bx+bw>W-20)bx=poi.sx-bw-25;
+    if(by<10)by=10;if(by+bh>H-10)by=H-bh-10;
+    // Background
+    ctx.fillStyle='rgba(4,8,16,.8)';ctx.fillRect(bx,by,bw,bh);
+    ctx.strokeStyle=poi.color+'.3)';ctx.lineWidth=1;ctx.strokeRect(bx,by,bw,bh);
+    // Title
+    ctx.font=`bold ${bfs+1}px 'Courier New'`;ctx.textAlign='start';
+    ctx.fillStyle=poi.color+'.8)';
+    ctx.fillText(poi.icon+' '+poi.label,bx+10,by+bfs+8);
+    // Divider
+    ctx.strokeStyle=poi.color+'.15)';ctx.lineWidth=.5;
+    ctx.beginPath();ctx.moveTo(bx+8,by+bfs+14);ctx.lineTo(bx+bw-8,by+bfs+14);ctx.stroke();
+    // Detail rows
+    ctx.font=`${bfs}px 'Courier New'`;
+    const rows=[
+      {label:'Elevation',val:d.elevation},
+      {label:'Climate',val:d.climate},
+      {label:'Hazards',val:d.hazard},
+    ];
+    if(poi.pop)rows.unshift({label:'Population',val:poi.pop});
+    rows.forEach((row,i)=>{
+      const ry=by+bfs+22+i*blh;
+      ctx.fillStyle='rgba(140,180,220,.35)';ctx.fillText(row.label,bx+10,ry);
+      ctx.fillStyle='rgba(200,220,240,.6)';ctx.fillText(row.val,bx+bw*.4,ry);
+    });
+    // Resources
+    const resY=by+bfs+22+rows.length*blh;
+    ctx.fillStyle='rgba(140,180,220,.35)';ctx.fillText('Resources',bx+10,resY);
+    d.resources.forEach((res,ri)=>{
+      ctx.fillStyle='rgba(46,204,113,.5)';ctx.fillText('• '+res,bx+bw*.4,resY+ri*blh);
+    });
+    // Note (italic feel)
+    const noteY=resY+d.resources.length*blh+blh*.5;
+    ctx.fillStyle='rgba(160,180,200,.3)';ctx.font=`${Math.max(7,bfs-2)}px 'Courier New'`;
+    const noteText=d.note.length>45?d.note.substring(0,44)+'…':d.note;
+    ctx.fillText('"'+noteText+'"',bx+10,noteY);
+    // Close hint
+    ctx.fillStyle='rgba(100,180,255,.15)';ctx.font=`${Math.max(6,bfs-3)}px 'Courier New'`;
+    ctx.fillText('click elsewhere to dismiss',bx+10,by+bh-6);
+  }
+
+  // === PLANET DATA READOUT (centered, collapsible) ===
+  const pd=p.data;
+  const rdFs=Math.max(11,W*.012);
+  const rdLh=rdFs+3;
+  const panelW=Math.min(W*.52,560);
+  const headerH=rdFs+16;
+  const panelH=orbitDataExpanded?rdLh*14+26:headerH;
+  const rdX=W/2-panelW/2-50;
+  const rdY=H*.08+100;
+  // Store panel bounds for click detection
+  p._panelBounds={x:rdX,y:rdY,w:panelW,h:headerH};
+  // Background panel
+  ctx.fillStyle='rgba(4,8,16,.6)';
+  ctx.fillRect(rdX,rdY,panelW,panelH);
+  ctx.strokeStyle='rgba(100,180,255,.15)';ctx.lineWidth=1;
+  ctx.strokeRect(rdX,rdY,panelW,panelH);
+  ctx.strokeStyle='rgba(100,180,255,.06)';
+  ctx.beginPath();ctx.moveTo(rdX+1,rdY+1);ctx.lineTo(rdX+panelW-1,rdY+1);ctx.stroke();
+
+  // Title bar (always visible, clickable)
+  ctx.font=`bold ${rdFs+2}px 'Courier New'`;ctx.textAlign='center';
+  ctx.fillStyle='rgba(100,200,255,.7)';
+  ctx.fillText('◈ '+p.name.toUpperCase()+' — PLANETARY DATA',W/2,rdY+rdFs+8);
+  // Expand/collapse indicator
+  ctx.fillStyle='rgba(100,200,255,.35)';ctx.font=`${rdFs}px 'Courier New'`;ctx.textAlign='end';
+  ctx.fillText(orbitDataExpanded?'▲':'▼',rdX+panelW-10,rdY+rdFs+8);
+  ctx.textAlign='start';
+
+  if(orbitDataExpanded){
+  // Divider
+  ctx.strokeStyle='rgba(100,180,255,.1)';ctx.lineWidth=.5;
+  ctx.beginPath();ctx.moveTo(rdX+12,rdY+rdFs+20);ctx.lineTo(rdX+panelW-12,rdY+rdFs+20);ctx.stroke();
+
+  const rdLines=[
+    {label:'Classification',val:pd.atmoClass,color:'#64b4ff'},
+    {label:'Radius',val:pd.radius,color:'#64b4ff'},
+    {label:'Gravity',val:pd.gravity,color:parseFloat(pd.gravity)>1.5?'#ef5350':'#4cdf80'},
+    {label:'Atmosphere',val:pd.atmo,color:'#5ec4d4'},
+    {label:'Breathable',val:pd.breathable?'YES — Compatible':'NO — Hostile',color:pd.breathable?'#4cdf80':'#ef5350'},
+    {label:'Pressure',val:pd.pressure,color:parseFloat(pd.pressure)>2?'#e8a840':'#5ec4d4'},
+    {label:'Surface Temp',val:pd.temp,color:'#e8a840'},
+    {label:'Rotation',val:pd.rotation,color:'#5ec4d4'},
+    {label:'Mag Field',val:pd.magField,color:pd.magField.startsWith('Active')?'#5ec4d4':'#e8a840'},
+    {label:'Water',val:pd.water,color:pd.water!=='None detected'?'#64b4ff':'#6a7a8a'},
+    {label:'Moons',val:pd.moons.toString(),color:'#a0b0c0'},
+    {label:'Population',val:pd.population,color:pd.population.includes('billion')?'#ffd860':'#6a7a8a'},
+  ];
+
+  ctx.font=`${rdFs}px 'Courier New'`;
+  const labelCol=rdX+16;
+  const valCol=rdX+panelW*.38;
+  rdLines.forEach((l,i)=>{
+    const y=rdY+rdFs+32+i*rdLh;
+    // Label
+    ctx.textAlign='start';
+    ctx.fillStyle='rgba(140,180,220,.45)';
+    ctx.fillText(l.label,labelCol,y);
+    // Value — bright
+    ctx.fillStyle=l.color;
+    ctx.globalAlpha=.75;
+    const vt=l.val.length>32?l.val.substring(0,31)+'…':l.val;
+    ctx.fillText(vt,valCol,y);
+    ctx.globalAlpha=1;
+    // Subtle row separator
+    if(i<rdLines.length-1){
+      ctx.strokeStyle='rgba(100,180,255,.03)';ctx.lineWidth=.5;
+      ctx.beginPath();ctx.moveTo(labelCol,y+4);ctx.lineTo(rdX+panelW-16,y+4);ctx.stroke();
+    }
+  });
+
+  // Scanning indicator
+  const scanPulse=Math.sin(t*2)*.5+.5;
+  ctx.textAlign='center';
+  ctx.fillStyle=`rgba(46,230,130,${.3+scanPulse*.3})`;ctx.font=`bold ${Math.max(9,W*.009)}px 'Courier New'`;
+  ctx.fillText('● SCANNING — '+(p.pois.length)+' POIs IDENTIFIED',W/2,rdY+panelH-8);
+  } // end orbitDataExpanded
+
+  // Orbit HUD (top of screen)
+  ctx.textAlign='start';
+  ctx.fillStyle='rgba(100,200,255,.4)';ctx.font=`bold ${Math.max(11,W*.013)}px 'Courier New'`;
+  ctx.fillText('◉ ORBIT: '+p.name.toUpperCase(),20,22);
+  ctx.fillStyle='rgba(100,200,255,.25)';ctx.font=`${Math.max(9,W*.009)}px 'Courier New'`;
+  ctx.fillText('ALT: '+(280+Math.sin(t*.3)*15).toFixed(0)+' km  INC: '+(Math.abs(p.dir)*51.6).toFixed(1)+'°  PER: '+(92+Math.sin(t*.1)*3).toFixed(1)+' min',20,38);
+}
+
+// Orbit toggle handler
+document.getElementById('orbit-toggle').addEventListener('click',()=>{
+  const btn=document.getElementById('orbit-toggle');
+  orbitMode=!orbitMode;
+  if(orbitMode){btn.classList.add('active');initOrbit()}
+  else{btn.classList.remove('active');orbitSelectedPOI=null;logComms('Helm','Breaking orbit. Returning to open space.');addCrewEntry('Lt. Park: "Orbit broken. Resuming course."')}
+  if(engaged)clickSound();
+});
+// Click on main canvas to toggle orbit data panel and select POIs
+canvas.addEventListener('click',e=>{
+  if(!orbitMode||!orbitPlanet)return;
+  const mx=e.clientX,my=e.clientY;
+  // Check data panel header click
+  const b=orbitPlanet._panelBounds;
+  if(b&&mx>=b.x&&mx<=b.x+b.w&&my>=b.y&&my<=b.y+b.h){
+    orbitDataExpanded=!orbitDataExpanded;
+    if(engaged)clickSound();
+    return;
+  }
+  // Check POI clicks
+  let hitPOI=null;
+  orbitPlanet.pois.forEach(poi=>{
+    if(!poi.onScreen)return;
+    const dx=mx-poi.sx,dy=my-poi.sy;
+    if(Math.sqrt(dx*dx+dy*dy)<18)hitPOI=poi;
+  });
+  if(hitPOI){
+    orbitSelectedPOI=hitPOI===orbitSelectedPOI?null:hitPOI;
+    if(orbitSelectedPOI&&!orbitSelectedPOI.detail.scanned){
+      orbitSelectedPOI.detail.scanned=true;
+      logComms('Science','Surface scan: '+orbitSelectedPOI.label+' — '+orbitSelectedPOI.detail.climate+' climate, elevation '+orbitSelectedPOI.detail.elevation+'.');
+    }
+    if(engaged)clickSound();
+  } else {
+    if(orbitSelectedPOI){orbitSelectedPOI=null;if(engaged)clickSound()}
+  }
+});
+
 // === ATTITUDE GIMBAL ===
 const gimbalCv=document.getElementById('gimbal-cv');
 const gimbalCtx=gimbalCv.getContext('2d');
@@ -9695,6 +10132,15 @@ function draw(now){
   // Pan rubber-band interpolation
   panX+=(panTargetX-panX)*.08;
   panY+=(panTargetY-panY)*.05;
+
+  // ORBIT MODE — render orbital view instead of starfield
+  let flareTarget=0;
+  if(orbitMode&&orbitPlanet){
+    drawOrbit(ctx,W,H,t);
+    // Skip normal starfield but still do overlays
+    // Jump to end of space rendering
+  } else {
+
   // Update heading from pan offset
   const panHeadingOffset=panX*.05;
 
@@ -9834,7 +10280,7 @@ function draw(now){
   const speed=(.001+throttle*.005+warpT*.04);
   activeDensity+=(densityTarget-activeDensity)*.001;
   const activeCount=Math.round(activeDensity);
-  let flareTarget=0;
+  flareTarget=0;
   for(let si=0;si<stars.length;si++){
     const s=stars[si];
     s.z-=speed;
@@ -9995,6 +10441,8 @@ function draw(now){
     ctx.strokeStyle=`rgba(46,204,113,${.3+Math.sin(t*5)*.15})`;ctx.lineWidth=1.5;
     ctx.beginPath();ctx.arc(tsx,tsy,12+Math.sin(t*3)*3,0,6.283);ctx.stroke();
   }
+
+  } // end orbit mode else
 
   // Restore roll rotation
   if(Math.abs(flightRoll)>.1)ctx.restore();
