@@ -9831,9 +9831,9 @@ function drawOrbit(ctx,W,H,t){
   // === POI DETAIL BOX ===
   if(orbitSelectedPOI&&orbitSelectedPOI.onScreen){
     const poi=orbitSelectedPOI;const d=poi.detail;
-    const bw=Math.min(W*.28,320);const bfs=Math.max(9,W*.009);const blh=bfs+5;
+    const bw=Math.min(W*.38,470);const bfs=Math.max(9,W*.009);const blh=bfs+5;
     const lines=6+(d.resources?d.resources.length:0);
-    const bh=blh*lines+30;
+    const bh=blh*lines+40;
     // Position box near the POI but not overlapping
     let bx=poi.sx+25,by=poi.sy-bh/2;
     if(bx+bw>W-20)bx=poi.sx-bw-25;
@@ -9847,7 +9847,7 @@ function drawOrbit(ctx,W,H,t){
     ctx.fillText(poi.icon+' '+poi.label,bx+10,by+bfs+8);
     // Divider
     ctx.strokeStyle=poi.color+'.15)';ctx.lineWidth=.5;
-    ctx.beginPath();ctx.moveTo(bx+8,by+bfs+14);ctx.lineTo(bx+bw-8,by+bfs+14);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(bx+8,by+bfs+20);ctx.lineTo(bx+bw-8,by+bfs+20);ctx.stroke();
     // Detail rows
     ctx.font=`${bfs}px 'Courier New'`;
     const rows=[
@@ -9857,12 +9857,12 @@ function drawOrbit(ctx,W,H,t){
     ];
     if(poi.pop)rows.unshift({label:'Population',val:poi.pop});
     rows.forEach((row,i)=>{
-      const ry=by+bfs+22+i*blh;
+      const ry=by+bfs+32+i*blh;
       ctx.fillStyle='rgba(140,180,220,.35)';ctx.fillText(row.label,bx+10,ry);
       ctx.fillStyle='rgba(200,220,240,.6)';ctx.fillText(row.val,bx+bw*.4,ry);
     });
     // Resources
-    const resY=by+bfs+22+rows.length*blh;
+    const resY=by+bfs+32+rows.length*blh;
     ctx.fillStyle='rgba(140,180,220,.35)';ctx.fillText('Resources',bx+10,resY);
     d.resources.forEach((res,ri)=>{
       ctx.fillStyle='rgba(46,204,113,.5)';ctx.fillText('• '+res,bx+bw*.4,resY+ri*blh);
