@@ -9897,9 +9897,9 @@ function drawOrbit(ctx,W,H,t){
   ctx.beginPath();ctx.moveTo(rdX+1,rdY+1);ctx.lineTo(rdX+panelW-1,rdY+1);ctx.stroke();
 
   // Title bar (always visible, clickable)
-  ctx.font=`bold ${rdFs+2}px 'Courier New'`;ctx.textAlign='center';
+  ctx.font=`bold ${rdFs+2}px 'Courier New'`;ctx.textAlign='start';
   ctx.fillStyle='rgba(100,200,255,.7)';
-  ctx.fillText('◈ '+p.name.toUpperCase()+' — PLANETARY DATA',W/2,rdY+rdFs+8);
+  ctx.fillText('◈ '+p.name.toUpperCase()+' — PLANETARY DATA',rdX+12,rdY+rdFs+8);
   // Expand/collapse indicator
   ctx.fillStyle='rgba(100,200,255,.35)';ctx.font=`${rdFs}px 'Courier New'`;ctx.textAlign='end';
   ctx.fillText(orbitDataExpanded?'▲':'▼',rdX+panelW-10,rdY+rdFs+8);
