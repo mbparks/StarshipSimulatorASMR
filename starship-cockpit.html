@@ -812,6 +812,24 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .gimbal-panel{position:fixed;bottom:clamp(140px,24.5vh,265px);right:clamp(40px,4vw,60px);z-index:5;pointer-events:none}
 .gimbal-panel canvas{width:clamp(90px,9vw,130px);height:clamp(90px,9vw,130px);border:1.5px solid rgba(94,196,212,.2);border-radius:50%;background:rgba(4,8,12,.55)}
 
+/* === AWAY TEAM === */
+.away-team-btn{position:fixed;top:clamp(130px,15vh,170px);right:clamp(300px,20vw,330px);z-index:14;display:none;background:none;border:1px solid rgba(100,180,255,.25);color:#64b4ff;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:6px 14px;cursor:pointer;border-radius:3px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;pointer-events:auto}
+.away-team-btn:hover{border-color:#64b4ff;background:rgba(100,180,255,.08)}
+.away-team-btn.active{border-color:#4cdf80;color:#4cdf80;background:rgba(46,204,113,.06)}
+.away-panel{position:fixed;top:clamp(50px,7vh,90px);left:clamp(15px,2vw,40px);z-index:14;width:clamp(280px,22vw,360px);background:rgba(4,8,16,.88);border:1px solid rgba(100,180,255,.15);border-radius:4px;display:none;pointer-events:auto;backdrop-filter:blur(3px)}
+.away-panel.show{display:block}
+.away-header{padding:8px 12px;border-bottom:1px solid rgba(100,180,255,.08);display:flex;justify-content:space-between;align-items:center}
+.away-title{font-size:clamp(9px,.8vw,11px);color:#64b4ff;letter-spacing:3px;text-transform:uppercase}
+.away-member{padding:10px 12px;border-bottom:1px solid rgba(100,180,255,.04)}
+.away-member:last-child{border-bottom:none}
+.away-name{font-size:clamp(10px,.9vw,12px);color:#4cdf80;font-weight:bold;letter-spacing:1px;margin-bottom:4px}
+.away-row{display:flex;justify-content:space-between;font-size:clamp(8px,.7vw,10px);padding:2px 0}
+.away-label{color:#5a8a9a}
+.away-val{color:#8ab0c0}
+.away-obj{font-size:clamp(8px,.7vw,10px);color:#d4a03c;font-style:italic;margin-top:3px;padding:3px 0;border-top:1px solid rgba(212,160,60,.06)}
+.away-chart{display:flex;gap:6px;margin-top:4px}
+.away-chart canvas{border:1px solid rgba(100,180,255,.06);border-radius:2px;background:rgba(4,8,12,.3)}
+
 /* === SHUTTLE BAY === */
 .shuttle-panel{position:fixed;inset:0;z-index:14;display:none;background:rgba(4,8,12,.9);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);pointer-events:auto}
 .shuttle-panel.show{display:flex}
@@ -1937,6 +1955,13 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
     <button id="warp-btn">Warp</button>
     <button id="emer-light-btn" style="background:none;border:1px solid rgba(231,76,60,.2);color:#e74c3c;padding:clamp(3px,.4vh,6px) clamp(8px,1vw,16px);font-family:inherit;font-size:clamp(8px,.8vw,10px);letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .3s;border-radius:3px">Red Alert</button>
   </div>
+</div>
+
+<!-- AWAY TEAM -->
+<button class="away-team-btn" id="away-team-btn">◈ Deploy Away Team</button>
+<div class="away-panel" id="away-panel">
+  <div class="away-header"><span class="away-title">◈ Away Team</span><button class="pwr-close" id="away-collapse" style="font-size:10px">▲</button></div>
+  <div id="away-body"></div>
 </div>
 
 <!-- ATTITUDE GIMBAL -->
@@ -9966,8 +9991,8 @@ function drawOrbit(ctx,W,H,t){
 document.getElementById('orbit-toggle').addEventListener('click',()=>{
   const btn=document.getElementById('orbit-toggle');
   orbitMode=!orbitMode;
-  if(orbitMode){btn.classList.add('active');initOrbit()}
-  else{btn.classList.remove('active');orbitSelectedPOI=null;logComms('Helm','Breaking orbit. Returning to open space.');addCrewEntry('Lt. Park: "Orbit broken. Resuming course."')}
+  if(orbitMode){btn.classList.add('active');initOrbit();document.getElementById('away-team-btn').style.display='block'}
+  else{btn.classList.remove('active');orbitSelectedPOI=null;document.getElementById('away-team-btn').style.display='none';document.getElementById('away-panel').classList.remove('show');awayTeamDeployed=false;document.getElementById('away-team-btn').classList.remove('active');document.getElementById('away-team-btn').textContent='◈ Deploy Away Team';logComms('Helm','Breaking orbit. Returning to open space.');addCrewEntry('Lt. Park: "Orbit broken. Resuming course."')}
   if(engaged)clickSound();
 });
 // Click on main canvas to toggle orbit data panel and select POIs
@@ -9999,6 +10024,194 @@ canvas.addEventListener('click',e=>{
     if(orbitSelectedPOI){orbitSelectedPOI=null;if(engaged)clickSound()}
   }
 });
+
+// === AWAY TEAM ===
+let awayTeamDeployed=false,awayTeamMembers=[],awayAnimFrame=0;
+const awayObjectives=[
+  'Collect geological samples from surface outcrop',
+  'Survey ancient ruins for structural integrity',
+  'Deploy seismic monitoring equipment',
+  'Retrieve water samples from subsurface aquifer',
+  'Catalog local flora specimens',
+  'Establish temporary comm relay',
+  'Investigate anomalous energy readings',
+  'Repair damaged research outpost antenna',
+  'Map cave system using portable sonar',
+  'Document atmospheric composition at ground level',
+  'Photograph pre-colonial structures',
+  'Extract core sample from mineral deposit',
+];
+const awayCrew=[
+  {name:'Cpl. Reyes',role:'Engineer',baseHR:72,baseBR:16},
+  {name:'Dr. Tanaka',role:'Science Officer',baseHR:68,baseBR:14},
+  {name:'Dr. Okafor',role:'Medical',baseHR:65,baseBR:15},
+  {name:'Ensign Park',role:'Navigation',baseHR:70,baseBR:15},
+];
+
+function deployAwayTeam(){
+  // Pick 2 random crew
+  const pool=[...awayCrew].sort(()=>Math.random()-.5);
+  const inventoryByRole={
+    'Engineer':['Tricorder','Phaser (Stun)','Repair Kit','Plasma Torch','Comm Badge','Emergency Beacon','Ration Pack'],
+    'Science Officer':['Tricorder','Phaser (Stun)','Sample Containers','Spectrometer','Comm Badge','Holo-Recorder','Data Pad'],
+    'Medical':['Tricorder','Phaser (Stun)','Med Kit','Hypospray','Comm Badge','Bio-Scanner','Dermal Regenerator'],
+    'Navigation':['Tricorder','Phaser (Stun)','Portable Nav Unit','Terrain Mapper','Comm Badge','Flare Gun','Climbing Gear'],
+  };
+  awayTeamMembers=pool.slice(0,2).map((c,i)=>{
+    const lat=((Math.random()-.5)*120).toFixed(2);
+    const lng=((Math.random()-.5)*240).toFixed(2);
+    const baseInv=inventoryByRole[c.role]||['Tricorder','Phaser (Stun)','Comm Badge'];
+    // Pick 4-5 items from role inventory
+    const inv=[...baseInv].sort(()=>Math.random()-.5).slice(0,4+Math.floor(Math.random()*2));
+    return{...c,objective:awayObjectives[Math.floor(Math.random()*awayObjectives.length)],
+      lat:parseFloat(lat),lng:parseFloat(lng),
+      latDrift:(Math.random()-.5)*.002,lngDrift:(Math.random()-.5)*.003,
+      health:98+Math.random()*2,o2:99+Math.random(),
+      hrHistory:Array(60).fill(0).map(()=>c.baseHR+Math.random()*6-3),
+      brHistory:Array(60).fill(0).map(()=>c.baseBR+Math.random()*3-1.5),
+      status:'Active',inventory:inv};
+  });
+  awayTeamDeployed=true;
+  document.getElementById('away-panel').classList.add('show');
+  document.getElementById('away-team-btn').classList.add('active');
+  document.getElementById('away-team-btn').textContent='◈ Recall Away Team';
+  logComms('Away Team','Away team deployed: '+awayTeamMembers.map(m=>m.name).join(', ')+'. Shuttle away.');
+  addCrewEntry(awayTeamMembers[0].name+' and '+awayTeamMembers[1].name+' departing via shuttle.');
+  addCrewEntry('Objectives: '+awayTeamMembers.map(m=>m.objective.substring(0,30)+'…').join(' | '));
+  renderAwayTeam();
+}
+
+function renderAwayTeam(){
+  if(!awayTeamDeployed)return;
+  const body=document.getElementById('away-body');
+  body.innerHTML=awayTeamMembers.map((m,i)=>`
+    <div class="away-member">
+      <div class="away-name">${m.name} <span style="color:#5a8a9a;font-weight:normal;font-size:clamp(7px,.6vw,9px)">(${m.role})</span></div>
+      <div class="away-row"><span class="away-label">Status</span><span class="away-val" style="color:${m.health>90?'#4cdf80':m.health>70?'#e8a840':'#ef5350'}">${m.status}</span></div>
+      <div class="away-row"><span class="away-label">Health</span><span class="away-val" style="color:${m.health>90?'#4cdf80':'#e8a840'}">${m.health.toFixed(1)}%</span></div>
+      <div class="away-row"><span class="away-label">O₂ Supply</span><span class="away-val">${m.o2.toFixed(1)}%</span></div>
+      <div class="away-row"><span class="away-label">Position</span><span class="away-val">${m.lat.toFixed(3)}°, ${m.lng.toFixed(3)}°</span></div>
+      <div class="away-chart"><canvas id="away-hr-${i}" width="120" height="36" style="width:120px;height:36px"></canvas><canvas id="away-br-${i}" width="120" height="36" style="width:120px;height:36px"></canvas></div>
+      <div class="away-obj">◈ ${m.objective}</div>
+      <div style="margin-top:4px;padding-top:3px;border-top:1px solid rgba(100,180,255,.04)"><span style="font-size:clamp(7px,.6vw,9px);color:#5a8a9a;letter-spacing:1px">INVENTORY</span>
+      <div style="display:flex;flex-wrap:wrap;gap:3px 8px;margin-top:2px">${m.inventory.map(item=>`<span style="font-size:clamp(7px,.6vw,9px);color:#8ab0c0">▪ ${item}</span>`).join('')}</div></div>
+    </div>`).join('');
+  // Start chart animation
+  cancelAnimationFrame(awayAnimFrame);
+  drawAwayCharts();
+}
+
+function drawAwayCharts(){
+  if(!awayTeamDeployed||!document.getElementById('away-panel').classList.contains('show')){return}
+  awayTeamMembers.forEach((m,i)=>{
+    // Update vitals
+    m.lat+=m.latDrift+Math.sin(performance.now()*.0003+i)*.0005;
+    m.lng+=m.lngDrift+Math.cos(performance.now()*.0004+i*3)*.0008;
+    m.o2=Math.max(0,m.o2-.0008);
+    m.health=Math.max(60,m.health+(Math.random()-.502)*.02);
+    if(m.o2<20)m.status='⚠ Low O₂';
+    else if(m.health<80)m.status='⚠ Stressed';
+    else m.status='Active';
+    // Update HR/BR histories
+    const hr=m.baseHR+Math.sin(performance.now()*.002+i*5)*4+Math.random()*3-1.5;
+    const br=m.baseBR+Math.sin(performance.now()*.0015+i*7)*2+Math.random()*2-1;
+    m.hrHistory.push(hr);m.hrHistory.shift();
+    m.brHistory.push(br);m.brHistory.shift();
+    // Draw HR chart
+    const hrCv=document.getElementById('away-hr-'+i);
+    if(hrCv){
+      const hx=hrCv.getContext('2d');hrCv.width=240;hrCv.height=72;
+      const w=hrCv.width,h=hrCv.height;
+      hx.fillStyle='rgba(4,8,12,.5)';hx.fillRect(0,0,w,h);
+      // Label
+      hx.fillStyle='rgba(231,76,60,.3)';hx.font='bold 8px Courier New';hx.fillText('HR',3,10);
+      hx.fillStyle='rgba(231,76,60,.5)';hx.font='9px Courier New';
+      hx.fillText(Math.round(hr)+' bpm',w-45,10);
+      // Line
+      hx.strokeStyle='rgba(231,76,60,.5)';hx.lineWidth=1;hx.beginPath();
+      const hrMin=Math.min(...m.hrHistory)-5,hrMax=Math.max(...m.hrHistory)+5;
+      m.hrHistory.forEach((v,j)=>{
+        const px=j/59*w,py=h-((v-hrMin)/(hrMax-hrMin))*(h-16)-4;
+        j===0?hx.moveTo(px,py):hx.lineTo(px,py);
+      });
+      hx.stroke();
+      // Fill under
+      hx.lineTo(w,h);hx.lineTo(0,h);hx.closePath();
+      hx.fillStyle='rgba(231,76,60,.04)';hx.fill();
+    }
+    // Draw BR chart
+    const brCv=document.getElementById('away-br-'+i);
+    if(brCv){
+      const bx=brCv.getContext('2d');brCv.width=240;brCv.height=72;
+      const w=brCv.width,h=brCv.height;
+      bx.fillStyle='rgba(4,8,12,.5)';bx.fillRect(0,0,w,h);
+      bx.fillStyle='rgba(94,196,212,.3)';bx.font='bold 8px Courier New';bx.fillText('BR',3,10);
+      bx.fillStyle='rgba(94,196,212,.5)';bx.font='9px Courier New';
+      bx.fillText(Math.round(br)+' rpm',w-45,10);
+      bx.strokeStyle='rgba(94,196,212,.5)';bx.lineWidth=1;bx.beginPath();
+      const brMin=Math.min(...m.brHistory)-3,brMax=Math.max(...m.brHistory)+3;
+      m.brHistory.forEach((v,j)=>{
+        const px=j/59*w,py=h-((v-brMin)/(brMax-brMin))*(h-16)-4;
+        j===0?bx.moveTo(px,py):bx.lineTo(px,py);
+      });
+      bx.stroke();
+      bx.lineTo(w,h);bx.lineTo(0,h);bx.closePath();
+      bx.fillStyle='rgba(94,196,212,.04)';bx.fill();
+    }
+    // Update text values
+    const member=document.querySelectorAll('.away-member')[i];
+    if(member){
+      const vals=member.querySelectorAll('.away-val');
+      if(vals[0]){vals[0].textContent=m.status;vals[0].style.color=m.status==='Active'?'#4cdf80':'#e8a840'}
+      if(vals[1]){vals[1].textContent=m.health.toFixed(1)+'%';vals[1].style.color=m.health>90?'#4cdf80':'#e8a840'}
+      if(vals[2])vals[2].textContent=m.o2.toFixed(1)+'%';
+      if(vals[3])vals[3].textContent=m.lat.toFixed(3)+'°, '+m.lng.toFixed(3)+'°';
+    }
+  });
+  awayAnimFrame=requestAnimationFrame(drawAwayCharts);
+}
+
+document.getElementById('away-team-btn').addEventListener('click',()=>{
+  if(!orbitMode)return;
+  if(awayTeamDeployed){
+    // Recall team
+    awayTeamDeployed=false;
+    cancelAnimationFrame(awayAnimFrame);
+    document.getElementById('away-panel').classList.remove('show');
+    document.getElementById('away-team-btn').classList.remove('active');
+    document.getElementById('away-team-btn').textContent='◈ Deploy Away Team';
+    awayPanelCollapsed=false;document.getElementById('away-body').style.display='block';document.getElementById('away-collapse').textContent='▲';
+    logComms('Away Team','Away team recalled. Shuttle returning to bay.');
+    addCrewEntry(awayTeamMembers.map(m=>m.name).join(' and ')+' returning from surface mission.');
+    awayTeamMembers=[];
+  } else {
+    deployAwayTeam();
+  }
+  if(engaged)clickSound();
+});
+let awayPanelCollapsed=false;
+document.getElementById('away-collapse').addEventListener('click',()=>{
+  awayPanelCollapsed=!awayPanelCollapsed;
+  document.getElementById('away-body').style.display=awayPanelCollapsed?'none':'block';
+  document.getElementById('away-collapse').textContent=awayPanelCollapsed?'▼':'▲';
+  if(engaged)clickSound();
+});
+
+// Periodic away team comms
+setInterval(()=>{
+  if(!awayTeamDeployed||!engaged)return;
+  const m=awayTeamMembers[Math.floor(Math.random()*awayTeamMembers.length)];
+  const msgs=[
+    m.name+': "Making progress on objective. Conditions stable."',
+    m.name+': "Surface gravity feels '+((parseFloat(orbitPlanet?.data?.gravity)||1)>1?'heavy':'light')+'. Adjusting pace."',
+    m.name+': "Fascinating readings here. Logging everything."',
+    m.name+': "Terrain is challenging but manageable."',
+    m.name+': "O₂ holding steady. Proceeding to next waypoint."',
+    m.name+': "Found something unusual. Taking samples."',
+    m.name+': "Visibility is '+(Math.random()>.5?'excellent':'limited')+' at ground level."',
+  ];
+  logComms('Away Team',msgs[Math.floor(Math.random()*msgs.length)]);
+},45000+Math.random()*30000);
 
 // === ATTITUDE GIMBAL ===
 const gimbalCv=document.getElementById('gimbal-cv');
