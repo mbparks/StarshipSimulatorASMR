@@ -40,6 +40,8 @@ Starship ASMR Simulator is a single HTML file that transforms your browser into 
 
 No server, no dependencies, no build step. It's a single self-contained HTML file.
 
+Looking for a tricorder sim for iOS or Android? [**Click Here**](https://github.com/mbparks/SAS_Tricorder)
+
 ---
 
 ## Features
