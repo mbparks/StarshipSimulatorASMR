@@ -812,6 +812,23 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .gimbal-panel{position:fixed;bottom:clamp(140px,24.5vh,265px);right:clamp(40px,4vw,60px);z-index:5;pointer-events:none}
 .gimbal-panel canvas{width:clamp(90px,9vw,130px);height:clamp(90px,9vw,130px);border:1.5px solid rgba(94,196,212,.2);border-radius:50%;background:rgba(4,8,12,.55)}
 
+/* === UNCHARTED SYSTEM DIALOG === */
+.uncharted-dialog{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:20;width:clamp(360px,30vw,480px);background:rgba(4,8,16,.95);border:1px solid rgba(155,100,255,.25);border-radius:5px;display:none;pointer-events:auto;backdrop-filter:blur(4px)}
+.uncharted-dialog.show{display:block}
+.uncharted-header{padding:12px 16px;border-bottom:1px solid rgba(155,100,255,.1)}
+.uncharted-title{font-size:clamp(11px,.9vw,14px);color:#b480ff;letter-spacing:3px;text-transform:uppercase}
+.uncharted-body{padding:14px 16px}
+.uncharted-row{display:flex;justify-content:space-between;font-size:clamp(9px,.8vw,11px);padding:3px 0}
+.uncharted-label{color:#6a7a8a}
+.uncharted-val{color:#b0c0d0}
+.uncharted-input{width:100%;background:rgba(10,18,24,.85);border:1px solid rgba(155,100,255,.35);color:#b480ff;font-family:inherit;font-size:clamp(11px,.9vw,14px);letter-spacing:2px;padding:6px 10px;outline:none;border-radius:3px;margin:8px 0;transition:border-color .3s;text-align:center}
+.uncharted-input:focus{border-color:rgba(155,100,255,.7)}
+.uncharted-input::placeholder{color:rgba(155,100,255,.25)}
+.uncharted-actions{display:flex;gap:8px;margin-top:8px}
+.uncharted-btn{flex:1;background:none;border:1px solid rgba(155,100,255,.2);color:#b480ff;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:6px 12px;cursor:pointer;border-radius:3px;letter-spacing:1px;transition:all .2s}
+.uncharted-btn:hover{border-color:#b480ff;background:rgba(155,100,255,.06)}
+.uncharted-btn.primary{border-color:rgba(155,100,255,.4);background:rgba(155,100,255,.08)}
+
 /* === AWAY TEAM === */
 .away-team-btn{position:fixed;top:clamp(130px,15vh,170px);right:clamp(300px,20vw,330px);z-index:14;display:none;background:none;border:1px solid rgba(100,180,255,.25);color:#64b4ff;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:6px 14px;cursor:pointer;border-radius:3px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;pointer-events:auto}
 .away-team-btn:hover{border-color:#64b4ff;background:rgba(100,180,255,.08)}
@@ -1954,6 +1971,21 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
     <button id="tractor-btn">Tractor</button>
     <button id="warp-btn">Warp</button>
     <button id="emer-light-btn" style="background:none;border:1px solid rgba(231,76,60,.2);color:#e74c3c;padding:clamp(3px,.4vh,6px) clamp(8px,1vw,16px);font-family:inherit;font-size:clamp(8px,.8vw,10px);letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .3s;border-radius:3px">Red Alert</button>
+  </div>
+</div>
+
+<!-- UNCHARTED SYSTEM DIALOG -->
+<div class="uncharted-dialog" id="uncharted-dialog">
+  <div class="uncharted-header"><span class="uncharted-title">★ Uncharted System Detected</span></div>
+  <div class="uncharted-body">
+    <div style="color:#8a9aaa;font-size:clamp(9px,.8vw,11px);margin-bottom:8px" id="uncharted-desc"></div>
+    <div id="uncharted-data"></div>
+    <div style="margin-top:10px;color:#6a7a8a;font-size:clamp(8px,.7vw,10px)">As the first vessel to chart this system, you may designate its name:</div>
+    <input type="text" class="uncharted-input" id="uncharted-name" placeholder="Enter system name…" maxlength="24">
+    <div class="uncharted-actions">
+      <button class="uncharted-btn" id="uncharted-skip">Skip — Use Default</button>
+      <button class="uncharted-btn primary" id="uncharted-confirm">◈ Chart System</button>
+    </div>
   </div>
 </div>
 
@@ -10024,6 +10056,111 @@ canvas.addEventListener('click',e=>{
     if(orbitSelectedPOI){orbitSelectedPOI=null;if(engaged)clickSound()}
   }
 });
+
+// === UNCHARTED SYSTEM DISCOVERY ===
+let unchartedPending=null;
+const orbitStarTypes=['M4V Red Dwarf','M2V Red Dwarf','K5V Orange Dwarf','K1V Orange','G8V Yellow','G2V Yellow Dwarf','F5V White','A3V Blue-White'];
+const hazardTypes=['None','Asteroid Belt','Radiation Zone','Magnetic Storms','Debris Field','Unstable Orbit','Solar Flares','Gravitational Anomalies'];
+const defaultNames=['UCS-'+Math.floor(Math.random()*9000+1000),'SURVEY-'+String.fromCharCode(65+Math.floor(Math.random()*26))+Math.floor(Math.random()*99),'NGC-'+Math.floor(Math.random()*90000+10000)];
+
+function scheduleUnchartedDiscovery(){
+  setTimeout(()=>{
+    if(engaged&&!orbitMode&&!unchartedPending)triggerUnchartedDiscovery();
+    scheduleUnchartedDiscovery();
+  },900000+Math.random()*900000);// 15-30 min
+}
+
+function triggerUnchartedDiscovery(){
+  const sType=orbitStarTypes[Math.floor(Math.random()*orbitStarTypes.length)];
+  const planets=1+Math.floor(Math.random()*8);
+  const hazard=hazardTypes[Math.floor(Math.random()*hazardTypes.length)];
+  const hasFuel=Math.random()<.3;
+  const hasRelay=Math.random()<.2;
+  const factions=['Uncharted','Uncharted','Independent Zone','Uncharted'];
+  const faction=factions[Math.floor(Math.random()*factions.length)];
+  // Find an empty region on the nav map
+  let sx,sy,attempts=0;
+  do{sx=.08+Math.random()*.84;sy=.08+Math.random()*.84;attempts++;
+    const tooClose=navWaypoints.some(w=>Math.sqrt((w.x-sx)**2+(w.y-sy)**2)<.1);
+    if(!tooClose)break;
+  }while(attempts<50);
+
+  unchartedPending={type:sType,planets,hazard,fuel:hasFuel,relay:hasRelay,faction,x:sx,y:sy,
+    defaultName:defaultNames[Math.floor(Math.random()*defaultNames.length)]};
+
+  logComms('Science','★ Long-range sensors detecting uncharted star system! Spectral analysis: '+sType+', '+planets+' planet'+(planets!==1?'s':'')+' detected.');
+  addCrewEntry('Dr. Tanaka: "Captain, this system isn\'t in any database. We\'d be the first to chart it!"');
+
+  // Show survey notification
+  const mn=document.getElementById('maint-notif');
+  if(mn&&!mn.classList.contains('show')){
+    document.getElementById('maint-text').innerHTML='★ Uncharted system detected! <span style="color:#b480ff">Survey and chart?</span>';
+    document.getElementById('maint-repair-btn').textContent='◈ Survey System';
+    document.getElementById('maint-repair-btn').onclick=()=>{mn.classList.remove('show');showUnchartedDialog()};
+    document.getElementById('maint-dismiss').onclick=()=>{mn.classList.remove('show');logComms('Science','Uncharted system noted in logs. Proceeding on course.');unchartedPending=null};
+    mn.classList.add('show');
+  }
+}
+
+function showUnchartedDialog(){
+  const dlg=document.getElementById('uncharted-dialog');
+  const u=unchartedPending;if(!u){return}
+  // Populate data
+  document.getElementById('uncharted-desc').textContent='Sensors have detected a previously uncharted star system. No existing records match these coordinates. As the first vessel to survey this system, '+shipName+' will be credited with its discovery.';
+  const dataEl=document.getElementById('uncharted-data');
+  const rows=[
+    {label:'Star Type',val:u.type,color:u.type.includes('Red')?'#ef7070':u.type.includes('Orange')?'#e8a840':u.type.includes('Yellow')?'#ffd860':u.type.includes('Blue')?'#64b4ff':'#d0d8e0'},
+    {label:'Planets',val:u.planets.toString(),color:'#b0c0d0'},
+    {label:'Hazards',val:u.hazard,color:u.hazard==='None'?'#4cdf80':'#e8a840'},
+    {label:'Fuel Depot',val:u.fuel?'Possible — mineral signatures detected':'None detected',color:u.fuel?'#4cdf80':'#6a7a8a'},
+    {label:'Comm Relay',val:u.relay?'Subspace beacon detected':'No relay infrastructure',color:u.relay?'#5ec4d4':'#6a7a8a'},
+    {label:'Jurisdiction',val:u.faction,color:'#b480ff'},
+    {label:'Coordinates',val:u.x.toFixed(3)+', '+u.y.toFixed(3),color:'#8a9aaa'},
+  ];
+  dataEl.innerHTML=rows.map(r=>`<div class="uncharted-row"><span class="uncharted-label">${r.label}</span><span class="uncharted-val" style="color:${r.color}">${r.val}</span></div>`).join('');
+  document.getElementById('uncharted-name').value='';
+  dlg.classList.add('show');
+  setTimeout(()=>document.getElementById('uncharted-name').focus(),100);
+  if(engaged)clickSound();
+}
+
+function chartUnchartedSystem(name){
+  const u=unchartedPending;if(!u)return;
+  const sysName=name.trim()||u.defaultName;
+  // Add to navWaypoints
+  const newIdx=navWaypoints.length;
+  navWaypoints.push({name:sysName,x:u.x,y:u.y,z:(Math.random()-.5)*.06,current:false,type:u.type,planets:u.planets,fuel:u.fuel,faction:u.faction,hazard:u.hazard,visited:false,relay:u.relay,discovered:true,discoveredBy:shipName});
+  // Connect to nearest existing waypoint via hyperspace lane
+  let nearestIdx=0,nearestDist=99;
+  navWaypoints.forEach((w,i)=>{
+    if(i===newIdx)return;
+    const d=Math.sqrt((w.x-u.x)**2+(w.y-u.y)**2);
+    if(d<nearestDist){nearestDist=d;nearestIdx=i}
+  });
+  hyperLanes.push([nearestIdx,newIdx]);
+  // Clear fog around new system
+  fogCleared.add(u.x.toFixed(2)+','+u.y.toFixed(2));
+  // Close dialog
+  document.getElementById('uncharted-dialog').classList.remove('show');
+  unchartedPending=null;
+  logComms('Science','★ System charted: '+sysName+' — '+u.type+', '+u.planets+' planet'+(u.planets!==1?'s':'')+'. '+(u.hazard!=='None'?'Hazard: '+u.hazard+'. ':'')+'Added to navigation database.');
+  logComms('Nav','Hyperspace lane plotted to '+sysName+' via '+navWaypoints[nearestIdx].name+'.');
+  addCrewEntry('Dr. Tanaka: "'+sysName+' — has a nice ring to it. Logging discovery."');
+  addCrewEntry('Lt. Park: "New waypoint added to the nav planner. Ready to plot course."');
+  addDiscovery('charting','★ First charting — '+sysName+': '+u.type+', '+u.planets+' planets, '+u.faction+'. Discovered by '+shipName+'. Hazard: '+u.hazard+'.');
+  if(engaged)clickSound();
+}
+
+document.getElementById('uncharted-confirm').addEventListener('click',()=>{
+  chartUnchartedSystem(document.getElementById('uncharted-name').value);
+});
+document.getElementById('uncharted-skip').addEventListener('click',()=>{
+  chartUnchartedSystem('');// uses default name
+});
+document.getElementById('uncharted-name').addEventListener('keydown',e=>{
+  if(e.key==='Enter')chartUnchartedSystem(document.getElementById('uncharted-name').value);
+});
+scheduleUnchartedDiscovery();
 
 // === AWAY TEAM ===
 let awayTeamDeployed=false,awayTeamMembers=[],awayAnimFrame=0;
