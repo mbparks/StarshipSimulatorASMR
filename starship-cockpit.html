@@ -833,7 +833,7 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .away-team-btn{position:fixed;top:clamp(130px,15vh,170px);right:clamp(300px,20vw,330px);z-index:14;display:none;background:none;border:1px solid rgba(100,180,255,.25);color:#64b4ff;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:6px 14px;cursor:pointer;border-radius:3px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;pointer-events:auto}
 .away-team-btn:hover{border-color:#64b4ff;background:rgba(100,180,255,.08)}
 .away-team-btn.active{border-color:#4cdf80;color:#4cdf80;background:rgba(46,204,113,.06)}
-.away-panel{position:fixed;top:clamp(50px,7vh,90px);left:clamp(15px,2vw,40px);z-index:14;width:clamp(280px,22vw,360px);background:rgba(4,8,16,.88);border:1px solid rgba(100,180,255,.15);border-radius:4px;display:none;pointer-events:auto;backdrop-filter:blur(3px)}
+.away-panel{position:fixed;top:clamp(50px,7vh,90px);left:clamp(15px,2vw,40px);z-index:14;width:clamp(300px,24vw,380px);max-height:80vh;background:rgba(4,8,16,.88);border:1px solid rgba(100,180,255,.15);border-radius:4px;display:none;pointer-events:auto;backdrop-filter:blur(3px);overflow-y:auto}
 .away-panel.show{display:block}
 .away-header{padding:8px 12px;border-bottom:1px solid rgba(100,180,255,.08);display:flex;justify-content:space-between;align-items:center}
 .away-title{font-size:clamp(9px,.8vw,11px);color:#64b4ff;letter-spacing:3px;text-transform:uppercase}
@@ -10183,6 +10183,8 @@ const awayCrew=[
   {name:'Dr. Tanaka',role:'Science Officer',baseHR:68,baseBR:14},
   {name:'Dr. Okafor',role:'Medical',baseHR:65,baseBR:15},
   {name:'Ensign Park',role:'Navigation',baseHR:70,baseBR:15},
+  {name:'Lt. Vasquez',role:'Security',baseHR:74,baseBR:16},
+  {name:'Ensign Chen',role:'Science Officer',baseHR:66,baseBR:14},
 ];
 
 function deployAwayTeam(){
@@ -10193,8 +10195,9 @@ function deployAwayTeam(){
     'Science Officer':['Tricorder','Phaser (Stun)','Sample Containers','Spectrometer','Comm Badge','Holo-Recorder','Data Pad'],
     'Medical':['Tricorder','Phaser (Stun)','Med Kit','Hypospray','Comm Badge','Bio-Scanner','Dermal Regenerator'],
     'Navigation':['Tricorder','Phaser (Stun)','Portable Nav Unit','Terrain Mapper','Comm Badge','Flare Gun','Climbing Gear'],
+    'Security':['Tricorder','Phaser (Heavy)','Stun Grenades','Tactical Scanner','Comm Badge','Restraints','Field Rations'],
   };
-  awayTeamMembers=pool.slice(0,2).map((c,i)=>{
+  awayTeamMembers=pool.slice(0,4).map((c,i)=>{
     const lat=((Math.random()-.5)*120).toFixed(2);
     const lng=((Math.random()-.5)*240).toFixed(2);
     const baseInv=inventoryByRole[c.role]||['Tricorder','Phaser (Stun)','Comm Badge'];
@@ -10213,7 +10216,7 @@ function deployAwayTeam(){
   document.getElementById('away-team-btn').classList.add('active');
   document.getElementById('away-team-btn').textContent='◈ Recall Away Team';
   logComms('Away Team','Away team deployed: '+awayTeamMembers.map(m=>m.name).join(', ')+'. Shuttle away.');
-  addCrewEntry(awayTeamMembers[0].name+' and '+awayTeamMembers[1].name+' departing via shuttle.');
+  addCrewEntry(awayTeamMembers.map(m=>m.name).join(', ')+' departing via shuttle.');
   addCrewEntry('Objectives: '+awayTeamMembers.map(m=>m.objective.substring(0,30)+'…').join(' | '));
   renderAwayTeam();
 }
@@ -10319,7 +10322,8 @@ document.getElementById('away-team-btn').addEventListener('click',()=>{
     document.getElementById('away-team-btn').textContent='◈ Deploy Away Team';
     awayPanelCollapsed=false;document.getElementById('away-body').style.display='block';document.getElementById('away-collapse').textContent='▲';
     logComms('Away Team','Away team recalled. Shuttle returning to bay.');
-    addCrewEntry(awayTeamMembers.map(m=>m.name).join(' and ')+' returning from surface mission.');
+    const names=awayTeamMembers.map(m=>m.name);
+    addCrewEntry((names.length>1?names.slice(0,-1).join(', ')+' and '+names[names.length-1]:names[0])+' returning from surface mission.');
     awayTeamMembers=[];
   } else {
     deployAwayTeam();
