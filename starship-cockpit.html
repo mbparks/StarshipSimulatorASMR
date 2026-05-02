@@ -3653,7 +3653,7 @@ function showRoomDetail(name){
 // === LONG RANGE SCANNER ===
 const lrsCanvas=document.getElementById('lrs-canvas');
 const lrsCtx=lrsCanvas.getContext('2d');
-const lrsColors={beacon:'#d4a03c',ship:'#2ecc71',asteroid:'#888',planet:'#5ec4d4',unknown:'#e74c3c',organism:'#78dcb4'};
+const lrsColors={beacon:'#d4a03c',ship:'#2ecc71',asteroid:'#888',planet:'#5ec4d4',unknown:'#e74c3c',organism:'#78dcb4',hostile:'#ff4444'};
 const lrsObjects=[
   {name:'Beacon K-7',x:.1,y:-.2,vx:0,vy:0,type:'beacon',brightness:1,scanned:false,firstSeen:Date.now()},
   {name:'CSV Hypatia',x:.3,y:.15,vx:-.0001,vy:.00005,type:'ship',brightness:1,scanned:false,firstSeen:Date.now()},
@@ -3768,7 +3768,19 @@ function drawLRS(){
     // Dot
     const dotSize=lrsSelectedObj===o?5:lrsTrackTarget===o?4:3;
     lrsCtx.fillStyle=color;lrsCtx.globalAlpha=alpha;
-    lrsCtx.beginPath();lrsCtx.arc(pos.sx,pos.sy,dotSize,0,6.283);lrsCtx.fill();
+    if(o.type==='hostile'){
+      // Red triangle for hostiles
+      const ts=dotSize+2;
+      lrsCtx.beginPath();lrsCtx.moveTo(pos.sx,pos.sy-ts);lrsCtx.lineTo(pos.sx-ts,pos.sy+ts*.7);lrsCtx.lineTo(pos.sx+ts,pos.sy+ts*.7);lrsCtx.closePath();lrsCtx.fill();
+      // Threat ring
+      lrsCtx.strokeStyle=`rgba(255,68,68,${.2+Math.sin(now*.004)*.15})`;lrsCtx.lineWidth=1;
+      lrsCtx.beginPath();lrsCtx.arc(pos.sx,pos.sy,12+Math.sin(now*.003)*3,0,6.283);lrsCtx.stroke();
+      // Firing indicator
+      if(o.firing){lrsCtx.strokeStyle='rgba(255,40,40,.5)';lrsCtx.lineWidth=1.5;
+        lrsCtx.beginPath();lrsCtx.moveTo(pos.sx,pos.sy);lrsCtx.lineTo(shipX,shipY);lrsCtx.stroke()}
+    } else {
+      lrsCtx.beginPath();lrsCtx.arc(pos.sx,pos.sy,dotSize,0,6.283);lrsCtx.fill();
+    }
     lrsCtx.globalAlpha=1;
 
     // Tracked highlight
@@ -3786,8 +3798,8 @@ function drawLRS(){
     }
 
     // Label
-    lrsCtx.fillStyle=`rgba(94,196,212,${alpha*.5})`;lrsCtx.font="11px 'Courier New'";
-    lrsCtx.fillText(o.name,pos.sx+8,pos.sy+3);
+    lrsCtx.fillStyle=o.type==='hostile'?`rgba(255,68,68,${alpha*.7})`:`rgba(94,196,212,${alpha*.5})`;lrsCtx.font="11px 'Courier New'";
+    lrsCtx.fillText(o.name+(o.type==='hostile'&&o.hostileType?' ['+o.hostileType.toUpperCase()+']':''),pos.sx+8,pos.sy+3);
   });
 
   // Drag-to-measure line
@@ -3896,7 +3908,7 @@ lrsCanvas.addEventListener('contextmenu',e=>{
   if(!found)return;
   lrsSelectedObj=found;
   const ctxMenu=document.getElementById('lrs-context');
-  const canHail=found.type==='ship'||found.type==='beacon'||found.type==='planet';
+  const canHail=found.type==='ship'||found.type==='beacon'||found.type==='planet'||found.type==='hostile';
   const canTractor=found.type==='asteroid';
   const canMine=found.type==='asteroid';
   const canDock=found.type==='ship';
@@ -3917,7 +3929,13 @@ lrsCanvas.addEventListener('contextmenu',e=>{
       const action=item.dataset.action;
       ctxMenu.classList.remove('show');
       if(action==='scan'){found.scanned=true;logComms('Sensors','Remote scan initiated on '+found.name+'.'); selectLRSObject(found)}
-      if(action==='hail'&&canHail)initiateHail({name:found.name,seed:Math.abs(Math.round(found.x*10000+found.y*10000)),status:'online'});
+      if(action==='hail'&&canHail){
+        if(found.type==='hostile'){
+          const msgs=hostileHails[found.hostileType]||hostileHails.pirate;
+          logComms(found.name,msgs[Math.floor(Math.random()*msgs.length)]);
+          found.hailed=true;
+        } else {initiateHail({name:found.name,seed:Math.abs(Math.round(found.x*10000+found.y*10000)),status:'online'})}
+      }
       if(action==='course'){
         const bearing=((Math.atan2(found.x,found.y)*180/Math.PI+360)%360);
         hudHeading=bearing;logComms('Helm','Intercept course set for '+found.name+', bearing '+bearing.toFixed(1)+'°.');
@@ -7180,6 +7198,14 @@ function initWeapons(){
         locked:false,health:100,shieldStr:0});
     }
   }
+  // Add hostile LRS contacts
+  lrsObjects.filter(o=>o.type==='hostile'&&!o.departed&&o.health>0).forEach(h=>{
+    if(!wpnTargets.find(t=>t.name===h.name)){
+      wpnTargets.push({obj:{x:h.x,y:h.y,z:.5,kind:'ship'},name:h.name,
+        kind:'hostile',dist:(Math.sqrt(h.x*h.x+h.y*h.y)*15).toFixed(1),
+        locked:false,health:h.health,shieldStr:h.shields});
+    }
+  });
   renderTargetList();
   renderTorpRack();
   renderShieldGrid();
@@ -7347,6 +7373,7 @@ document.getElementById('wpn-fire-laser').addEventListener('click',()=>{
       wpnLogEntry('Laser hit '+target.name+' — hull damage ('+Math.round(target.health)+'% integrity)','hit');
     }
     if(target.health<=0){wpnLogEntry('*** '+target.name+' DESTROYED ***','hit');sessionStats.targetsDestroyed++}
+    if(typeof damageHostileFromWeapons==='function')damageHostileFromWeapons(target.name,dmg);
   } else {
     wpnLogEntry('Laser missed '+target.name,'miss');
   }
@@ -7590,6 +7617,7 @@ function drawWeaponsView(){
           wpnLogEntry('Torpedo IMPACT on '+t.target.name+' — hull breach ('+Math.round(t.target.health)+'%)','hit');
         }
         if(t.target.health<=0){wpnLogEntry('*** '+t.target.name+' DESTROYED ***','hit');sessionStats.targetsDestroyed++}
+        if(typeof damageHostileFromWeapons==='function')damageHostileFromWeapons(t.target.name,dmg);
         // Explosion effect
         wpnCtx.fillStyle='rgba(255,200,50,.4)';wpnCtx.beginPath();wpnCtx.arc(t.tx,t.ty,25,0,6.283);wpnCtx.fill();
         wpnCtx.fillStyle='rgba(255,100,30,.3)';wpnCtx.beginPath();wpnCtx.arc(t.tx,t.ty,40,0,6.283);wpnCtx.fill();
@@ -10571,6 +10599,172 @@ document.getElementById('grav-cv').addEventListener('click',e=>{
     if(engaged)clickSound();
   }
 });
+
+scheduleDebrisField();
+
+// === HOSTILE CONTACTS ===
+const hostileNames={
+  pirate:['Black Corsair','Ravager','Void Fang','Shadow Runner','Iron Claw','Dead Reckoning','Night Talon','Crimson Wake','Skull Dagger','Razor Wind'],
+  smuggler:['Whisper','Ghost Runner','Quiet Hand','Slim Chance','Grey Market','The Broker','No Questions','Last Resort','Cold Cargo','Silent Partner'],
+  raider:['Warlord Kess','Scourge','Blood Hammer','Slag Runner','Bone Collector','Pain Trader','Ash Rider','War Dog','Fury Lance','Kill Switch'],
+};
+const hostileHails={
+  pirate:[
+    'Cut your engines and prepare to be boarded. We\'ll take your cargo and let you go. Resist and we won\'t.',
+    'This is your only warning. Drop your shields and jettison your cargo bay.',
+    'Well, well. A nice fat ship all alone out here. Hand over the goods.',
+    'Don\'t bother calling for help. No one\'s coming. Make this easy on yourself.',
+  ],
+  smuggler:[
+    'Hey, hey — we\'re just passing through. No trouble. Nothing to see here.',
+    'Look, we don\'t want any problems. Let us pass and everyone\'s happy.',
+    'You didn\'t see us. We were never here. Got it?',
+    'We have friends in places you don\'t want to know about. Let us go.',
+  ],
+  raider:[
+    'Your ship will make a fine trophy. ENGAGE!',
+    'We\'ve been tracking you for three systems. Today you die.',
+    'All power to weapons! ATTACK!',
+    'You wandered into the wrong sector. Prepare to be destroyed.',
+  ],
+};
+let hostileActive=[];
+function scheduleHostile(){
+  setTimeout(()=>{
+    if(engaged&&hostileActive.length<2)spawnHostile();
+    scheduleHostile();
+  },480000+Math.random()*720000);// 8-20 min
+}
+function spawnHostile(){
+  const types=['pirate','pirate','pirate','smuggler','smuggler','raider'];
+  const hType=types[Math.floor(Math.random()*types.length)];
+  const names=hostileNames[hType];
+  const hName=names[Math.floor(Math.random()*names.length)];
+  const edge=Math.random()*4;
+  let hx,hy;
+  if(edge<1){hx=-.48;hy=(Math.random()-.5)*.8}
+  else if(edge<2){hx=.48;hy=(Math.random()-.5)*.8}
+  else if(edge<3){hy=-.48;hx=(Math.random()-.5)*.8}
+  else{hy=.48;hx=(Math.random()-.5)*.8}
+  const hostile={name:hName,x:hx,y:hy,vx:0,vy:0,type:'hostile',brightness:1,
+    scanned:false,firstSeen:Date.now(),trail:[],departed:false,status:'active',
+    hostileType:hType,
+    aggression:hType==='raider'?1:hType==='pirate'?.7:.3,
+    shields:hType==='raider'?80:hType==='pirate'?50:20,
+    health:100,
+    fleeing:false,firing:false,hailed:false,
+    behavior:hType==='smuggler'?'evade':'approach'};
+  // Velocity toward center (player)
+  const angle=Math.atan2(-hy,-hx);
+  const speed=hType==='raider'?.00025:hType==='pirate'?.00015:.0002;
+  hostile.vx=Math.cos(angle)*speed;
+  hostile.vy=Math.sin(angle)*speed;
+  lrsObjects.push(hostile);
+  hostileActive.push(hostile);
+  // Alert
+  if(hType==='smuggler'){
+    logComms('Sensors','Contact detected at bearing '+(Math.atan2(hx,hy)*180/Math.PI+360).toFixed(0)%360+'°. Transponder reads: '+hName+'. No hostile intent detected.');
+    addCrewEntry('Sensors: Unknown vessel on approach. Transponder signal is… intermittent.');
+  } else {
+    logComms('Tactical','⚠ HOSTILE CONTACT — '+hName+' ('+hType.toUpperCase()+') entering sensor range!');
+    addCrewEntry('Red light on tactical. Hostile vessel inbound: '+hName+'.');
+    logComms('Tactical','Recommend raising shields and arming weapons.');
+  }
+  // Start hostile AI behavior
+  runHostileAI(hostile);
+}
+function runHostileAI(h){
+  const aiInt=setInterval(()=>{
+    if(!engaged||h.departed||h.health<=0){clearInterval(aiInt);return}
+    const dist=Math.sqrt(h.x*h.x+h.y*h.y);
+    // Update behavior based on state
+    if(h.fleeing){
+      // Move away from center
+      const fa=Math.atan2(h.y,h.x);
+      h.vx=Math.cos(fa)*.0003;h.vy=Math.sin(fa)*.0003;
+      if(dist>.5){
+        h.departed=true;clearInterval(aiInt);
+        logComms('Tactical',h.name+' has left sensor range.');
+        addCrewEntry(h.name+' has fled the area.');
+        hostileActive=hostileActive.filter(a=>a!==h);
+      }
+      return;
+    }
+    if(h.behavior==='evade'){
+      // Smugglers try to slip past
+      if(dist<.15){
+        // Too close, change direction
+        const ea=Math.atan2(h.y,h.x)+Math.PI/2;
+        h.vx=Math.cos(ea)*.0002;h.vy=Math.sin(ea)*.0002;
+      }
+      if(dist>.45){h.departed=true;clearInterval(aiInt);
+        logComms('Sensors',h.name+' has moved out of sensor range.');
+        hostileActive=hostileActive.filter(a=>a!==h)}
+      return;
+    }
+    // Approach behavior (pirates, raiders)
+    if(dist>.05){
+      const aa=Math.atan2(-h.y,-h.x);
+      h.vx=Math.cos(aa)*(h.hostileType==='raider'?.00025:.00015);
+      h.vy=Math.sin(aa)*(h.hostileType==='raider'?.00025:.00015);
+    } else {
+      h.vx=(Math.random()-.5)*.00005;h.vy=(Math.random()-.5)*.00005;
+    }
+    // Hail when getting close
+    if(dist<.2&&!h.hailed){
+      h.hailed=true;
+      const msgs=hostileHails[h.hostileType];
+      logComms(h.name,msgs[Math.floor(Math.random()*msgs.length)]);
+    }
+    // Attack when very close
+    if(dist<.12&&h.aggression>.5&&!h.firing){
+      h.firing=true;
+      logComms('Tactical','⚠ '+h.name+' is firing weapons!');
+      addCrewEntry('Impact! Shields absorbing fire from '+h.name+'.');
+      const fireInt=setInterval(()=>{
+        if(h.departed||h.health<=0||h.fleeing){clearInterval(fireInt);h.firing=false;return}
+        const dmg=2+Math.random()*3*h.aggression;
+        shieldsVal=Math.max(10,shieldsVal-dmg);
+        if(Math.random()<.15){
+          panTargetX=(Math.random()-.5)*6;panTargetY=(Math.random()-.5)*4;
+          setTimeout(()=>{panTargetX=0;panTargetY=0},200);
+        }
+        if(shieldsVal<30)logComms('Engineering','⚠ Shields critical! Taking hull damage!');
+      },3000);
+    }
+    // Check if destroyed by player weapons
+    // (handled by weapons fire system targeting this contact)
+    // Flee if shields drop below 20%
+    if(h.shields<20&&h.hostileType!=='raider'){
+      h.fleeing=true;h.firing=false;
+      logComms(h.name,h.hostileType==='smuggler'?'Alright, alright! We\'re leaving!':'You\'ll pay for this! We\'re pulling back!');
+      addCrewEntry(h.name+' is disengaging and retreating.');
+    }
+  },2000);
+}
+// Hook weapons to damage hostiles
+const _origWpnFire=typeof wpnFireLaser==='function'?wpnFireLaser:null;
+function damageHostileFromWeapons(targetName,dmg){
+  const h=hostileActive.find(ho=>ho.name===targetName);
+  if(!h)return;
+  h.shields=Math.max(0,h.shields-dmg);
+  h.health=Math.max(0,h.health-(h.shields<=0?dmg*.5:0));
+  if(h.shields<20&&!h.fleeing&&h.hostileType!=='raider'){
+    h.fleeing=true;h.firing=false;
+    logComms(h.name,h.hostileType==='smuggler'?'We surrender! Cease fire!':'Shields failing — retreating!');
+    addCrewEntry(h.name+' is breaking off.');
+  }
+  if(h.health<=0){
+    h.departed=true;h.firing=false;
+    logComms('Tactical','✓ '+h.name+' destroyed.');
+    addCrewEntry(h.name+' has been destroyed. Debris field expanding.');
+    addDiscovery('tactical','Hostile vessel destroyed: '+h.name+' ('+h.hostileType+')');
+    hostileActive=hostileActive.filter(a=>a!==h);
+  }
+}
+scheduleHostile();
+// Spawn one early for testing
+setTimeout(()=>{if(engaged)spawnHostile()},120000+Math.random()*180000);// 2-5 min
 
 // === DOCKING SEQUENCE ===
 let dockActive=false,dockTarget=null,dockState='approach',dockYaw=0,dockPitch=0;
