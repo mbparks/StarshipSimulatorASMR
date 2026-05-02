@@ -830,7 +830,7 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .uncharted-btn.primary{border-color:rgba(155,100,255,.4);background:rgba(155,100,255,.08)}
 
 /* === AWAY TEAM === */
-.away-team-btn{position:fixed;top:clamp(130px,15vh,170px);right:clamp(300px,20vw,330px);z-index:14;display:none;background:none;border:1px solid rgba(100,180,255,.25);color:#64b4ff;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:6px 14px;cursor:pointer;border-radius:3px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;pointer-events:auto}
+.away-team-btn{position:fixed;top:clamp(130px,15vh,170px);right:clamp(375px,25vw,405px);z-index:14;display:none;background:none;border:1px solid rgba(100,180,255,.25);color:#64b4ff;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:6px 14px;cursor:pointer;border-radius:3px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;pointer-events:auto}
 .away-team-btn:hover{border-color:#64b4ff;background:rgba(100,180,255,.08)}
 .away-team-btn.active{border-color:#4cdf80;color:#4cdf80;background:rgba(46,204,113,.06)}
 .away-panel{position:fixed;top:clamp(50px,7vh,90px);left:clamp(15px,2vw,40px);z-index:14;width:clamp(300px,24vw,380px);max-height:80vh;background:rgba(4,8,16,.88);border:1px solid rgba(100,180,255,.15);border-radius:4px;display:none;pointer-events:auto;backdrop-filter:blur(3px);overflow-y:auto}
@@ -846,6 +846,52 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .away-obj{font-size:clamp(8px,.7vw,10px);color:#d4a03c;font-style:italic;margin-top:3px;padding:3px 0;border-top:1px solid rgba(212,160,60,.06)}
 .away-chart{display:flex;gap:6px;margin-top:4px}
 .away-chart canvas{border:1px solid rgba(100,180,255,.06);border-radius:2px;background:rgba(4,8,12,.3)}
+
+/* === SCIENCE STATION === */
+.science-panel{position:fixed;inset:0;z-index:16;display:none;background:rgba(4,8,12,.92);backdrop-filter:blur(4px);pointer-events:auto}
+.science-panel.show{display:flex}
+.science-layout{display:flex;width:100%;height:100%;padding:clamp(10px,1.5vh,16px);gap:12px}
+.science-main{flex:1;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.science-sidebar{width:clamp(220px,20vw,300px);display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.sci-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:6px;border-bottom:1px solid rgba(180,120,255,.08)}
+.sci-header .sh-title{font-size:clamp(12px,1.1vw,16px);color:#b478ff;letter-spacing:4px;text-transform:uppercase}
+.sci-tabs{display:flex;gap:4px;padding:4px 0}
+.sci-tab{background:none;border:1px solid rgba(180,120,255,.15);color:#6a5a8a;font-family:inherit;font-size:clamp(8px,.7vw,10px);padding:4px 10px;cursor:pointer;border-radius:2px;letter-spacing:1px;text-transform:uppercase;transition:all .2s}
+.sci-tab:hover{border-color:rgba(180,120,255,.4);color:#b478ff}
+.sci-tab.active{border-color:#b478ff;color:#b478ff;background:rgba(180,120,255,.08)}
+.sci-body{flex:1;border:1px solid rgba(180,120,255,.06);border-radius:3px;overflow:hidden;position:relative}
+.sci-body canvas{width:100%;height:100%}
+.sci-card{border:1px solid rgba(180,120,255,.08);border-radius:3px;padding:8px 10px;background:rgba(4,8,12,.4)}
+.sci-card-title{font-size:clamp(8px,.7vw,10px);color:#b478ff;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
+.sci-btn{background:none;border:1px solid rgba(180,120,255,.2);color:#b478ff;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:5px 10px;cursor:pointer;border-radius:3px;letter-spacing:1px;transition:all .2s;width:100%;margin-top:4px}
+.sci-btn:hover{border-color:#b478ff;background:rgba(180,120,255,.06)}
+.sci-btn:disabled{opacity:.3;pointer-events:none}
+.sci-sample{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(180,120,255,.03);font-size:clamp(8px,.7vw,10px);cursor:pointer;transition:background .2s}
+.sci-sample:hover{background:rgba(180,120,255,.04)}
+.sci-sample.selected{background:rgba(180,120,255,.08)}
+.sci-sample .ss-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sci-sample .ss-name{flex:1;color:#8a7aaa}
+.sci-sample .ss-type{color:#5a4a6a;font-size:clamp(7px,.6vw,9px)}
+
+/* === GRAVITY MAPPER === */
+.grav-mapper{position:fixed;bottom:clamp(430px,45vh,470px);left:clamp(65px,5vw,90px);z-index:14;display:none;pointer-events:auto}
+.grav-mapper.show{display:block}
+.grav-mapper canvas{border:1px solid rgba(100,180,255,.1);border-radius:3px;background:rgba(4,8,12,.5)}
+.grav-mapper-label{font-size:clamp(7px,.6vw,9px);color:rgba(100,180,255,.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
+
+/* === DOCKING === */
+.dock-overlay{position:fixed;inset:0;z-index:17;display:none;background:rgba(4,8,12,.95);pointer-events:auto}
+.dock-overlay.show{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dock-overlay canvas{border:1px solid rgba(94,196,212,.1);border-radius:3px}
+.dock-hud{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:12px;align-items:center}
+.dock-btn{background:none;border:1px solid rgba(94,196,212,.2);color:#5ec4d4;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:6px 14px;cursor:pointer;border-radius:3px;letter-spacing:2px;text-transform:uppercase;transition:all .2s}
+.dock-btn:hover{border-color:#5ec4d4;background:rgba(94,196,212,.08)}
+.dock-status{font-size:clamp(10px,.9vw,13px);color:#5ec4d4;letter-spacing:2px}
+
+/* === PLANETARY LANDING === */
+.land-btn{position:fixed;top:clamp(130px,15vh,170px);right:clamp(120px,12vw,200px);z-index:14;display:none;background:none;border:1px solid rgba(46,204,113,.25);color:#2ecc71;font-family:inherit;font-size:clamp(9px,.8vw,11px);padding:6px 14px;cursor:pointer;border-radius:3px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;pointer-events:auto}
+.land-btn:hover{border-color:#2ecc71;background:rgba(46,204,113,.08)}
+.land-btn.active{border-color:#e8a840;color:#e8a840}
 
 /* === SHUTTLE BAY === */
 .shuttle-panel{position:fixed;inset:0;z-index:14;display:none;background:rgba(4,8,12,.9);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);pointer-events:auto}
@@ -1447,6 +1493,7 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
   <button class="scr-btn" data-screen="weapons" style="border-color:rgba(231,76,60,.2);color:#e74c3c">Wpns</button>
   <button class="scr-btn" data-screen="shuttle" style="border-color:rgba(94,196,212,.25)">Bay</button>
   <button class="scr-btn" data-screen="cargo" style="border-color:rgba(212,160,60,.2);color:#d4a03c">Cargo</button>
+  <button class="scr-btn" data-screen="science" style="border-color:rgba(180,120,255,.2);color:#b478ff">Sci</button>
   <button class="scr-btn" id="orbit-toggle" style="border-color:rgba(100,180,255,.2);color:#64b4ff">Orbit</button>
   <button class="scr-btn" id="hud-toggle" style="border-color:rgba(46,204,113,.2);color:#2ecc71">HUD</button>
 </div>
@@ -1579,6 +1626,12 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
       <div class="wpn-torp-rack" id="wpn-torp-rack"></div>
       <button class="wpn-torp-btn" id="wpn-fire-torp">▷ Launch Torpedo</button>
       <div style="font-size:clamp(8px,.7vw,10px);color:#2a4a5a;text-align:center;margin-top:4px" id="wpn-torp-status">8 / 8 loaded</div>
+    </div>
+
+    <div class="wpn-section">
+      <div class="wpn-sec-title">Electronic Warfare</div>
+      <button class="wpn-fire-btn" id="wpn-jam-btn" style="border-color:rgba(180,120,255,.3);color:#b478ff;background:rgba(180,120,255,.06);font-size:clamp(9px,.8vw,11px);letter-spacing:3px">◈ Activate Jammer</button>
+      <div style="font-size:clamp(8px,.7vw,10px);color:#5a4a6a;text-align:center;margin-top:4px" id="wpn-jam-status">Standby — Target required</div>
     </div>
 
     <div class="wpn-section">
@@ -1988,6 +2041,44 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
     </div>
   </div>
 </div>
+
+<!-- SCIENCE STATION -->
+<div class="science-panel" id="science-panel">
+<div class="science-layout">
+  <div class="science-main">
+    <div class="sci-header"><span class="sh-title">◈ Science Station</span><button class="pwr-close" id="science-close">Close</button></div>
+    <div class="sci-tabs" id="sci-tabs">
+      <button class="sci-tab active" data-sci="spectral">Spectral Analysis</button>
+    </div>
+    <div class="sci-body"><canvas id="sci-cv"></canvas></div>
+  </div>
+  <div class="science-sidebar">
+    <div class="sci-card"><div class="sci-card-title">Sample Queue</div><div id="sci-queue"></div></div>
+    <div class="sci-card"><div class="sci-card-title">Analysis Controls</div>
+    <button class="sci-btn" id="sci-run-btn" disabled>◈ Run Analysis</button>
+    <button class="sci-btn" id="sci-clear-btn" style="border-color:rgba(231,76,60,.2);color:#e74c3c">Clear Results</button></div>
+    <div class="sci-card"><div class="sci-card-title">Results</div><div id="sci-results" style="font-size:clamp(8px,.7vw,10px);color:#6a5a8a;max-height:30vh;overflow-y:auto">No analysis run yet.</div></div>
+  </div>
+</div>
+</div>
+
+<!-- GRAVITY MAPPER -->
+<div class="grav-mapper" id="grav-mapper">
+  <div class="grav-mapper-label">Gravity Field</div>
+  <canvas id="grav-cv" width="200" height="200" style="width:200px;height:200px"></canvas>
+</div>
+
+<!-- DOCKING OVERLAY -->
+<div class="dock-overlay" id="dock-overlay">
+  <canvas id="dock-cv" style="width:80vw;height:70vh"></canvas>
+  <div class="dock-hud">
+    <span class="dock-status" id="dock-status">Approach — Align with docking port</span>
+    <button class="dock-btn" id="dock-abort">Abort</button>
+  </div>
+</div>
+
+<!-- LANDING BUTTON -->
+<button class="land-btn" id="land-btn">◈ Begin Landing</button>
 
 <!-- AWAY TEAM -->
 <button class="away-team-btn" id="away-team-btn">◈ Deploy Away Team</button>
@@ -3311,6 +3402,12 @@ document.querySelectorAll('.scr-btn').forEach(btn=>{
       else{cp.classList.add('show');btn.classList.add('active');initCargo();renderCargo()}
       if(engaged)clickSound();return;
     }
+    if(id==='science'){
+      const sp=document.getElementById('science-panel');
+      if(sp.classList.contains('show')){sp.classList.remove('show');btn.classList.remove('active')}
+      else{sp.classList.add('show');btn.classList.add('active');initScienceStation()}
+      if(engaged)clickSound();return;
+    }
     if(id==='power'){
       const pp=document.getElementById('power-panel');
       if(pp.classList.contains('show')){pp.classList.remove('show');btn.classList.remove('active')}
@@ -3802,6 +3899,7 @@ lrsCanvas.addEventListener('contextmenu',e=>{
   const canHail=found.type==='ship'||found.type==='beacon'||found.type==='planet';
   const canTractor=found.type==='asteroid';
   const canMine=found.type==='asteroid';
+  const canDock=found.type==='ship';
   ctxMenu.innerHTML=`
     <div class="lrs-ctx-item" data-action="scan">◎ Scan</div>
     <div class="lrs-ctx-item ${canHail?'':'disabled'}" data-action="hail">⟐ Hail</div>
@@ -3809,6 +3907,7 @@ lrsCanvas.addEventListener('contextmenu',e=>{
     <div class="lrs-ctx-item" data-action="probe">◈ Launch Probe</div>
     <div class="lrs-ctx-item ${canTractor?'':'disabled'}" data-action="tractor">◉ Tractor Beam</div>
     <div class="lrs-ctx-item ${canMine?'':'disabled'}" data-action="mine">⛏ Deploy Mining Laser</div>
+    <div class="lrs-ctx-item ${canDock?'':'disabled'}" data-action="dock">⊞ Initiate Docking</div>
     <div class="lrs-ctx-item" data-action="track">${lrsTrackTarget===found?'✕ Stop Tracking':'◎ Track'}</div>`;
   ctxMenu.style.left=(e.clientX-document.getElementById('scr-lrs').getBoundingClientRect().left)+'px';
   ctxMenu.style.top=(e.clientY-document.getElementById('scr-lrs').getBoundingClientRect().top)+'px';
@@ -3827,6 +3926,7 @@ lrsCanvas.addEventListener('contextmenu',e=>{
       if(action==='probe'&&!probeActive){document.getElementById('probe-btn').click()}
       if(action==='tractor'&&canTractor){tractorMode=true;tractorBtn.classList.add('active');logComms('Engineering','Tractor beam armed, targeting '+found.name+'.')}
       if(action==='mine'&&canMine){startAsteroidMining(found)}
+      if(action==='dock'&&canDock){startDockingSequence(found)}
       if(action==='track'){
         lrsTrackTarget=lrsTrackTarget===found?null:found;
         logComms('Sensors',lrsTrackTarget?'Now tracking '+found.name+'.':'Tracking disengaged.');
@@ -10023,8 +10123,8 @@ function drawOrbit(ctx,W,H,t){
 document.getElementById('orbit-toggle').addEventListener('click',()=>{
   const btn=document.getElementById('orbit-toggle');
   orbitMode=!orbitMode;
-  if(orbitMode){btn.classList.add('active');initOrbit();document.getElementById('away-team-btn').style.display='block'}
-  else{btn.classList.remove('active');orbitSelectedPOI=null;document.getElementById('away-team-btn').style.display='none';document.getElementById('away-panel').classList.remove('show');awayTeamDeployed=false;document.getElementById('away-team-btn').classList.remove('active');document.getElementById('away-team-btn').textContent='◈ Deploy Away Team';logComms('Helm','Breaking orbit. Returning to open space.');addCrewEntry('Lt. Park: "Orbit broken. Resuming course."')}
+  if(orbitMode){btn.classList.add('active');initOrbit();document.getElementById('away-team-btn').style.display='block';document.getElementById('land-btn').style.display='block';initGravMapper();document.getElementById('grav-mapper').classList.add('show');gravMapperInited=false;initGravMapper();drawGravMapper()}
+  else{btn.classList.remove('active');orbitSelectedPOI=null;document.getElementById('away-team-btn').style.display='none';document.getElementById('land-btn').style.display='none';document.getElementById('away-panel').classList.remove('show');awayTeamDeployed=false;document.getElementById('away-team-btn').classList.remove('active');document.getElementById('away-team-btn').textContent='◈ Deploy Away Team';document.getElementById('grav-mapper').classList.remove('show');gravMapperInited=false;landingActive=false;landedOnSurface=false;landingPhase='idle';document.getElementById('land-btn').textContent='◈ Begin Landing';document.getElementById('land-btn').classList.remove('active');logComms('Helm','Breaking orbit. Returning to open space.');addCrewEntry('Lt. Park: "Orbit broken. Resuming course."')}
   if(engaged)clickSound();
 });
 // Click on main canvas to toggle orbit data panel and select POIs
@@ -10161,6 +10261,631 @@ document.getElementById('uncharted-name').addEventListener('keydown',e=>{
   if(e.key==='Enter')chartUnchartedSystem(document.getElementById('uncharted-name').value);
 });
 scheduleUnchartedDiscovery();
+
+// === SCIENCE STATION ===
+let sciSamples=[],sciSelectedSample=null,sciAnalysisRunning=false,sciAnimFrame=0,sciActiveTab='spectral';
+const sciElements=['Hydrogen','Helium','Carbon','Nitrogen','Oxygen','Iron','Silicon','Calcium','Sodium','Magnesium','Titanium','Lithium','Argon','Neon','Sulfur','Phosphorus','Chromium','Vanadium'];
+const sciUnknown=['Element X','Compound Ω','Isotope ξ-7','Material Θ','Substance Δ-9','Crystal Matrix Φ'];
+
+function initScienceStation(){
+  // Populate sample queue from discoveries, scans, and cargo
+  sciSamples=[];
+  // Add from cargo bio items
+  if(cargoInited)cargoBays.forEach(b=>{if(b&&(b.type==='bio'||b.type==='classified'))sciSamples.push({name:b.name,type:'cargo',source:'Cargo Bay',analyzed:false})});
+  // Add generic scan samples
+  sciSamples.push({name:'Ambient Starfield Spectra',type:'ambient',source:'Passive Sensors',analyzed:false});
+  sciSamples.push({name:'Hull Residue Sample',type:'surface',source:'External Sensors',analyzed:false});
+  if(orbitMode&&orbitPlanet){
+    sciSamples.push({name:orbitPlanet.name+' Atmospheric Sample',type:'atmosphere',source:'Orbital Scan',analyzed:false});
+    sciSamples.push({name:orbitPlanet.name+' Surface Spectra',type:'surface',source:'Orbital Scan',analyzed:false});
+  }
+  // Add from LRS scanned objects
+  lrsObjects.filter(o=>o.scanned).forEach(o=>sciSamples.push({name:o.name+' Scan Data',type:'scan',source:'LRS',analyzed:false}));
+  renderSciQueue();
+  drawSciIdle();
+}
+
+function renderSciQueue(){
+  const el=document.getElementById('sci-queue');if(!el)return;
+  el.innerHTML=sciSamples.map((s,i)=>{
+    const colors={cargo:'#2ecc71',ambient:'#5ec4d4',surface:'#d4a03c',atmosphere:'#64b4ff',scan:'#b478ff'};
+    const c=colors[s.type]||'#5ec4d4';
+    return`<div class="sci-sample${sciSelectedSample===i?' selected':''}" data-idx="${i}"><div class="ss-dot" style="background:${c}"></div><span class="ss-name">${s.name}${s.analyzed?' ✓':''}</span><span class="ss-type">${s.source}</span></div>`;
+  }).join('')||'<div style="color:#5a4a6a;font-size:clamp(8px,.7vw,10px)">No samples available</div>';
+  // Click handlers
+  el.querySelectorAll('.sci-sample').forEach(el2=>{
+    el2.addEventListener('click',()=>{
+      sciSelectedSample=parseInt(el2.dataset.idx);
+      document.getElementById('sci-run-btn').disabled=false;
+      renderSciQueue();
+      if(engaged)clickSound();
+    });
+  });
+}
+
+function drawSciIdle(){
+  const cv=document.getElementById('sci-cv');if(!cv)return;
+  const cx=cv.getContext('2d');
+  cv.width=cv.parentElement.offsetWidth*2||800;cv.height=cv.parentElement.offsetHeight*2||400;
+  if(cv.width<10)return;
+  const w=cv.width,h=cv.height;
+  cx.fillStyle='rgba(4,8,12,.95)';cx.fillRect(0,0,w,h);
+  // Draw empty spectrograph grid
+  cx.strokeStyle='rgba(180,120,255,.06)';cx.lineWidth=.5;
+  for(let x=0;x<w;x+=w/20){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,h);cx.stroke()}
+  for(let y=0;y<h;y+=h/10){cx.beginPath();cx.moveTo(0,y);cx.lineTo(w,y);cx.stroke()}
+  // Axis labels
+  cx.fillStyle='rgba(180,120,255,.15)';cx.font=`${Math.max(9,w*.012)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillText('WAVELENGTH (nm)',w/2,h-8);
+  cx.save();cx.translate(14,h/2);cx.rotate(-Math.PI/2);cx.fillText('INTENSITY',0,0);cx.restore();
+  // Wavelength markers
+  cx.font=`${Math.max(7,w*.009)}px 'Courier New'`;
+  ['380','450','520','590','660','730','780'].forEach((nm,i)=>{
+    cx.fillStyle='rgba(180,120,255,.1)';cx.fillText(nm,w*.1+i*w*.12,h-22);
+  });
+  // Idle message
+  cx.fillStyle='rgba(180,120,255,.2)';cx.font=`${Math.max(11,w*.015)}px 'Courier New'`;
+  cx.fillText('Select a sample and run analysis',w/2,h/2);
+}
+
+function runSpectralAnalysis(sampleIdx){
+  if(sciAnalysisRunning||sampleIdx===null)return;
+  const sample=sciSamples[sampleIdx];if(!sample)return;
+  sciAnalysisRunning=true;
+  document.getElementById('sci-run-btn').disabled=true;
+  document.getElementById('sci-run-btn').textContent='● Analyzing…';
+  logComms('Science','Spectral analysis initiated: '+sample.name);
+  const cv=document.getElementById('sci-cv');if(!cv){sciAnalysisRunning=false;return}
+  cv.width=cv.parentElement.offsetWidth*2||800;cv.height=cv.parentElement.offsetHeight*2||400;
+  const cx=cv.getContext('2d');const w=cv.width,h=cv.height;
+  // Generate result data
+  const numPeaks=5+Math.floor(Math.random()*8);
+  const peaks=[];
+  for(let i=0;i<numPeaks;i++){
+    const elem=sciElements[Math.floor(Math.random()*sciElements.length)];
+    peaks.push({pos:.05+Math.random()*.9,height:.2+Math.random()*.8,width:.005+Math.random()*.02,elem,
+      color:`hsla(${280+Math.random()*80},60%,${40+Math.random()*30}%,`});
+  }
+  const hasUnknown=Math.random()<.2;
+  let unknownElem=null;
+  if(hasUnknown){unknownElem=sciUnknown[Math.floor(Math.random()*sciUnknown.length)];
+    peaks.push({pos:.3+Math.random()*.4,height:.5+Math.random()*.5,width:.008+Math.random()*.015,elem:unknownElem,color:'rgba(255,60,60,',unknown:true})}
+  let scanX=0,elapsed=0;
+  const analysisInt=setInterval(()=>{
+    elapsed++;scanX=elapsed/20*w;
+    cx.fillStyle='rgba(4,8,12,.15)';cx.fillRect(0,0,w,h);
+    // Grid
+    cx.strokeStyle='rgba(180,120,255,.04)';cx.lineWidth=.5;
+    for(let gx=0;gx<w;gx+=w/20){cx.beginPath();cx.moveTo(gx,0);cx.lineTo(gx,h);cx.stroke()}
+    for(let gy=0;gy<h;gy+=h/10){cx.beginPath();cx.moveTo(0,gy);cx.lineTo(w,gy);cx.stroke()}
+    // Scan sweep line
+    cx.strokeStyle='rgba(180,120,255,.3)';cx.lineWidth=1.5;
+    cx.beginPath();cx.moveTo(scanX,0);cx.lineTo(scanX,h);cx.stroke();
+    const grad=cx.createLinearGradient(scanX-30,0,scanX,0);grad.addColorStop(0,'transparent');grad.addColorStop(1,'rgba(180,120,255,.03)');
+    cx.fillStyle=grad;cx.fillRect(scanX-30,0,30,h);
+    // Draw revealed peaks
+    peaks.forEach(p=>{
+      const px=p.pos*w;if(px>scanX)return;
+      // Emission line
+      for(let y=0;y<h*.85;y++){
+        const intensity=p.height*Math.exp(-((y/h-.5)**2)/.08);
+        const xOff=Math.exp(-((0)**2)/(p.width*p.width*w*w));
+        cx.fillStyle=p.color+(intensity*.6)+')';
+        cx.fillRect(px-1,h*.9-y,3,1);
+      }
+      // Peak glow
+      cx.fillStyle=p.color+'.08)';
+      cx.beginPath();cx.arc(px,h*.4,p.width*w*3,0,6.283);cx.fill();
+      // Element label
+      cx.fillStyle=p.color+(p.unknown?'.8)':'.5)');cx.font=`${p.unknown?'bold ':''}${Math.max(8,w*.01)}px 'Courier New'`;cx.textAlign='center';
+      cx.fillText(p.elem,px,h*.92+12);
+      if(p.unknown){cx.fillStyle='rgba(255,60,60,.3)';cx.fillText('⚠ UNKNOWN',px,h*.92+24)}
+    });
+    // Wavelength axis
+    cx.fillStyle='rgba(180,120,255,.1)';cx.font=`${Math.max(7,w*.009)}px 'Courier New'`;
+    ['380','450','520','590','660','730','780'].forEach((nm,i)=>{cx.fillText(nm,w*.1+i*w*.12,h-6)});
+    // Progress
+    cx.fillStyle='rgba(180,120,255,.25)';cx.font=`${Math.max(9,w*.011)}px 'Courier New'`;cx.textAlign='start';
+    cx.fillText('ANALYSIS: '+Math.min(100,Math.round(elapsed/20*100))+'%',10,20);
+    cx.fillText(sample.name,10,36);
+    if(elapsed>=20){
+      clearInterval(analysisInt);sciAnalysisRunning=false;sample.analyzed=true;
+      document.getElementById('sci-run-btn').textContent='◈ Run Analysis';document.getElementById('sci-run-btn').disabled=false;
+      renderSciQueue();
+      // Build results text
+      const elems=peaks.filter(p=>!p.unknown).map(p=>p.elem);
+      const uniqueElems=[...new Set(elems)];
+      let resultHTML=`<div style="color:#b478ff;margin-bottom:4px;font-weight:bold">${sample.name}</div>`;
+      resultHTML+=`<div style="color:#8a7aaa;margin-bottom:4px">${uniqueElems.length} elements identified:</div>`;
+      uniqueElems.forEach(e=>{resultHTML+=`<div style="color:#6a8a9a">▪ ${e} — ${(Math.random()*40+1).toFixed(1)}%</div>`});
+      if(unknownElem){resultHTML+=`<div style="color:#ef5350;margin-top:4px;font-weight:bold">⚠ ${unknownElem} detected — not in standard database</div>`}
+      resultHTML+=`<div style="color:#5a4a6a;margin-top:6px;font-style:italic">${peaks.length} emission lines catalogued. Confidence: ${(85+Math.random()*14).toFixed(1)}%</div>`;
+      document.getElementById('sci-results').innerHTML=resultHTML;
+      logComms('Science','Spectral analysis complete: '+uniqueElems.length+' elements identified.'+(unknownElem?' ⚠ Unknown element detected: '+unknownElem:''));
+      addDiscovery('science','Spectral analysis — '+sample.name+': '+uniqueElems.join(', ')+(unknownElem?'. UNKNOWN: '+unknownElem:''));
+    }
+  },1000);
+}
+
+document.getElementById('science-close').addEventListener('click',()=>{
+  document.getElementById('science-panel').classList.remove('show');
+  document.querySelectorAll('.scr-btn').forEach(b=>{if(b.dataset.screen==='science')b.classList.remove('active')});
+  if(engaged)clickSound();
+});
+document.getElementById('sci-run-btn').addEventListener('click',()=>{
+  if(sciSelectedSample!==null)runSpectralAnalysis(sciSelectedSample);
+  if(engaged)clickSound();
+});
+document.getElementById('sci-clear-btn').addEventListener('click',()=>{
+  document.getElementById('sci-results').innerHTML='No analysis run yet.';
+  drawSciIdle();if(engaged)clickSound();
+});
+
+// === ELECTRONIC WARFARE ===
+let ewJamming=false,ewJamTarget=null,ewJamTimer=0;
+document.getElementById('wpn-jam-btn').addEventListener('click',()=>{
+  if(!engaged)return;
+  if(ewJamming){// Cancel jam
+    ewJamming=false;ewJamTarget=null;
+    document.getElementById('wpn-jam-btn').textContent='◈ Activate Jammer';
+    document.getElementById('wpn-jam-btn').style.borderColor='rgba(180,120,255,.3)';
+    document.getElementById('wpn-jam-status').textContent='Jammer disengaged';
+    document.getElementById('wpn-jam-status').style.color='#5a4a6a';
+    logComms('Tactical','Electronic countermeasures disengaged.');
+    clickSound();return;
+  }
+  // Need a locked target
+  if(!wpnLockedTarget){
+    document.getElementById('wpn-jam-status').textContent='⚠ No target lock — acquire target first';
+    document.getElementById('wpn-jam-status').style.color='#e74c3c';
+    clickSound();return;
+  }
+  ewJamming=true;ewJamTarget=wpnLockedTarget;ewJamTimer=30;
+  document.getElementById('wpn-jam-btn').textContent='● Jamming — Cancel';
+  document.getElementById('wpn-jam-btn').style.borderColor='rgba(180,120,255,.6)';
+  logComms('Tactical','Electronic countermeasures activated. Jamming '+ewJamTarget.name+' on all frequencies.');
+  addCrewEntry('ECM array powering up. Sensor output reduced during jamming.');
+  const jamInt=setInterval(()=>{
+    if(!ewJamming){clearInterval(jamInt);return}
+    ewJamTimer--;
+    document.getElementById('wpn-jam-status').innerHTML=`<span style="color:#b478ff">Jamming: ${ewJamTimer}s</span> <span style="color:#5a4a6a">| Reactor: -8% | Sensors: -15%</span>`;
+    // Jitter the target on LRS
+    if(ewJamTarget){ewJamTarget.x+=(Math.random()-.5)*.01;ewJamTarget.y+=(Math.random()-.5)*.01}
+    if(ewJamTimer<=0){
+      clearInterval(jamInt);ewJamming=false;
+      document.getElementById('wpn-jam-btn').textContent='◈ Activate Jammer';
+      document.getElementById('wpn-jam-btn').style.borderColor='rgba(180,120,255,.3)';
+      document.getElementById('wpn-jam-status').textContent='Cycle complete — cooldown';
+      document.getElementById('wpn-jam-status').style.color='#2ecc71';
+      logComms('Tactical','ECM cycle complete. Target sensors disrupted for 30 seconds.');
+      addCrewEntry('Jammer cooldown. Sensors returning to full sensitivity.');
+      ewJamTarget=null;
+      setTimeout(()=>{document.getElementById('wpn-jam-status').textContent='Standby — Target required';document.getElementById('wpn-jam-status').style.color='#5a4a6a'},5000);
+    }
+  },1000);
+  clickSound();
+});
+
+// === GRAVITY WELL MAPPER ===
+let gravWells=[],gravMapperInited=false;
+function initGravMapper(){
+  if(gravMapperInited)return;gravMapperInited=true;
+  gravWells=[];
+  // Generate 4-7 gravity anomalies
+  const count=4+Math.floor(Math.random()*4);
+  for(let i=0;i<count;i++){
+    gravWells.push({x:.15+Math.random()*.7,y:.15+Math.random()*.7,
+      strength:.3+Math.random()*.7,radius:.05+Math.random()*.08,
+      pulse:Math.random()*6.283,type:Math.random()<.3?'anomaly':'normal',
+      flagged:false,
+      label:Math.random()<.3?['Mass Concentration','Subsurface Void','Dense Core Fragment','Tectonic Stress','Magma Chamber','Unknown Density'][Math.floor(Math.random()*6)]:null});
+  }
+}
+function drawGravMapper(){
+  if(!orbitMode||!document.getElementById('grav-mapper').classList.contains('show'))return;
+  const cv=document.getElementById('grav-cv');if(!cv)return;
+  const cx=cv.getContext('2d');cv.width=400;cv.height=400;
+  const w=cv.width,h=cv.height,n=performance.now()*.001;
+  cx.fillStyle='rgba(4,8,12,.95)';cx.fillRect(0,0,w,h);
+  // Contour lines
+  for(let gy=0;gy<h;gy+=4){
+    for(let gx=0;gx<w;gx+=4){
+      let val=0;
+      gravWells.forEach(gw=>{
+        const dx=(gx/w-gw.x),dy=(gy/h-gw.y);
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        val+=gw.strength*Math.exp(-(dist*dist)/(gw.radius*gw.radius*2));
+      });
+      if(val>.02){
+        const hue=val>.5?0:val>.3?30:val>.15?180:220;
+        const alpha=Math.min(.4,val*.5);
+        cx.fillStyle=`hsla(${hue},60%,50%,${alpha})`;
+        cx.fillRect(gx,gy,4,4);
+      }
+    }
+  }
+  // Contour rings around wells
+  gravWells.forEach(gw=>{
+    const gwx=gw.x*w,gwy=gw.y*h;
+    [1,2,3].forEach(ring=>{
+      const r=gw.radius*w*ring*.7;
+      cx.strokeStyle=`rgba(100,180,255,${.06/ring})`;cx.lineWidth=.5;
+      cx.beginPath();cx.arc(gwx,gwy,r,0,6.283);cx.stroke();
+    });
+    // Anomaly pulse
+    if(gw.type==='anomaly'){
+      const pulse=Math.sin(n*2+gw.pulse)*.5+.5;
+      cx.fillStyle=`rgba(255,80,80,${.05+pulse*.1})`;
+      cx.beginPath();cx.arc(gwx,gwy,gw.radius*w*.8+pulse*5,0,6.283);cx.fill();
+      cx.strokeStyle=`rgba(255,80,80,${.15+pulse*.15})`;cx.lineWidth=1;
+      cx.beginPath();cx.arc(gwx,gwy,gw.radius*w*.5,0,6.283);cx.stroke();
+    }
+    // Label
+    if(gw.label||gw.flagged){
+      cx.fillStyle=gw.type==='anomaly'?'rgba(255,100,100,.4)':'rgba(100,180,255,.3)';
+      cx.font=`${Math.max(7,w*.018)}px 'Courier New'`;cx.textAlign='center';
+      cx.fillText(gw.label||(gw.flagged?'◉ FLAGGED':''),gwx,gwy-gw.radius*w*.6-4);
+    }
+    // Flagged marker
+    if(gw.flagged){
+      cx.strokeStyle='rgba(46,204,113,.4)';cx.lineWidth=1.5;
+      cx.beginPath();cx.arc(gwx,gwy,6,0,6.283);cx.stroke();
+      cx.fillStyle='rgba(46,204,113,.3)';cx.beginPath();cx.arc(gwx,gwy,2.5,0,6.283);cx.fill();
+    }
+  });
+  // Grid overlay
+  cx.strokeStyle='rgba(100,180,255,.04)';cx.lineWidth=.5;
+  for(let x=0;x<w;x+=w/10){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,h);cx.stroke()}
+  for(let y=0;y<h;y+=h/10){cx.beginPath();cx.moveTo(0,y);cx.lineTo(w,y);cx.stroke()}
+  // Labels
+  cx.fillStyle='rgba(100,180,255,.15)';cx.font=`${Math.max(7,w*.018)}px 'Courier New'`;cx.textAlign='start';
+  cx.fillText('GRAVITY FIELD — '+(orbitPlanet?orbitPlanet.name.toUpperCase():''),6,12);
+  cx.fillText(gravWells.filter(g=>g.type==='anomaly').length+' anomalies detected',6,h-6);
+  cx.textAlign='center';
+  if(orbitMode)requestAnimationFrame(drawGravMapper);
+}
+// Gravity mapper click — flag wells and add as POIs
+document.getElementById('grav-cv').addEventListener('click',e=>{
+  if(!orbitMode||!orbitPlanet)return;
+  const cv=document.getElementById('grav-cv');
+  const rect=cv.getBoundingClientRect();
+  const mx=(e.clientX-rect.left)/rect.width;
+  const my=(e.clientY-rect.top)/rect.height;
+  let closest=null,closestDist=999;
+  gravWells.forEach(gw=>{
+    const d=Math.sqrt((mx-gw.x)**2+(my-gw.y)**2);
+    if(d<.08&&d<closestDist){closest=gw;closestDist=d}
+  });
+  if(closest&&!closest.flagged){
+    closest.flagged=true;
+    const poiLabel=closest.label||'Gravity Anomaly '+(gravWells.filter(g=>g.flagged).length);
+    // Add to planet POIs
+    if(orbitPlanet.pois){
+      orbitPlanet.pois.push({label:poiLabel,icon:'◎',color:'rgba(255,100,100,',
+        lng:closest.x*6.283,lat:(closest.y-.5)*2.2,pop:null,
+        detail:{elevation:'Subsurface',climate:'N/A — Underground',resources:['Unknown dense material'],hazard:'Gravitational instability',note:'Flagged from orbital gravity mapper. Subsurface investigation recommended.',scanned:true},
+        sx:0,sy:0,onScreen:false});
+    }
+    logComms('Science','Gravity anomaly flagged as POI: '+poiLabel+'. Coordinates relayed to away team.');
+    addCrewEntry('Dr. Tanaka: "Interesting gravity well. I\'ve flagged it for surface investigation."');
+    if(engaged)clickSound();
+  }
+});
+
+// === DOCKING SEQUENCE ===
+let dockActive=false,dockTarget=null,dockState='approach',dockYaw=0,dockPitch=0;
+function startDockingSequence(ship){
+  dockActive=true;dockTarget=ship;dockState='approach';dockYaw=0;dockPitch=0;
+  document.getElementById('dock-overlay').classList.add('show');
+  logComms('Helm','Initiating docking approach with '+ship.name+'.');
+  logComms(ship.name,'Roger '+shipName+', you are cleared for docking on port 2. Maintain alignment.');
+  addCrewEntry('Lt. Park: "Docking protocol engaged. Reducing speed."');
+  const cv=document.getElementById('dock-cv');
+  cv.width=cv.offsetWidth*2||1200;cv.height=cv.offsetHeight*2||800;
+  // Mouse controls yaw/pitch
+  const moveHandler=e=>{
+    const rect=cv.getBoundingClientRect();
+    dockYaw=((e.clientX-rect.left)/rect.width-.5)*60;
+    dockPitch=((e.clientY-rect.top)/rect.height-.5)*40;
+  };
+  cv.addEventListener('mousemove',moveHandler);
+  let alignTime=0,approachDist=100;
+  function drawDock(){
+    if(!dockActive){cv.removeEventListener('mousemove',moveHandler);return}
+    const cx=cv.getContext('2d');const w=cv.width,h=cv.height;
+    const n=performance.now()*.001;
+    cx.fillStyle='rgba(4,8,12,.95)';cx.fillRect(0,0,w,h);
+    // Stars
+    for(let i=0;i<120;i++){
+      const sx=(i*127.3+n*.5)%w,sy=(i*211.7+n*.3)%h;
+      cx.fillStyle=`rgba(200,210,220,${.15+Math.sin(i)*.05})`;cx.fillRect(sx,sy,1,1);
+    }
+    const cX=w/2,cY=h/2;
+    if(dockState==='approach'){
+      approachDist=Math.max(0,approachDist-.08);
+      // Target ship hull
+      const scale=1+((100-approachDist)/100)*2;
+      const shipW=w*.15*scale,shipH=h*.08*scale;
+      const shipX=cX+dockYaw*.3-shipW/2,shipY=cY+dockPitch*.3-shipH/2;
+      // Hull
+      cx.fillStyle='rgba(60,70,80,.5)';cx.fillRect(shipX,shipY,shipW,shipH);
+      cx.strokeStyle='rgba(94,196,212,.2)';cx.lineWidth=1;cx.strokeRect(shipX,shipY,shipW,shipH);
+      // Windows
+      for(let wi=0;wi<5;wi++){cx.fillStyle='rgba(255,220,100,.15)';cx.fillRect(shipX+shipW*.15+wi*shipW*.15,shipY+shipH*.3,shipW*.06,shipH*.25)}
+      // Engine glow
+      cx.fillStyle='rgba(94,196,212,.08)';cx.beginPath();cx.ellipse(shipX+shipW+10,shipY+shipH/2,8*scale,shipH*.3,0,0,6.283);cx.fill();
+      // Docking port — target brackets
+      const portX=cX,portY=cY;
+      const portR=20+approachDist*.3;
+      cx.strokeStyle=`rgba(46,204,113,${.3+Math.sin(n*3)*.1})`;cx.lineWidth=2;
+      // Corner brackets
+      const bL=portR*.4;
+      [[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([dx,dy])=>{
+        cx.beginPath();cx.moveTo(portX+dx*portR,portY+dy*portR);cx.lineTo(portX+dx*portR,portY+dy*(portR-bL));cx.stroke();
+        cx.beginPath();cx.moveTo(portX+dx*portR,portY+dy*portR);cx.lineTo(portX+dx*(portR-bL),portY+dy*portR);cx.stroke();
+      });
+      // Ship reticle (your alignment)
+      cx.strokeStyle='rgba(212,160,60,.4)';cx.lineWidth=1.5;
+      const rx=cX+dockYaw*.5,ry=cY+dockPitch*.5;
+      cx.beginPath();cx.moveTo(rx-12,ry);cx.lineTo(rx+12,ry);cx.stroke();
+      cx.beginPath();cx.moveTo(rx,ry-12);cx.lineTo(rx,ry+12);cx.stroke();
+      // Alignment check
+      const drift=Math.sqrt(dockYaw*dockYaw+dockPitch*dockPitch);
+      if(drift<5&&approachDist<5){alignTime++}else{alignTime=Math.max(0,alignTime-1)}
+      // Alignment indicator
+      cx.fillStyle=drift<5?'rgba(46,204,113,.4)':drift<15?'rgba(212,160,60,.4)':'rgba(231,76,60,.4)';
+      cx.font=`bold ${Math.max(11,w*.014)}px 'Courier New'`;cx.textAlign='center';
+      cx.fillText(drift<5?'◉ ALIGNED':'◎ ALIGN TO PORT',cX,h*.12);
+      // Distance readout
+      cx.fillStyle='rgba(94,196,212,.3)';cx.font=`${Math.max(9,w*.011)}px 'Courier New'`;
+      cx.fillText('RANGE: '+approachDist.toFixed(0)+'m  DRIFT: '+drift.toFixed(1)+'°',cX,h*.88);
+      document.getElementById('dock-status').textContent='Approach — Range '+approachDist.toFixed(0)+'m';
+      // Lock when aligned for 3 seconds at close range
+      if(alignTime>180){
+        dockState='locked';alignTime=0;
+        logComms(dockTarget.name,'Magnetic clamps engaged. Welcome aboard, '+shipName+'.');
+        addCrewEntry('Docking clamps locked. Umbilicals connecting.');
+        if(engaged)clickSound();
+      }
+    } else if(dockState==='locked'){
+      // Docked view — station interior through port
+      cx.fillStyle='rgba(30,35,40,.8)';cx.fillRect(w*.1,h*.1,w*.8,h*.8);
+      cx.strokeStyle='rgba(94,196,212,.15)';cx.lineWidth=1;cx.strokeRect(w*.1,h*.1,w*.8,h*.8);
+      // Interior details
+      cx.fillStyle='rgba(255,220,100,.04)';
+      for(let ri=0;ri<6;ri++){cx.fillRect(w*.15+ri*w*.11,h*.2,w*.08,h*.12)}
+      cx.fillStyle='rgba(94,196,212,.05)';cx.fillRect(w*.2,h*.5,w*.6,h*.02);// corridor
+      // Docked menu
+      cx.fillStyle='rgba(94,196,212,.5)';cx.font=`bold ${Math.max(14,w*.018)}px 'Courier New'`;cx.textAlign='center';
+      cx.fillText('◉ DOCKED — '+dockTarget.name.toUpperCase(),cX,h*.18);
+      const opts=['[1] Refuel (+20%)', '[2] Exchange Cargo', '[3] Crew Shore Leave', '[4] Station Gossip', '[5] Undock'];
+      cx.font=`${Math.max(11,w*.014)}px 'Courier New'`;
+      opts.forEach((o,i)=>{
+        cx.fillStyle='rgba(94,196,212,.35)';
+        cx.fillText(o,cX,h*.38+i*h*.08);
+      });
+      document.getElementById('dock-status').textContent='Docked — Select option (click)';
+    }
+    requestAnimationFrame(drawDock);
+  }
+  // Click handler for docked options
+  cv.addEventListener('click',function dockClick(e){
+    if(dockState!=='locked')return;
+    const rect=cv.getBoundingClientRect();
+    const my=(e.clientY-rect.top)/rect.height;
+    const optIdx=Math.floor((my-.34)/.08);
+    if(optIdx===0){// Refuel
+      hudFuel=Math.min(100,hudFuel+20);fuelReserve=Math.min(100,fuelReserve+10);
+      logComms(dockTarget.name,'Fuel transfer complete. Primary topped up.');
+      addCrewEntry('Fuel lines disconnected. Tanks replenished.');
+    } else if(optIdx===1){// Cargo
+      if(cargoInited){const empties=cargoBays.reduce((a,b,i)=>b?a:[...a,i],[]);
+        if(empties.length>0){const bay=empties[0];
+          const names=['Trade Goods','Station Supplies','Data Archives','Medical Resupply','Replacement Parts'];
+          cargoBays[bay]={name:names[Math.floor(Math.random()*names.length)],type:'supply',mass:50+Math.floor(Math.random()*200),origin:dockTarget.name,notes:'Received during docking',temp:[-20,60],condition:100,led:'green',id:Date.now()};
+          logComms('Cargo','Cargo exchange: received shipment in bay '+String.fromCharCode(65+Math.floor(bay/CARGO_COLS))+'-'+(bay%CARGO_COLS+1));
+        } else {logComms('Cargo','No empty bays available for cargo exchange.')}}
+    } else if(optIdx===2){// Shore leave
+      logComms(dockTarget.name,'Shore leave approved. Crew rotation: 4 hours.');
+      addCrewEntry('Crew rotating through station for shore leave. Morale improving.');
+      addCrewEntry('Reyes found a bar. Park is calling home. Tanaka is in their science library.');
+    } else if(optIdx===3){// Gossip
+      const gossip=[
+        '"Have you heard about the signal near Sector 7? Three ships reported it last month."',
+        '"A colony ship went missing near the Drift. Search and rescue found nothing."',
+        '"The Colonial Authority is tightening trade lanes. Expect more inspections."',
+        '"Rumor has it someone found alien ruins on Kepler-442b. UESA is keeping it quiet."',
+        '"Fuel prices are up 30% since the refinery incident at Proxima Station."',
+        '"There\'s a pilot here who says she saw something alive in the Veil Nebula. No one believes her."',
+        '"The shipyard at Tau Ceti is building something big. Military contract, hush-hush."',
+      ];
+      logComms(dockTarget.name,gossip[Math.floor(Math.random()*gossip.length)]);
+    } else if(optIdx===4){// Undock
+      dockState='undock';
+      logComms('Helm','Undocking sequence initiated.');
+      logComms(dockTarget.name,'Releasing clamps. Safe travels, '+shipName+'.');
+      addCrewEntry('Separation thrusters firing. Clearing docking port.');
+      setTimeout(()=>{
+        dockActive=false;dockTarget=null;
+        document.getElementById('dock-overlay').classList.remove('show');
+        cv.removeEventListener('click',dockClick);
+        cv.removeEventListener('mousemove',moveHandler);
+        logComms('Helm','Clear of station. Resuming normal operations.');
+      },2000);
+    }
+    if(engaged)clickSound();
+  });
+  drawDock();
+  if(engaged)clickSound();
+}
+document.getElementById('dock-abort').addEventListener('click',()=>{
+  dockActive=false;dockTarget=null;
+  document.getElementById('dock-overlay').classList.remove('show');
+  logComms('Helm','Docking approach aborted.');
+  if(engaged)clickSound();
+});
+
+// === PLANETARY LANDING ===
+let landingActive=false,landingPhase='idle',landingT=0,landedOnSurface=false;
+function startLandingSequence(){
+  if(landingActive||!orbitMode||!orbitPlanet)return;
+  landingActive=true;landingPhase='descent';landingT=0;landedOnSurface=false;
+  document.getElementById('land-btn').classList.add('active');
+  document.getElementById('land-btn').textContent='● Descending…';
+  logComms('Helm','Deorbit burn initiated. Beginning atmospheric entry.');
+  addCrewEntry('Lt. Park: "Hold on — atmospheric entry in 10 seconds."');
+}
+function drawLanding(ctx,W,H,t){
+  if(!landingActive||!orbitPlanet)return false;
+  const p=orbitPlanet;
+  landingT++;
+  const progress=Math.min(1,landingT/1800);// 30 seconds at 60fps
+  ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  if(landingPhase==='descent'){
+    // Planet surface growing
+    const surfaceY=H*(1.2-progress*1.1);// starts below viewport, rises to fill
+    const horizonY=Math.max(H*.15,surfaceY);
+    // Sky gradient
+    const skyGrad=ctx.createLinearGradient(0,0,0,horizonY);
+    skyGrad.addColorStop(0,`hsla(${p.hue+20},30%,8%,1)`);
+    skyGrad.addColorStop(1,`hsla(${p.hue+10},40%,15%,1)`);
+    ctx.fillStyle=skyGrad;ctx.fillRect(0,0,W,horizonY);
+    // Ground
+    const gndGrad=ctx.createLinearGradient(0,horizonY,0,H);
+    gndGrad.addColorStop(0,`hsla(${p.hue},${p.sat}%,25%,1)`);
+    gndGrad.addColorStop(1,`hsla(${p.hue},${p.sat-10}%,12%,1)`);
+    ctx.fillStyle=gndGrad;ctx.fillRect(0,horizonY,W,H-horizonY);
+    // Terrain features on ground
+    if(progress>.3){
+      ctx.strokeStyle=`hsla(${p.hue+10},${p.sat}%,35%,.1)`;ctx.lineWidth=1;
+      for(let i=0;i<15;i++){
+        const tx=W*.1+i*W*.06;const ty=horizonY+(i%3)*30*progress;
+        ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(tx+W*.04,ty+10*progress);ctx.stroke();
+      }
+    }
+    // Atmospheric entry effects (first 40%)
+    if(progress<.4){
+      const entryIntensity=(1-progress/.4);
+      // Orange glow at edges
+      const edgeGrad=ctx.createRadialGradient(W/2,H/2,W*.2,W/2,H/2,W*.6);
+      edgeGrad.addColorStop(0,'transparent');
+      edgeGrad.addColorStop(.7,`rgba(255,120,30,${entryIntensity*.15})`);
+      edgeGrad.addColorStop(1,`rgba(255,80,20,${entryIntensity*.25})`);
+      ctx.fillStyle=edgeGrad;ctx.fillRect(0,0,W,H);
+      // Plasma streaks
+      for(let s=0;s<8;s++){
+        const sx=W*.2+Math.sin(t*3+s*4)*W*.3;
+        const sy=H*.1+Math.cos(t*2+s*7)*H*.3;
+        ctx.strokeStyle=`rgba(255,${150+s*10},30,${entryIntensity*.1})`;ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx+30,sy+40);ctx.stroke();
+      }
+      // Turbulence shake
+      if(Math.random()<entryIntensity*.3){
+        panTargetX=(Math.random()-.5)*entryIntensity*8;
+        panTargetY=(Math.random()-.5)*entryIntensity*5;
+      }
+    }
+    // Cloud layers (40-70%)
+    if(progress>.35&&progress<.75){
+      const cloudAlpha=Math.sin((progress-.35)/.4*Math.PI)*.2;
+      for(let c=0;c<6;c++){
+        const cy2=horizonY-50+c*30;
+        ctx.fillStyle=`rgba(255,255,255,${cloudAlpha*(.3+Math.sin(t+c)*.1)})`;
+        for(let cx2=0;cx2<W;cx2+=60){
+          ctx.beginPath();ctx.ellipse(cx2+Math.sin(c*2+t*.5)*20,cy2,40+Math.random()*20,8+Math.random()*5,0,0,6.283);ctx.fill();
+        }
+      }
+    }
+    // HUD
+    ctx.fillStyle='rgba(94,196,212,.4)';ctx.font=`bold ${Math.max(11,W*.013)}px 'Courier New'`;ctx.textAlign='center';
+    ctx.fillText('◉ ATMOSPHERIC DESCENT — '+(orbitPlanet.name.toUpperCase()),W/2,30);
+    ctx.fillStyle='rgba(94,196,212,.25)';ctx.font=`${Math.max(9,W*.01)}px 'Courier New'`;
+    const alt=Math.max(0,(280*(1-progress))).toFixed(0);
+    const vel=Math.max(0,(800*(1-progress*.7))).toFixed(0);
+    ctx.fillText('ALT: '+alt+' km   VEL: '+vel+' m/s   PHASE: '+(progress<.15?'DEORBIT':progress<.4?'ENTRY':progress<.7?'AEROBRAKE':'FINAL'),W/2,50);
+    // Progress bar
+    ctx.fillStyle='rgba(94,196,212,.06)';ctx.fillRect(W*.2,H-30,W*.6,6);
+    ctx.fillStyle='rgba(46,204,113,.3)';ctx.fillRect(W*.2,H-30,W*.6*progress,6);
+    // Touchdown
+    if(progress>=1){
+      landingPhase='surface';landedOnSurface=true;
+      document.getElementById('land-btn').textContent='◈ Launch to Orbit';
+      document.getElementById('land-btn').classList.remove('active');
+      logComms('Helm','Touchdown confirmed. '+orbitPlanet.name+' surface.');
+      addCrewEntry('Landing struts deployed. Engines powering down.');
+      addCrewEntry('Dr. Tanaka: "We\'re on the surface. This is extraordinary."');
+      panTargetX=0;panTargetY=0;
+    }
+  } else if(landingPhase==='surface'){
+    // Ground level view
+    const horizY=H*.35;
+    // Sky
+    const skyGrad=ctx.createLinearGradient(0,0,0,horizY);
+    skyGrad.addColorStop(0,`hsla(${p.hue+20},30%,8%,1)`);
+    skyGrad.addColorStop(.6,`hsla(${p.hue+10},40%,18%,1)`);
+    skyGrad.addColorStop(1,`hsla(${p.hue},50%,25%,1)`);
+    ctx.fillStyle=skyGrad;ctx.fillRect(0,0,W,horizY);
+    // Ground plane
+    const gndGrad=ctx.createLinearGradient(0,horizY,0,H);
+    gndGrad.addColorStop(0,`hsla(${p.hue},${p.sat}%,28%,1)`);
+    gndGrad.addColorStop(.3,`hsla(${p.hue},${p.sat-5}%,18%,1)`);
+    gndGrad.addColorStop(1,`hsla(${p.hue},${p.sat-10}%,10%,1)`);
+    ctx.fillStyle=gndGrad;ctx.fillRect(0,horizY,W,H-horizY);
+    // Terrain details
+    ctx.strokeStyle=`hsla(${p.hue+10},${p.sat}%,35%,.08)`;ctx.lineWidth=1;
+    for(let i=0;i<20;i++){
+      const tx=i*W*.055;const ty=horizY+10+i*((H-horizY)*.04);
+      ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(tx+W*.04,ty);ctx.stroke();
+    }
+    // Mountains on horizon
+    ctx.fillStyle=`hsla(${p.hue},${p.sat-10}%,20%,.4)`;
+    ctx.beginPath();ctx.moveTo(0,horizY);
+    for(let mx=0;mx<=W;mx+=W*.05){
+      const mh=Math.sin(mx*.003+p.hue)*30+Math.cos(mx*.007)*20;
+      ctx.lineTo(mx,horizY-Math.abs(mh)-10);
+    }
+    ctx.lineTo(W,horizY);ctx.closePath();ctx.fill();
+    // Stars in sky
+    for(let s=0;s<60;s++){
+      const sx=(s*173.7)%W,sy=(s*97.3)%(horizY*.8);
+      ctx.fillStyle=`rgba(200,210,220,${.1+Math.sin(s+t)*.05})`;ctx.fillRect(sx,sy,1,1);
+    }
+    // Away team dots (if deployed)
+    if(awayTeamDeployed){
+      awayTeamMembers.forEach((m,i)=>{
+        const ax=W*.3+i*W*.12+Math.sin(t*.5+i*3)*15;
+        const ay=horizY+40+i*20;
+        ctx.fillStyle='rgba(46,204,113,.5)';ctx.beginPath();ctx.arc(ax,ay,3,0,6.283);ctx.fill();
+        ctx.fillStyle='rgba(46,204,113,.2)';ctx.beginPath();ctx.arc(ax,ay,6+Math.sin(t*2+i)*.5,0,6.283);ctx.fill();
+        ctx.fillStyle='rgba(46,204,113,.3)';ctx.font=`${Math.max(7,W*.008)}px 'Courier New'`;ctx.textAlign='center';
+        ctx.fillText(m.name.split(' ')[1]||m.name,ax,ay+14);
+      });
+    }
+    // Ship shadow/footprint
+    ctx.fillStyle=`hsla(${p.hue},${p.sat}%,15%,.3)`;
+    ctx.beginPath();ctx.ellipse(W*.15,horizY+25,40,8,0,0,6.283);ctx.fill();
+    // HUD
+    ctx.fillStyle='rgba(94,196,212,.4)';ctx.font=`bold ${Math.max(11,W*.013)}px 'Courier New'`;ctx.textAlign='center';
+    ctx.fillText('◉ SURFACE — '+orbitPlanet.name.toUpperCase(),W/2,30);
+    ctx.fillStyle='rgba(94,196,212,.2)';ctx.font=`${Math.max(9,W*.01)}px 'Courier New'`;
+    ctx.fillText('GRAVITY: '+p.data.gravity+'   TEMP: '+p.data.temp+'   ATMO: '+(p.data.breathable?'BREATHABLE':'HOSTILE'),W/2,50);
+  }
+  return true;
+}
+document.getElementById('land-btn').addEventListener('click',()=>{
+  if(!orbitMode||!orbitPlanet)return;
+  if(landedOnSurface){
+    // Launch back to orbit
+    landingActive=false;landingPhase='idle';landedOnSurface=false;landingT=0;
+    document.getElementById('land-btn').textContent='◈ Begin Landing';
+    document.getElementById('land-btn').classList.remove('active');
+    logComms('Helm','Launch sequence complete. Returning to orbit.');
+    addCrewEntry('Engines firing. Lifting off from '+orbitPlanet.name+'.');
+  } else if(!landingActive){
+    startLandingSequence();
+  }
+  if(engaged)clickSound();
+});
 
 // === AWAY TEAM ===
 let awayTeamDeployed=false,awayTeamMembers=[],awayAnimFrame=0;
@@ -10490,7 +11215,11 @@ function draw(now){
   // ORBIT MODE — render orbital view instead of starfield
   let flareTarget=0;
   if(orbitMode&&orbitPlanet){
-    drawOrbit(ctx,W,H,t);
+    if(landingActive||landedOnSurface){
+      drawLanding(ctx,W,H,t);
+    } else {
+      drawOrbit(ctx,W,H,t);
+    }
     // Skip normal starfield but still do overlays
     // Jump to end of space rendering
   } else {
