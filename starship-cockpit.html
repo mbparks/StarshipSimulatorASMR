@@ -801,7 +801,7 @@ canvas#c{position:fixed;inset:0;z-index:0}
 .cargo-env-item{flex:1;text-align:center;padding:4px;border:1px solid rgba(94,196,212,.06);border-radius:2px}
 .cargo-env-label{font-size:clamp(8px,.7vw,10px);color:#5a8a9a;letter-spacing:1px;text-transform:uppercase}
 .cargo-env-val{font-size:clamp(10px,.9vw,13px);color:#5ec4d4;font-weight:bold}
-.cargo-mini{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:18;width:clamp(400px,42vw,580px);background:rgba(6,10,14,.96);border:1px solid rgba(212,160,60,.2);border-radius:5px;display:none;pointer-events:auto}
+.cargo-mini{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:18;width:clamp(450px,48vw,650px);max-height:85vh;background:rgba(6,10,14,.96);border:1px solid rgba(212,160,60,.2);border-radius:5px;display:none;pointer-events:auto;overflow-y:auto}
 .cargo-mini.show{display:block}
 .cargo-mini-header{padding:10px 14px;border-bottom:1px solid rgba(212,160,60,.1);display:flex;justify-content:space-between;align-items:center}
 .cargo-mini-header .cm-title{font-size:clamp(10px,.9vw,13px);color:#d4a03c;letter-spacing:3px;text-transform:uppercase}
@@ -1423,6 +1423,7 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
   <div class="sg-row" data-sys="sens"><div class="sg-name">Sensors</div><div class="sg-status"><div class="sg-dot ok" id="sg-sens-dot"></div><span style="color:#2ecc71" id="sg-sens">Active</span></div></div>
   <div class="sg-row" data-sys="comms"><div class="sg-name">Comms Array</div><div class="sg-status"><div class="sg-dot ok" id="sg-comms-dot"></div><span style="color:#2ecc71" id="sg-comms">Linked</span></div></div>
   <div class="sg-row" data-sys="defl"><div class="sg-name">Deflectors</div><div class="sg-status"><div class="sg-dot ok" id="sg-defl-dot"></div><span style="color:#2ecc71" id="sg-defl">Online</span></div></div>
+  <div class="sg-row" data-sys="wpn"><div class="sg-name">Weapons</div><div class="sg-status"><div class="sg-dot ok" id="sg-wpn-dot"></div><span style="color:#2ecc71" id="sg-wpn">Armed</span></div></div>
   <div class="sg-row" data-sys="cool"><div class="sg-name">Coolant</div><div class="sg-status"><div class="sg-dot warn" id="sg-cool-dot"></div><span id="sg-cool" style="color:#d4a03c">Low Press</span></div></div>
 </div>
 
@@ -1491,7 +1492,7 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
   <button class="scr-btn" data-screen="power">Power</button>
   <button class="scr-btn" data-screen="watch" style="border-color:rgba(212,160,60,.2);color:#d4a03c">Watch</button>
   <button class="scr-btn" data-screen="weapons" style="border-color:rgba(231,76,60,.2);color:#e74c3c">Wpns</button>
-  <button class="scr-btn" data-screen="shuttle" style="border-color:rgba(94,196,212,.25)">Bay</button>
+  <button class="scr-btn" data-screen="shuttle" style="border-color:rgba(94,196,212,.25)">Shuttle</button>
   <button class="scr-btn" data-screen="cargo" style="border-color:rgba(212,160,60,.2);color:#d4a03c">Cargo</button>
   <button class="scr-btn" data-screen="science" style="border-color:rgba(180,120,255,.2);color:#b478ff">Sci</button>
   <button class="scr-btn" id="orbit-toggle" style="border-color:rgba(100,180,255,.2);color:#64b4ff">Orbit</button>
@@ -4151,6 +4152,10 @@ const engSystems=[
    tuning:.5,alertAmber:70,alertRed:50,viewMode:"live",expanded:false,restarting:false,bypassed:false,
    bypassInfo:'Compensate via port thruster differential — reduced maneuverability',
    components:['Fuel Injector','Ignition Chamber','Nozzle Assembly','Gimbal Actuator','Thrust Vector Control','Fuel Line','Temperature Sensor','Emergency Cutoff']},
+  {id:'weapons',label:'Weapons Array',color:'#e74c3c',data:[],laserData:[],torpData:[],targetData:[],val:()=>94+Math.random()*6,unit:'%',
+   tuning:.5,alertAmber:70,alertRed:50,viewMode:"live",expanded:false,restarting:false,bypassed:false,
+   bypassInfo:'Reroute through shield emitters — 30% power, shields compromised',
+   components:['Laser Emitter Bank','Targeting Computer','Torpedo Loading Mechanism','Warhead Magazine','Power Coupling','Firing Circuit','Coolant Jacket','Safety Interlock']},
 ];
 const engMaintHistory=[];
 let engAnimFrame=0,engTimeWindow=60; // samples to show
@@ -4195,6 +4200,17 @@ setInterval(()=>{
       if(s.stbdData.length>300)s.stbdData.shift();
       if(s.aftData.length>300)s.aftData.shift();
     }
+    // Track weapons subsystems
+    if(s.id==='weapons'){
+      const n=performance.now()*.001;
+      s.laserData.push(Math.max(0,Math.min(100,wpnHeat*100+Math.random()*3)));
+      const torpLoaded=typeof wpnTorpedoes!=='undefined'?wpnTorpedoes:8;
+      s.torpData.push(Math.min(100,torpLoaded/8*100));
+      s.targetData.push(Math.max(0,Math.min(100,v*.9+Math.sin(n*.6)*3+Math.random()*2)));
+      if(s.laserData.length>300)s.laserData.shift();
+      if(s.torpData.length>300)s.torpData.shift();
+      if(s.targetData.length>300)s.targetData.shift();
+    }
   });
 },1000);
 
@@ -4230,6 +4246,7 @@ function renderEngineering(){
           <button class="eng-sm-btn" data-action="expand" data-idx="${si}">${s.expanded?'▲ Collapse':'▼ Details'}</button>
           <button class="eng-sm-btn" data-action="restart" data-idx="${si}" ${s.restarting?'disabled':''}>↻ Restart</button>
           <button class="eng-sm-btn" data-action="deepdiag" data-idx="${si}">◈ Deep Diag</button>
+          <button class="eng-sm-btn" data-action="pmcheck" data-idx="${si}">☑ PM Check</button>
           ${isDegraded||isCritical?`<button class="eng-sm-btn warn-btn" data-action="bypass" data-idx="${si}">${s.bypassed?'✕ End Bypass':'⤮ Bypass'}</button>`:''}
         </div>
       </div>
@@ -4283,6 +4300,7 @@ function renderEngineering(){
       if(action==='expand'){engSystems[idx].expanded=!engSystems[idx].expanded;renderEngineering()}
       if(action==='restart')restartSystem(idx);
       if(action==='deepdiag')startDeepDiagnostic(idx);
+      if(action==='pmcheck')openPMChecklist(idx);
       if(action==='bypass'){engSystems[idx].bypassed=!engSystems[idx].bypassed;
         addEngMaintEntry(engSystems[idx].label,engSystems[idx].bypassed?'Bypass Engaged':'Bypass Disengaged',engSystems[idx].bypassInfo);
         logComms('Engineering',engSystems[idx].label+' '+(engSystems[idx].bypassed?'bypass engaged: '+engSystems[idx].bypassInfo:'bypass disengaged.'));
@@ -4336,6 +4354,7 @@ function drawEngGraph(id,data,color,amber,red){
     if(id==='lifesup') drawLifeSupportHistory(cx,cv.width,cv.height,data,sys);
     else if(id==='reactor') drawReactorHistory(cx,cv.width,cv.height,data,sys);
     else if(id==='shields') drawShieldHistory(cx,cv.width,cv.height,data,sys);
+    else if(id==='weapons') drawWeaponsHistory(cx,cv.width,cv.height,data,sys);
     else drawFallbackGraph(cx,cv.width,cv.height,data,color,amber,red);
     return;
   }
@@ -4347,6 +4366,7 @@ function drawEngGraph(id,data,color,amber,red){
   else if(id==='lifesup') drawLifeSupportBars(cx,cv.width,cv.height,val,n);
   else if(id==='port_thruster') drawTachometer(cx,cv.width,cv.height,val,n,'PORT');
   else if(id==='stbd_thruster') drawTachometer(cx,cv.width,cv.height,val,n,'STBD');
+  else if(id==='weapons') drawWeaponsGauge(cx,cv.width,cv.height,val,n);
   else drawFallbackGraph(cx,cv.width,cv.height,data,color,amber,red);
 }
 
@@ -4805,6 +4825,118 @@ function drawShieldHistory(cx,w,h,mainData,sys){
     {data:sys.portData.slice(-showN),color:'rgba(46,204,113,',label:'PORT'},
     {data:sys.stbdData.slice(-showN),color:'rgba(212,160,60,',label:'STBD'},
     {data:sys.aftData.slice(-showN),color:'rgba(231,76,60,',label:'AFT'},
+  ];
+  drawMultiLineHistory(cx,w,h,channels);
+}
+
+// Weapons Array — unique live gauge
+function drawWeaponsGauge(cx,w,h,val,n){
+  const sys=engSystems.find(s=>s.id==='weapons');
+  const laserHeat=sys&&sys.laserData.length?sys.laserData[sys.laserData.length-1]:0;
+  const torpPct=sys&&sys.torpData.length?sys.torpData[sys.torpData.length-1]:100;
+  const targAcc=sys&&sys.targetData.length?sys.targetData[sys.targetData.length-1]:95;
+  const torpLoaded=Math.round(torpPct/100*8);
+
+  // === LEFT: Targeting reticle ===
+  const rX=h*.45,rY=h*.5,rR=h*.32;
+  // Outer ring
+  cx.strokeStyle='rgba(231,76,60,.25)';cx.lineWidth=2;
+  cx.beginPath();cx.arc(rX,rY,rR,0,6.283);cx.stroke();
+  // Inner rings
+  cx.strokeStyle='rgba(231,76,60,.1)';cx.lineWidth=1;
+  cx.beginPath();cx.arc(rX,rY,rR*.65,0,6.283);cx.stroke();
+  cx.beginPath();cx.arc(rX,rY,rR*.3,0,6.283);cx.stroke();
+  // Crosshair
+  cx.strokeStyle='rgba(231,76,60,.2)';cx.lineWidth=1;
+  cx.beginPath();cx.moveTo(rX-rR,rY);cx.lineTo(rX+rR,rY);cx.stroke();
+  cx.beginPath();cx.moveTo(rX,rY-rR);cx.lineTo(rX,rY+rR);cx.stroke();
+  // Rotating scan line
+  const scanA=n*1.5;
+  cx.strokeStyle='rgba(231,76,60,.15)';cx.lineWidth=1.5;
+  cx.beginPath();cx.moveTo(rX,rY);cx.lineTo(rX+Math.cos(scanA)*rR,rY+Math.sin(scanA)*rR);cx.stroke();
+  // Accuracy jitter dot
+  const jitter=(100-targAcc)/100;
+  const dotX=rX+Math.sin(n*5)*rR*jitter*.3;
+  const dotY=rY+Math.cos(n*7)*rR*jitter*.3;
+  cx.fillStyle=targAcc>90?'rgba(46,204,113,.6)':targAcc>75?'rgba(212,160,60,.6)':'rgba(231,76,60,.6)';
+  cx.beginPath();cx.arc(dotX,dotY,3,0,6.283);cx.fill();
+  cx.fillStyle=targAcc>90?'rgba(46,204,113,.1)':targAcc>75?'rgba(212,160,60,.1)':'rgba(231,76,60,.1)';
+  cx.beginPath();cx.arc(dotX,dotY,8,0,6.283);cx.fill();
+  // Label
+  cx.fillStyle='rgba(231,76,60,.35)';cx.font=`${Math.max(8,w*.014)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillText('TARGETING',rX,rY+rR+12);
+  cx.fillText(targAcc.toFixed(0)+'%',rX,rY+rR+24);
+
+  // === CENTER: Laser heat arc gauge ===
+  const hX=w*.42,hY=h*.5,hR=h*.28;
+  const heatPct=laserHeat/100;
+  // Background arc
+  cx.strokeStyle='rgba(231,76,60,.08)';cx.lineWidth=8;
+  cx.beginPath();cx.arc(hX,hY,hR,Math.PI*.75,Math.PI*2.25);cx.stroke();
+  // Heat fill arc
+  const heatAngle=Math.PI*.75+heatPct*Math.PI*1.5;
+  const heatColor=heatPct>.8?'rgba(231,76,60,.6)':heatPct>.5?'rgba(212,160,60,.5)':'rgba(46,204,113,.4)';
+  cx.strokeStyle=heatColor;cx.lineWidth=8;
+  cx.beginPath();cx.arc(hX,hY,hR,Math.PI*.75,heatAngle);cx.stroke();
+  // Tick marks
+  for(let t=0;t<=10;t++){
+    const ta=Math.PI*.75+t*.15*Math.PI;
+    cx.strokeStyle='rgba(231,76,60,.1)';cx.lineWidth=1;
+    cx.beginPath();cx.moveTo(hX+Math.cos(ta)*(hR-12),hY+Math.sin(ta)*(hR-12));
+    cx.lineTo(hX+Math.cos(ta)*(hR+2),hY+Math.sin(ta)*(hR+2));cx.stroke();
+  }
+  // Center value
+  cx.fillStyle=heatColor;cx.font=`bold ${Math.max(12,w*.022)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillText(laserHeat.toFixed(0)+'°',hX,hY+4);
+  cx.fillStyle='rgba(231,76,60,.3)';cx.font=`${Math.max(8,w*.014)}px 'Courier New'`;
+  cx.fillText('LASER HEAT',hX,hY+hR+12);
+  // Overheat warning
+  if(laserHeat>80){cx.fillStyle=`rgba(231,76,60,${.3+Math.sin(n*5)*.2})`;cx.font=`bold ${Math.max(8,w*.012)}px 'Courier New'`;cx.fillText('⚠ OVERHEAT',hX,hY-hR-6)}
+
+  // === RIGHT: Torpedo rack ===
+  const tX=w*.68,tY=h*.2,tW=w*.06,tH=h*.07;
+  cx.fillStyle='rgba(231,76,60,.25)';cx.font=`${Math.max(8,w*.014)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillText('TORPEDO BAY',tX+tW*2,tY-8);
+  for(let ti=0;ti<8;ti++){
+    const row=ti%4,col=Math.floor(ti/4);
+    const tx=tX+col*(tW+4),ty=tY+row*(tH+3);
+    const loaded=ti<torpLoaded;
+    cx.fillStyle=loaded?'rgba(46,204,113,.15)':'rgba(40,20,20,.3)';cx.fillRect(tx,ty,tW,tH);
+    cx.strokeStyle=loaded?'rgba(46,204,113,.3)':'rgba(231,76,60,.1)';cx.lineWidth=1;cx.strokeRect(tx,ty,tW,tH);
+    // Warhead shape inside
+    if(loaded){
+      cx.fillStyle='rgba(46,204,113,.25)';
+      cx.beginPath();cx.moveTo(tx+tW*.2,ty+tH*.5);cx.lineTo(tx+tW*.8,ty+tH*.3);cx.lineTo(tx+tW*.8,ty+tH*.7);cx.closePath();cx.fill();
+    }
+    // Tube number
+    cx.fillStyle=loaded?'rgba(46,204,113,.3)':'rgba(231,76,60,.15)';cx.font=`${Math.max(6,w*.01)}px 'Courier New'`;cx.textAlign='center';
+    cx.fillText(''+(ti+1),tx+tW/2,ty+tH+10);
+  }
+  cx.fillStyle='rgba(46,204,113,.3)';cx.font=`${Math.max(8,w*.014)}px 'Courier New'`;
+  cx.fillText(torpLoaded+' / 8',tX+tW*2,tY+4*(tH+3)+16);
+
+  // === FAR RIGHT: Readout panel ===
+  const pX=w*.82,pFS=Math.max(8,w*.013);
+  const rows=[
+    {label:'STATUS',val:val>90?'ONLINE':val>70?'DEGRADED':'CRITICAL',color:val>90?'#4cdf80':val>70?'#e8a840':'#ef5350'},
+    {label:'READINESS',val:val.toFixed(0)+'%',color:'#e74c3c'},
+    {label:'LASER PWR',val:(70+Math.sin(n*.3)*10).toFixed(0)+' MW',color:'#e74c3c'},
+    {label:'TGT LOCK',val:wpnLockedTarget?'LOCKED':'STANDBY',color:wpnLockedTarget?'#ef5350':'#5a4a6a'},
+    {label:'COOLANT',val:laserHeat<30?'NOMINAL':'STRESSED',color:laserHeat<30?'#4cdf80':'#e8a840'},
+  ];
+  rows.forEach((r,i)=>{
+    cx.fillStyle='rgba(231,76,60,.15)';cx.font=`${pFS}px 'Courier New'`;cx.textAlign='start';
+    cx.fillText(r.label,pX,h*.15+i*(pFS+8));
+    cx.fillStyle=r.color;cx.textAlign='end';
+    cx.fillText(r.val,w-6,h*.15+i*(pFS+8));
+  });
+}
+
+function drawWeaponsHistory(cx,w,h,data,sys){
+  const channels=[
+    {label:'Laser Heat',data:sys.laserData,color:'rgba(231,76,60,'},
+    {label:'Torpedoes',data:sys.torpData,color:'rgba(46,204,113,'},
+    {label:'Targeting',data:sys.targetData,color:'rgba(212,160,60,'},
   ];
   drawMultiLineHistory(cx,w,h,channels);
 }
@@ -5942,6 +6074,9 @@ const maintSystems=[
   {id:'lifesupport',name:'Air Recycler',sgDot:'sg-life-dot',sgText:'sg-life',
    steps:['Replace carbon filter','Purge intake manifold','Calibrate O₂ mix ratio','Verify atmospheric output'],
    effect:()=>{o2Val=Math.max(65,o2Val-15)},recover:()=>{o2Val=Math.min(99,o2Val+15)}},
+  {id:'weapons',name:'Weapons Array',sgDot:'sg-wpn-dot',sgText:'sg-wpn',
+   steps:['Realign targeting optics','Flush laser coolant jacket','Cycle torpedo loading mechanism','Verify firing circuit integrity'],
+   effect:()=>{if(typeof wpnHeat!=='undefined')wpnHeat=.6},recover:()=>{if(typeof wpnHeat!=='undefined')wpnHeat=0}},
 ];
 let activeMaint=null,maintEscalateTimer=null,maintIgnoreCount=0;
 
@@ -6019,7 +6154,7 @@ document.getElementById('maint-repair-btn').addEventListener('click',()=>{
 
 // REPAIR SYSTEM — Unique puzzle per system type
 const puzzleTypes={
-  coolant:'leak',thruster:'bolt',sensors:'freq',deflectors:'sequence',comms:'wire',lifesupport:'thermal'
+  coolant:'leak',thruster:'bolt',sensors:'freq',deflectors:'sequence',comms:'wire',lifesupport:'thermal',weapons:'freq'
 };
 let repairFailCount=0;
 
@@ -9643,6 +9778,132 @@ function scheduleSignalPhase(){
   },baseDelay);
 }
 scheduleSignalPhase();
+
+// === PREVENTATIVE MAINTENANCE CHECKLIST ===
+const pmSchedule={
+  reactor:{
+    daily:['Verify plasma containment field integrity','Check reactor coolant temperature differential','Inspect neutron flux monitor readings','Log fuel rod consumption rate','Confirm emergency shutdown circuit test'],
+    weekly:['Calibrate magnetic confinement coils','Flush primary plasma injector lines','Test backup power routing','Inspect heat exchanger fouling levels','Run containment field harmonic analysis'],
+    monthly:['Replace neutron moderator rods (if >80% depleted)','Deep clean plasma injector nozzles','Full spectrum radiation leak scan','Recalibrate fuel rod assembly alignment','Stress test emergency shutoff valves'],
+    quarterly:['Magnetic coil rewind inspection','Containment field generator overhaul','Replace heat exchanger gaskets','Full reactor power curve calibration','Backup fusion cell charge verification'],
+    yearly:['Complete fuel rod assembly replacement','Plasma chamber interior inspection (cold shutdown required)','Magnetic confinement coil replacement','Control matrix firmware update','Full reactor certification — UESA compliance']
+  },
+  coolant:{
+    daily:['Check coolant pressure at all 4 monitoring points','Verify flow rate within ±5% of nominal','Inspect for visible leaks at pipe junctions','Log coolant temperature at inlet/outlet','Confirm pump vibration within tolerance'],
+    weekly:['Flush coolant filter screen','Test pressure relief valve operation','Calibrate flow sensors','Inspect expansion tank level','Check pump bearing temperature'],
+    monthly:['Replace coolant filter element','Coolant chemistry analysis (pH, conductivity, particulate)','Inspect all pipe joints for micro-fractures','Test backup pump switchover','Clean heat sink array fins'],
+    quarterly:['Full coolant flush and refill','Replace pump shaft seals','Pressure test loop to 150% operating pressure','Inspect loop seal integrity','Recalibrate all temperature probes'],
+    yearly:['Replace primary pump assembly','Full pipe network ultrasonic inspection','Heat sink array replacement','Expansion valve rebuild','Loop integrity certification']
+  },
+  hull:{
+    daily:['Review hull stress sensor telemetry','Check external pressure readings','Monitor micro-fracture detection grid','Verify radiation shielding levels','Log any impact events from debris'],
+    weekly:['Run automated hull plate stress scan','Inspect pressure seal status on all airlocks','Check thermal insulation readings','Test emergency patch kit readiness','Review micro-meteorite impact log'],
+    monthly:['Full hull plate ultrasonic thickness check','Inspect airlock seals for wear','Test emergency bulkhead closure (each section)','Recalibrate stress sensors','Check radiation shield degradation'],
+    quarterly:['External hull visual inspection (drone survey)','Replace worn pressure seals','Full fracture grid diagnostic','Test emergency hull patch deployment','Structural flex analysis under simulated load'],
+    yearly:['Hull plate replacement (any below 85% thickness)','Complete structural integrity certification','Radiation shielding replacement','Full airlock mechanism overhaul','UESA hull safety compliance audit']
+  },
+  shields:{
+    daily:['Verify shield output on all 4 emitters','Check power coupling voltage stability','Test shield frequency modulation range','Log shield recharge rate after drain test','Confirm backup capacitor charge level'],
+    weekly:['Calibrate emitter alignment (all quadrants)','Test rapid frequency cycling','Inspect power coupling connections','Run shield harmonic balance check','Verify emergency shield boost circuit'],
+    monthly:['Full emitter crystal inspection','Replace degraded frequency generator elements','Deep calibrate field stabilizer','Test shield overload protection','Run full-spectrum shield penetration analysis'],
+    quarterly:['Emitter crystal replacement (if output <90%)','Power coupling refurbishment','Field stabilizer overhaul','Full shield coverage mapping','Backup capacitor replacement'],
+    yearly:['Complete emitter array replacement','Shield generator core inspection','Power distribution overhaul','Full shield certification — combat readiness','Frequency generator replacement']
+  },
+  lifesup:{
+    daily:['Verify O₂ output at all deck vents','Check CO₂ levels at 6 monitoring points','Log humidity readings','Confirm air circulation fan operation','Test emergency O₂ backup valve'],
+    weekly:['Replace pre-filters on air intakes','Calibrate O₂/CO₂ sensors','Clean air circulation fan blades','Check water recycler output quality','Inspect temperature regulation actuators'],
+    monthly:['Replace carbon scrubber cartridges','Full air quality analysis (particulates, VOCs, pathogens)','Clean humidity control condensers','Inspect water recycler membranes','Test backup O₂ tank pressure and valve'],
+    quarterly:['O₂ generator electrode inspection','Deep clean entire air duct network','Water recycler membrane replacement','Pressure equalizer calibration','Replace temperature regulation elements'],
+    yearly:['O₂ generator overhaul','Complete ductwork inspection and sealing','Water recycler system rebuild','Full environmental certification — crew safety','Replace all sensors and probes']
+  },
+  port_thruster:{
+    daily:['Check fuel injector spray pattern','Monitor ignition chamber temperature','Verify gimbal actuator response time','Log thrust output vs commanded','Confirm emergency cutoff circuit'],
+    weekly:['Clean fuel injector nozzles','Calibrate thrust vector control','Test gimbal full range of motion','Inspect fuel line fittings','Check vibration dampener mounts'],
+    monthly:['Replace fuel line filters','Inspect ignition chamber lining','Nozzle assembly throat measurement','Full gimbal actuator lubrication','Run thrust calibration curve'],
+    quarterly:['Ignition chamber lining replacement (if eroded)','Fuel injector assembly rebuild','Gimbal actuator bearing replacement','Thrust vector control system overhaul','Full thrust certification test'],
+    yearly:['Complete thruster overhaul','Nozzle assembly replacement','Fuel line replacement','Ignition system rebuild','UESA propulsion certification']
+  },
+  stbd_thruster:{
+    daily:['Check fuel injector spray pattern','Monitor ignition chamber temperature','Verify gimbal actuator response time','Log thrust output vs commanded','Confirm emergency cutoff circuit'],
+    weekly:['Clean fuel injector nozzles','Calibrate thrust vector control','Test gimbal full range of motion','Inspect fuel line fittings','Check vibration dampener mounts'],
+    monthly:['Replace fuel line filters','Inspect ignition chamber lining','Nozzle assembly throat measurement','Full gimbal actuator lubrication','Run thrust calibration curve'],
+    quarterly:['Ignition chamber lining replacement (if eroded)','Fuel injector assembly rebuild','Gimbal actuator bearing replacement','Thrust vector control system overhaul','Full thrust certification test'],
+    yearly:['Complete thruster overhaul','Nozzle assembly replacement','Fuel line replacement','Ignition system rebuild','UESA propulsion certification']
+  },
+  weapons:{
+    daily:['Verify laser emitter alignment','Check targeting computer calibration drift','Confirm torpedo magazine temperature','Test firing circuit continuity','Log coolant jacket temperature'],
+    weekly:['Clean laser emitter optics','Run targeting computer diagnostic','Inspect torpedo loading mechanism','Check warhead magazine humidity','Test safety interlock sequence'],
+    monthly:['Laser emitter crystal inspection','Full targeting computer recalibration','Torpedo loading mechanism lubrication','Power coupling impedance test','Replace coolant jacket fluid'],
+    quarterly:['Laser emitter crystal replacement (if output <92%)','Targeting computer firmware update','Torpedo loading rail replacement','Firing circuit relay inspection','Full weapons accuracy certification'],
+    yearly:['Complete laser emitter bank overhaul','Targeting computer hardware replacement','Torpedo magazine inspection and refit','Full weapons system certification — combat readiness','Safety interlock mechanism rebuild']
+  }
+};
+// Track completion state per system
+let pmChecked={};
+function getPMKey(sysId,freq,taskIdx){return sysId+'_'+freq+'_'+taskIdx}
+
+function openPMChecklist(sysIdx){
+  const sys=engSystems[sysIdx];
+  const schedule=pmSchedule[sys.id];
+  if(!schedule)return;
+  const mini=document.getElementById('cargo-mini');const body=document.getElementById('cargo-mini-body');
+  document.getElementById('cargo-mini-title').textContent='PM Checklist — '+sys.label;
+  const freqs=['daily','weekly','monthly','quarterly','yearly'];
+  const freqLabels={daily:'Daily',weekly:'Weekly',monthly:'Monthly',quarterly:'Quarterly',yearly:'Yearly'};
+  const freqColors={daily:'#4cdf80',weekly:'#5ec4d4',monthly:'#d4a03c',quarterly:'#b478ff',yearly:'#e74c3c'};
+  const freqIcons={daily:'◉',weekly:'◈',monthly:'◆',quarterly:'★',yearly:'▲'};
+  let html='<div style="max-height:70vh;overflow-y:auto;padding-right:6px">';
+  freqs.forEach(freq=>{
+    const tasks=schedule[freq];if(!tasks)return;
+    const completedCount=tasks.filter((_,ti)=>pmChecked[getPMKey(sys.id,freq,ti)]).length;
+    const allDone=completedCount===tasks.length;
+    html+=`<div style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid ${freqColors[freq]}20">
+        <span style="color:${freqColors[freq]};font-size:clamp(12px,1.1vw,15px);letter-spacing:2px;font-weight:bold">${freqIcons[freq]} ${freqLabels[freq].toUpperCase()}</span>
+        <span style="color:${allDone?'#4cdf80':freqColors[freq]};font-size:clamp(10px,.9vw,13px)">${completedCount}/${tasks.length}${allDone?' ✓':''}</span>
+      </div>`;
+    tasks.forEach((task,ti)=>{
+      const key=getPMKey(sys.id,freq,ti);
+      const checked=pmChecked[key];
+      html+=`<div class="pm-task" data-key="${key}" style="display:flex;align-items:flex-start;gap:10px;padding:8px 4px;cursor:pointer;border-bottom:1px solid rgba(94,196,212,.03);transition:background .2s;${checked?'opacity:.5':''}">
+        <span style="color:${checked?'#4cdf80':'#3a5a6a'};font-size:clamp(13px,1.2vw,16px);flex-shrink:0;margin-top:1px">${checked?'☑':'☐'}</span>
+        <span style="color:${checked?'#5a8a7a':'#8ab0c0'};font-size:clamp(11px,1vw,14px);line-height:1.6">${task}</span>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  // Summary
+  const totalTasks=freqs.reduce((s,f)=>(schedule[f]?s+schedule[f].length:s),0);
+  const totalChecked=freqs.reduce((s,f)=>{if(!schedule[f])return s;return s+schedule[f].filter((_,ti)=>pmChecked[getPMKey(sys.id,f,ti)]).length},0);
+  html+=`<div style="text-align:center;padding:12px 0;border-top:1px solid rgba(94,196,212,.06)">
+    <span style="color:${totalChecked===totalTasks?'#4cdf80':'#8ab0c0'};font-size:clamp(12px,1.1vw,15px)">${totalChecked} / ${totalTasks} tasks complete</span>
+    ${totalChecked===totalTasks?'<div style="color:#4cdf80;font-size:clamp(11px,1vw,14px);margin-top:6px">✓ All preventative maintenance current — system certified</div>':''}
+    <button class="sci-btn" id="pm-reset-btn" style="margin-top:12px;border-color:rgba(231,76,60,.2);color:#e74c3c;width:auto;padding:6px 16px;font-size:clamp(10px,.9vw,12px)">Reset Checklist</button>
+  </div>`;
+  html+='</div>';
+  body.innerHTML=html;
+  mini.classList.add('show');
+  // Click handlers for task checkboxes
+  body.querySelectorAll('.pm-task').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const key=el.dataset.key;
+      pmChecked[key]=!pmChecked[key];
+      openPMChecklist(sysIdx);// Re-render
+      if(pmChecked[key]){
+        const taskText=el.querySelector('span:last-child').textContent;
+        addEngMaintEntry(sys.label,'PM',taskText);
+      }
+      if(engaged)clickSound();
+    });
+  });
+  // Reset button
+  document.getElementById('pm-reset-btn').addEventListener('click',()=>{
+    freqs.forEach(f=>{if(schedule[f])schedule[f].forEach((_,ti)=>{delete pmChecked[getPMKey(sys.id,f,ti)]})});
+    openPMChecklist(sysIdx);
+    if(engaged)clickSound();
+  });
+  if(engaged)clickSound();
+}
 
 // === DEEP DIAGNOSTIC ===
 function startDeepDiagnostic(sysIdx){
