@@ -2047,8 +2047,14 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
 <div class="science-layout">
   <div class="science-main">
     <div class="sci-header"><span class="sh-title">◈ Science Station</span><button class="pwr-close" id="science-close">Close</button></div>
-    <div class="sci-tabs" id="sci-tabs">
-      <button class="sci-tab active" data-sci="spectral">Spectral Analysis</button>
+    <div class="sci-tabs" id="sci-tabs" style="flex-wrap:wrap">
+      <button class="sci-tab active" data-sci="spectral">Spectral</button>
+      <button class="sci-tab" data-sci="molecular">Molecular</button>
+      <button class="sci-tab" data-sci="signal">Signal Decoder</button>
+      <button class="sci-tab" data-sci="cartography">Cartography</button>
+      <button class="sci-tab" data-sci="wormhole">Wormhole</button>
+      <button class="sci-tab" data-sci="solar">Solar Obs</button>
+      <button class="sci-tab" data-sci="subspace">Subspace</button>
     </div>
     <div class="sci-body"><canvas id="sci-cv"></canvas></div>
   </div>
@@ -3100,6 +3106,7 @@ let flareOpacity=0;
 // === THROTTLE ===
 document.getElementById('throttle').addEventListener('input',e=>{
   throttle=e.target.value/100;
+  fcThrottle=parseFloat(e.target.value);
   // Shift engine pitch
   for(const eh of engineOscs){
     eh.osc.frequency.setTargetAtTime(eh.baseFreq*(.7+throttle*.6),audioCtx?audioCtx.currentTime:0,.1);
@@ -8217,7 +8224,7 @@ document.getElementById('emer-thrust').addEventListener('click',()=>{
 
 // === HELM CONTROLS — VISUAL FLIGHT CONTROLLER ===
 let flightYaw=0,flightPitch=0,flightRoll=0,courseMark=0;
-let fcJoyX=0,fcJoyY=0,fcThrottle=50,fcDragging=null;
+let fcJoyX=0,fcJoyY=0,fcThrottle=30,fcDragging=null;
 const fcCanvas=document.getElementById('fc-canvas');
 const fcCtx=fcCanvas?fcCanvas.getContext('2d'):null;
 let fcAnimFrame=0;
@@ -8390,9 +8397,6 @@ function drawFlightController(){
   document.getElementById('fc-roll-val').textContent='R: '+flightRoll.toFixed(1)+'°';
   document.getElementById('fc-thr-val').textContent='THR: '+Math.round(fcThrottle)+'%';
 
-  // Sync throttle slider
-  const thrEl=document.getElementById('throttle');if(thrEl)thrEl.value=fcThrottle;
-
   fcAnimFrame=requestAnimationFrame(drawFlightController);
 }
 
@@ -8461,6 +8465,8 @@ setInterval(()=>{
   panTargetX=flightYaw*12;panTargetY=flightPitch*10;
   hudHeading=(hudHeading+flightYaw*.002+360)%360;
   throttle=fcThrottle/100;
+  const thrSlider=document.getElementById('throttle');
+  if(thrSlider&&parseFloat(thrSlider.value)!==Math.round(fcThrottle))thrSlider.value=Math.round(fcThrottle);
 },33);
 
 // Start drawing when flight panel opens
@@ -9912,6 +9918,7 @@ function startAnomalyInvestigation(){
       const roll=Math.random();
       if(roll<.3){
         logComms('Science','★ Discovery! Anomaly contains a stable wormhole aperture. Mapping coordinates.');
+        if(typeof wormholeDiscovered!=='undefined')wormholeDiscovered=true;
         addDiscovery('anomaly','Stable wormhole aperture detected — potential shortcut to uncharted space. Coordinates logged.');
         addCrewEntry('Dr. Tanaka: "This changes everything. A stable wormhole!"');
       } else if(roll<.55){
@@ -10662,13 +10669,455 @@ document.getElementById('science-close').addEventListener('click',()=>{
   if(engaged)clickSound();
 });
 document.getElementById('sci-run-btn').addEventListener('click',()=>{
-  if(sciSelectedSample!==null)runSpectralAnalysis(sciSelectedSample);
+  if(sciActiveTab==='spectral'&&sciSelectedSample!==null)runSpectralAnalysis(sciSelectedSample);
   if(engaged)clickSound();
 });
 document.getElementById('sci-clear-btn').addEventListener('click',()=>{
   document.getElementById('sci-results').innerHTML='No analysis run yet.';
   drawSciIdle();if(engaged)clickSound();
 });
+
+// === SCIENCE TAB SWITCHING ===
+document.getElementById('sci-tabs').addEventListener('click',e=>{
+  const tab=e.target.closest('.sci-tab');if(!tab)return;
+  sciActiveTab=tab.dataset.sci;
+  document.querySelectorAll('.sci-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  cancelAnimationFrame(sciAnimFrame);
+  // Update sidebar for tab
+  const runBtn=document.getElementById('sci-run-btn');
+  const queueEl=document.getElementById('sci-queue');
+  if(sciActiveTab==='spectral'){runBtn.style.display='';runBtn.textContent='◈ Run Analysis';initScienceStation()}
+  else if(sciActiveTab==='molecular'){runBtn.style.display='';runBtn.textContent='◈ Visualize';renderSciQueue();drawMolecular()}
+  else if(sciActiveTab==='signal'){runBtn.style.display='';runBtn.textContent='◈ Decode Signal';drawSignalDecoder()}
+  else if(sciActiveTab==='cartography'){runBtn.style.display='none';drawCartography()}
+  else if(sciActiveTab==='wormhole'){runBtn.style.display='';runBtn.textContent='◈ Probe Wormhole';drawWormhole()}
+  else if(sciActiveTab==='solar'){runBtn.style.display='none';drawSolarObs()}
+  else if(sciActiveTab==='subspace'){runBtn.style.display='';runBtn.textContent='◈ Ping Subspace';drawSubspace()}
+  if(engaged)clickSound();
+});
+// Override run button for different tabs
+const _origSciRun=document.getElementById('sci-run-btn');
+_origSciRun.addEventListener('click',()=>{
+  if(sciActiveTab==='molecular'&&sciSelectedSample!==null){startMolecularViz(sciSelectedSample)}
+  else if(sciActiveTab==='signal'){startSignalDecode()}
+  else if(sciActiveTab==='wormhole'){probeWormhole()}
+  else if(sciActiveTab==='subspace'){pingSubspace()}
+});
+
+// === MOLECULAR VISUALIZER ===
+let molAtoms=[],molRotation=0,molSelected=null;
+function startMolecularViz(idx){
+  const sample=sciSamples[idx];if(!sample)return;
+  molAtoms=[];molSelected=null;molRotation=0;
+  const numAtoms=6+Math.floor(Math.random()*10);
+  const elements=['H','C','N','O','Fe','Si','Ca','Na','Mg','Ti','Li','S','P','Cr','?'];
+  const colors={'H':'#ffffff','C':'#444444','N':'#3344ff','O':'#ff2222','Fe':'#d4a03c','Si':'#8888aa','Ca':'#44dd44','Na':'#dddd00','Mg':'#00dd88','Ti':'#aaaacc','Li':'#ff88ff','S':'#dddd44','P':'#ff8800','Cr':'#88cccc','?':'#ff0044'};
+  const isUnknown=Math.random()<.25;
+  for(let i=0;i<numAtoms;i++){
+    const el=isUnknown&&i===0?'?':elements[Math.floor(Math.random()*(elements.length-1))];
+    molAtoms.push({el,color:colors[el]||'#888',x:(Math.random()-.5)*1.6,y:(Math.random()-.5)*1.2,z:(Math.random()-.5)*1.2,
+      r:.08+Math.random()*.06,bonds:[],mass:(1+Math.random()*55).toFixed(1),charge:(['neutral','+1','-1','+2','-2'])[Math.floor(Math.random()*5)],
+      unknown:el==='?'});
+  }
+  // Generate bonds between nearby atoms
+  for(let i=0;i<molAtoms.length;i++)for(let j=i+1;j<molAtoms.length;j++){
+    const d=Math.sqrt((molAtoms[i].x-molAtoms[j].x)**2+(molAtoms[i].y-molAtoms[j].y)**2+(molAtoms[i].z-molAtoms[j].z)**2);
+    if(d<.8&&Math.random()<.6)molAtoms[i].bonds.push(j);
+  }
+  logComms('Science','Molecular visualization: '+sample.name+(isUnknown?' — ⚠ Unknown element detected':''));
+  document.getElementById('sci-results').innerHTML=`<div style="color:#b478ff;font-weight:bold">${sample.name}</div><div style="color:#6a5a8a">${numAtoms} atoms, ${molAtoms.reduce((s,a)=>s+a.bonds.length,0)} bonds</div>${isUnknown?'<div style="color:#ff4444;margin-top:4px">⚠ Unknown element — not in UESA database</div>':''}`;
+  drawMolecular();
+}
+function drawMolecular(){
+  if(sciActiveTab!=='molecular')return;
+  const cv=document.getElementById('sci-cv');if(!cv)return;
+  const cx=cv.getContext('2d');cv.width=cv.parentElement.offsetWidth*2||800;cv.height=cv.parentElement.offsetHeight*2||500;
+  const w=cv.width,h=cv.height,n=performance.now()*.001;
+  cx.fillStyle='rgba(4,8,12,.95)';cx.fillRect(0,0,w,h);
+  molRotation+=.008;
+  if(molAtoms.length===0){cx.fillStyle='rgba(180,120,255,.2)';cx.font=`${Math.max(11,w*.015)}px 'Courier New'`;cx.textAlign='center';cx.fillText('Select a sample and click Visualize',w/2,h/2);sciAnimFrame=requestAnimationFrame(drawMolecular);return}
+  const cX=w/2,cY=h/2,scale=Math.min(w,h)*.28;
+  // Sort by Z for depth
+  const projected=molAtoms.map((a,i)=>{
+    const cos=Math.cos(molRotation),sin=Math.sin(molRotation);
+    const rx=a.x*cos-a.z*sin,rz=a.x*sin+a.z*cos;
+    const sz=1/(2+rz);return{i,sx:cX+rx*scale*sz,sy:cY+a.y*scale*sz,sz,rz,a};
+  }).sort((a,b)=>a.rz-b.rz);
+  // Draw bonds
+  projected.forEach(p=>{p.a.bonds.forEach(bi=>{
+    const q=projected.find(pp=>pp.i===bi);if(!q)return;
+    cx.strokeStyle=`rgba(94,196,212,${.1*p.sz})`;cx.lineWidth=2*p.sz;
+    cx.beginPath();cx.moveTo(p.sx,p.sy);cx.lineTo(q.sx,q.sy);cx.stroke();
+  })});
+  // Draw atoms
+  projected.forEach(p=>{
+    const r=p.a.r*scale*p.sz;
+    const grad=cx.createRadialGradient(p.sx-r*.3,p.sy-r*.3,0,p.sx,p.sy,r);
+    grad.addColorStop(0,p.a.color+'cc');grad.addColorStop(1,p.a.color+'33');
+    cx.fillStyle=grad;cx.beginPath();cx.arc(p.sx,p.sy,r,0,6.283);cx.fill();
+    if(p.a.unknown){cx.strokeStyle=`rgba(255,0,68,${.3+Math.sin(n*3)*.2})`;cx.lineWidth=2;cx.beginPath();cx.arc(p.sx,p.sy,r+4+Math.sin(n*4)*2,0,6.283);cx.stroke()}
+    // Electron cloud
+    cx.strokeStyle=p.a.color+'15';cx.lineWidth=.5;cx.beginPath();cx.arc(p.sx,p.sy,r*1.8,n+p.i,n+p.i+3);cx.stroke();
+    // Label
+    if(r>8){cx.fillStyle='rgba(255,255,255,.6)';cx.font=`bold ${Math.max(8,r*.8)}px 'Courier New'`;cx.textAlign='center';cx.fillText(p.a.el,p.sx,p.sy+3)}
+    // Selected detail
+    if(molSelected===p.i){cx.strokeStyle='rgba(180,120,255,.5)';cx.lineWidth=2;cx.beginPath();cx.arc(p.sx,p.sy,r+6,0,6.283);cx.stroke();
+      cx.fillStyle='rgba(180,120,255,.4)';cx.font=`${Math.max(9,w*.012)}px 'Courier New'`;cx.textAlign='start';
+      cx.fillText(p.a.el+' — Mass: '+p.a.mass+' u  Charge: '+p.a.charge,10,h-10)}
+  });
+  // Click handler
+  if(!cv._molClick){cv._molClick=true;cv.addEventListener('click',e=>{
+    if(sciActiveTab!=='molecular')return;
+    const rect=cv.getBoundingClientRect();const mx=(e.clientX-rect.left)/rect.width*cv.width,my=(e.clientY-rect.top)/rect.height*cv.height;
+    let hit=null;projected.forEach(p=>{const d=Math.sqrt((mx-p.sx)**2+(my-p.sy)**2);if(d<p.a.r*scale*p.sz+8)hit=p.i});
+    molSelected=hit;if(engaged)clickSound();
+  })}
+  sciAnimFrame=requestAnimationFrame(drawMolecular);
+}
+
+// === SIGNAL DECODER ===
+let sigMode='frequency',sigDecoding=false,sigWaveData=Array(200).fill(0);
+function drawSignalDecoder(){
+  if(sciActiveTab!=='signal')return;
+  const cv=document.getElementById('sci-cv');if(!cv)return;
+  const cx=cv.getContext('2d');cv.width=cv.parentElement.offsetWidth*2||800;cv.height=cv.parentElement.offsetHeight*2||500;
+  const w=cv.width,h=cv.height,n=performance.now()*.001;
+  cx.fillStyle='rgba(4,8,12,.95)';cx.fillRect(0,0,w,h);
+  // Update wave data
+  sigWaveData.push(Math.sin(n*3)*.3+Math.sin(n*7.1)*.15+Math.sin(n*13.3)*.08+Math.random()*.1-.05);
+  sigWaveData.shift();
+  // Mode selector
+  const modes=['frequency','pattern','linguistic'];
+  modes.forEach((m,i)=>{
+    cx.fillStyle=sigMode===m?'rgba(180,120,255,.5)':'rgba(180,120,255,.12)';cx.font=`${Math.max(9,w*.012)}px 'Courier New'`;cx.textAlign='center';
+    cx.fillText(m.toUpperCase(),w*.25+i*w*.25,24);
+  });
+  // Click mode selector
+  if(!cv._sigModeClick){cv._sigModeClick=true;cv.addEventListener('click',e=>{
+    if(sciActiveTab!=='signal')return;
+    const rect=cv.getBoundingClientRect();const my=(e.clientY-rect.top)/rect.height*cv.height;
+    if(my<40){const mx=(e.clientX-rect.left)/rect.width*cv.width;const idx=Math.floor((mx/w-.1)/.25);if(idx>=0&&idx<3)sigMode=modes[idx];if(engaged)clickSound()}
+  })}
+  cx.strokeStyle='rgba(180,120,255,.06)';cx.lineWidth=.5;
+  for(let gy=0;gy<h;gy+=h/8){cx.beginPath();cx.moveTo(0,gy);cx.lineTo(w,gy);cx.stroke()}
+  if(sigMode==='frequency'){
+    // FFT-style bars
+    for(let i=0;i<40;i++){
+      const mag=Math.abs(Math.sin(n*.5+i*.7)*.3+Math.sin(n*.3+i*1.3)*.2+Math.random()*.05);
+      const bx=w*.05+i*(w*.9/40),bh=mag*h*.6;
+      cx.fillStyle=`hsla(${270+i*2},60%,50%,${.2+mag*.3})`;cx.fillRect(bx,h*.85-bh,w*.9/42,bh);
+    }
+    cx.fillStyle='rgba(180,120,255,.15)';cx.font=`${Math.max(8,w*.01)}px 'Courier New'`;cx.textAlign='center';cx.fillText('FREQUENCY SPECTRUM (Hz)',w/2,h-6);
+  } else if(sigMode==='pattern'){
+    // Repeating blocks
+    const blockW=w/50;
+    for(let i=0;i<sigWaveData.length;i++){
+      const v=sigWaveData[i];const hue=((v+.5)*360+180)%360;
+      cx.fillStyle=`hsla(${hue},60%,40%,${.3+Math.abs(v)*.4})`;
+      cx.fillRect(i*blockW+w*.02,h*.3,blockW-1,h*.4);
+    }
+    // Highlight repeating sequences
+    cx.strokeStyle='rgba(46,204,113,.2)';cx.lineWidth=2;cx.setLineDash([4,4]);
+    [30,80,140].forEach(s=>{cx.strokeRect(s*blockW+w*.02,h*.28,20*blockW,h*.44)});cx.setLineDash([]);
+    cx.fillStyle='rgba(46,204,113,.15)';cx.font=`${Math.max(8,w*.01)}px 'Courier New'`;cx.textAlign='center';cx.fillText('PATTERN RECOGNITION — 3 repeating sequences detected',w/2,h-6);
+  } else {
+    // Linguistic analysis
+    const chars='αβγδεζηθικλμνξοπρστυφχψω'.split('');
+    cx.font=`${Math.max(12,w*.016)}px 'Courier New'`;cx.textAlign='center';
+    for(let r=0;r<6;r++)for(let c=0;c<20;c++){
+      const ci=Math.floor(Math.abs(Math.sin(n*.1+r*20+c*7))*chars.length);
+      const brightness=Math.sin(n*.5+r+c*.3)*.5+.5;
+      cx.fillStyle=`rgba(180,120,255,${.05+brightness*.15})`;
+      cx.fillText(chars[ci],w*.08+c*w*.045,h*.25+r*h*.1);
+    }
+    cx.fillStyle='rgba(180,120,255,.15)';cx.font=`${Math.max(8,w*.01)}px 'Courier New'`;cx.fillText('LINGUISTIC MAPPING — structure analysis in progress',w/2,h-6);
+  }
+  // Oscilloscope waveform at top
+  cx.strokeStyle='rgba(180,120,255,.3)';cx.lineWidth=1.5;cx.beginPath();
+  sigWaveData.forEach((v,i)=>{const px=i/sigWaveData.length*w,py=h*.15+v*h*.1;i===0?cx.moveTo(px,py):cx.lineTo(px,py)});cx.stroke();
+  sciAnimFrame=requestAnimationFrame(drawSignalDecoder);
+}
+function startSignalDecode(){
+  if(sigDecoding)return;sigDecoding=true;
+  document.getElementById('sci-run-btn').disabled=true;document.getElementById('sci-run-btn').textContent='● Decoding…';
+  let elapsed=0;
+  const decInt=setInterval(()=>{elapsed++;
+    if(elapsed>=30){clearInterval(decInt);sigDecoding=false;
+      document.getElementById('sci-run-btn').disabled=false;document.getElementById('sci-run-btn').textContent='◈ Decode Signal';
+      const results=['Garbled distress call — origin unknown. Partial coordinates recovered.','Mathematical prime sequence — possibly artificial. Pattern repeats every 47 seconds.','Language structure detected — no match in database. Grammar complexity: high.','Encrypted military transmission — Colonial Authority cipher. Cannot decrypt.','Navigation beacon — automated. Broadcasting safe corridor coordinates.','Biological rhythm pattern — not mechanical. Something alive is transmitting.','Temporal echo — this signal was sent 14 years from now.'];
+      const r=results[Math.floor(Math.random()*results.length)];
+      document.getElementById('sci-results').innerHTML=`<div style="color:#b478ff;font-weight:bold">Signal Analysis Complete</div><div style="color:#8a7aaa;margin-top:4px">${r}</div>`;
+      logComms('Science','Signal decode complete: '+r);addDiscovery('science','Signal decoded: '+r);
+    }
+  },1000);
+}
+
+// === STELLAR CARTOGRAPHY ===
+let cartoRotX=0,cartoRotY=0,cartoDrag=false,cartoLastMX=0,cartoLastMY=0;
+let cartoVisited=new Set([0]);// index 0 is always visited
+function drawCartography(){
+  if(sciActiveTab!=='cartography')return;
+  const cv=document.getElementById('sci-cv');if(!cv)return;
+  const cx=cv.getContext('2d');cv.width=cv.parentElement.offsetWidth*2||800;cv.height=cv.parentElement.offsetHeight*2||500;
+  const w=cv.width,h=cv.height,n=performance.now()*.001;
+  cx.fillStyle='rgba(2,4,8,.95)';cx.fillRect(0,0,w,h);
+  const cX=w/2,cY=h/2,scale=Math.min(w,h)*.35;
+  cartoRotY+=.002;
+  // Project nav waypoints as 3D stars
+  const stars3d=navWaypoints.map((wp,i)=>{
+    const x3=(wp.x-.5)*2,y3=(wp.y-.5)*2,z3=Math.sin(i*1.7)*.8;
+    const cosY=Math.cos(cartoRotY),sinY=Math.sin(cartoRotY),cosX=Math.cos(cartoRotX),sinX=Math.sin(cartoRotX);
+    const rx=x3*cosY-z3*sinY,rz=x3*sinY+z3*cosY;
+    const ry=y3*cosX-rz*sinX,rz2=y3*sinX+rz*cosX;
+    const sz=1/(3+rz2);
+    return{i,sx:cX+rx*scale*sz,sy:cY+ry*scale*sz,sz,rz2,wp,visited:cartoVisited.has(i)};
+  }).sort((a,b)=>a.rz2-b.rz2);
+  // Fog of war
+  cx.fillStyle='rgba(20,10,40,.03)';cx.fillRect(0,0,w,h);
+  // Trade routes (hyperspace lanes)
+  if(typeof hyperspaceLinks!=='undefined'){hyperspaceLinks.forEach(([a,b])=>{
+    const pa=stars3d.find(s=>s.i===a),pb=stars3d.find(s=>s.i===b);if(!pa||!pb)return;
+    cx.strokeStyle='rgba(94,196,212,.06)';cx.lineWidth=1;cx.setLineDash([3,6]);
+    cx.beginPath();cx.moveTo(pa.sx,pa.sy);cx.lineTo(pb.sx,pb.sy);cx.stroke();cx.setLineDash([]);
+  })}
+  // Ship's traveled path
+  if(navRoute.length>1){cx.strokeStyle='rgba(46,204,113,.15)';cx.lineWidth=2;cx.beginPath();
+    navRoute.forEach((ri,idx)=>{const s=stars3d.find(ss=>ss.i===ri);if(!s)return;idx===0?cx.moveTo(s.sx,s.sy):cx.lineTo(s.sx,s.sy)});cx.stroke()}
+  // Stars
+  stars3d.forEach(s=>{
+    const r=s.visited?4+s.sz*3:2+s.sz*1.5;
+    const alpha=s.visited?.6:.15;
+    cx.fillStyle=`rgba(${s.visited?'94,196,212':'80,60,120'},${alpha*s.sz})`;
+    cx.beginPath();cx.arc(s.sx,s.sy,r,0,6.283);cx.fill();
+    if(s.visited){cx.fillStyle=`rgba(94,196,212,${.15*s.sz})`;cx.beginPath();cx.arc(s.sx,s.sy,r*2.5,0,6.283);cx.fill()}
+    // Label
+    if(s.sz>.3){cx.fillStyle=`rgba(${s.visited?'94,196,212':'120,100,160'},${(s.visited?.4:.12)*s.sz})`;
+      cx.font=`${Math.max(8,w*.01)}px 'Courier New'`;cx.textAlign='center';cx.fillText(s.wp.name,s.sx,s.sy+r+12)}
+  });
+  // Ship position
+  const shipStar=stars3d.find(s=>s.i===0);
+  if(shipStar){cx.fillStyle=`rgba(255,220,60,${.5+Math.sin(n*3)*.2})`;cx.beginPath();cx.arc(shipStar.sx,shipStar.sy,6,0,6.283);cx.fill();
+    cx.strokeStyle='rgba(255,220,60,.2)';cx.lineWidth=1;cx.beginPath();cx.arc(shipStar.sx,shipStar.sy,12+Math.sin(n*2)*3,0,6.283);cx.stroke()}
+  // Chart completion
+  const pct=Math.round(cartoVisited.size/navWaypoints.length*100);
+  cx.fillStyle='rgba(180,120,255,.3)';cx.font=`bold ${Math.max(10,w*.013)}px 'Courier New'`;cx.textAlign='start';
+  cx.fillText('STELLAR CARTOGRAPHY — '+pct+'% CHARTED',10,22);
+  cx.fillStyle='rgba(180,120,255,.15)';cx.font=`${Math.max(8,w*.01)}px 'Courier New'`;
+  cx.fillText(cartoVisited.size+' / '+navWaypoints.length+' systems surveyed',10,38);
+  // Drag handler
+  if(!cv._cartoDrag){cv._cartoDrag=true;
+    cv.addEventListener('mousedown',e=>{if(sciActiveTab!=='cartography')return;cartoDrag=true;const r=cv.getBoundingClientRect();cartoLastMX=e.clientX;cartoLastMY=e.clientY});
+    cv.addEventListener('mousemove',e=>{if(!cartoDrag||sciActiveTab!=='cartography')return;cartoRotY+=(e.clientX-cartoLastMX)*.005;cartoRotX+=(e.clientY-cartoLastMY)*.005;cartoLastMX=e.clientX;cartoLastMY=e.clientY});
+    addEventListener('mouseup',()=>{cartoDrag=false})}
+  // Mark visited when route changes
+  navRoute.forEach(r=>cartoVisited.add(r));
+  sciAnimFrame=requestAnimationFrame(drawCartography);
+}
+
+// === WORMHOLE STABILITY ANALYZER ===
+let wormholeDiscovered=false,wormholeStability=65,wormholeProbing=false;
+function drawWormhole(){
+  if(sciActiveTab!=='wormhole')return;
+  const cv=document.getElementById('sci-cv');if(!cv)return;
+  const cx=cv.getContext('2d');cv.width=cv.parentElement.offsetWidth*2||800;cv.height=cv.parentElement.offsetHeight*2||500;
+  const w=cv.width,h=cv.height,n=performance.now()*.001;
+  cx.fillStyle='rgba(2,4,8,.95)';cx.fillRect(0,0,w,h);
+  const cX=w/2,cY=h/2;
+  if(!wormholeDiscovered){
+    cx.fillStyle='rgba(180,120,255,.15)';cx.font=`${Math.max(11,w*.015)}px 'Courier New'`;cx.textAlign='center';
+    cx.fillText('No wormhole discovered yet',cX,cY-10);cx.fillStyle='rgba(180,120,255,.08)';cx.font=`${Math.max(9,w*.011)}px 'Courier New'`;
+    cx.fillText('Investigate gravitational anomalies to discover wormholes',cX,cY+14);
+    sciAnimFrame=requestAnimationFrame(drawWormhole);return;
+  }
+  // Wormhole funnel
+  wormholeStability=65+Math.sin(n*.3)*15+Math.sin(n*.7)*8;
+  const rings=20;
+  for(let i=0;i<rings;i++){
+    const t=i/rings;const depth=t*3;
+    const rx=(1-t*.7)*Math.min(w,h)*.2;const ry=rx*.4;
+    const yOff=t*h*.3;
+    cx.strokeStyle=`hsla(${270+t*40},${50+t*20}%,${40+t*20}%,${(.15-t*.1)+Math.sin(n*2+i)*.03})`;
+    cx.lineWidth=1.5;cx.beginPath();cx.ellipse(cX,cY-h*.1+yOff,rx,ry,Math.sin(n*.5+i*.3)*.1,0,6.283);cx.stroke();
+  }
+  // Spacetime grid bending
+  cx.strokeStyle='rgba(94,196,212,.04)';cx.lineWidth=.5;
+  for(let gx=-10;gx<=10;gx++){cx.beginPath();
+    for(let gy=-10;gy<=10;gy++){const px=cX+gx*w*.04,py=cY+gy*h*.04;
+      const d=Math.sqrt((px-cX)**2+(py-cY)**2);const bend=Math.max(0,1-d/(w*.3))*30;
+      const bpx=px+(cX-px)*bend*.02,bpy=py+(cY-py)*bend*.02+bend*.5;
+      gy===-10?cx.moveTo(bpx,bpy):cx.lineTo(bpx,bpy);}cx.stroke()}
+  // Core glow
+  const coreGrad=cx.createRadialGradient(cX,cY,0,cX,cY,w*.12);
+  coreGrad.addColorStop(0,`rgba(180,120,255,${.15+Math.sin(n*2)*.05})`);coreGrad.addColorStop(1,'transparent');
+  cx.fillStyle=coreGrad;cx.beginPath();cx.arc(cX,cY,w*.12,0,6.283);cx.fill();
+  // Readings
+  cx.fillStyle='rgba(180,120,255,.35)';cx.font=`bold ${Math.max(10,w*.013)}px 'Courier New'`;cx.textAlign='start';
+  cx.fillText('WORMHOLE STABILITY ANALYZER',10,22);
+  const stColor=wormholeStability>70?'rgba(46,204,113,.5)':wormholeStability>50?'rgba(212,160,60,.5)':'rgba(231,76,60,.5)';
+  cx.fillStyle=stColor;cx.fillText('Stability: '+wormholeStability.toFixed(1)+'%',10,42);
+  cx.fillStyle='rgba(180,120,255,.2)';cx.font=`${Math.max(9,w*.011)}px 'Courier New'`;
+  cx.fillText('Transit Probability: '+(wormholeStability*.85).toFixed(1)+'%',10,58);
+  cx.fillText('Throat Diameter: '+(120+Math.sin(n*.2)*30).toFixed(0)+' km',10,74);
+  sciAnimFrame=requestAnimationFrame(drawWormhole);
+}
+function probeWormhole(){
+  if(!wormholeDiscovered||wormholeProbing)return;
+  wormholeProbing=true;document.getElementById('sci-run-btn').disabled=true;document.getElementById('sci-run-btn').textContent='● Probe in transit…';
+  logComms('Science','Probe launched into wormhole aperture. Awaiting telemetry…');
+  let elapsed=0;
+  const probeInt=setInterval(()=>{elapsed++;
+    if(elapsed>=30){clearInterval(probeInt);wormholeProbing=false;
+      document.getElementById('sci-run-btn').disabled=false;document.getElementById('sci-run-btn').textContent='◈ Probe Wormhole';
+      const roll=Math.random();
+      if(roll<.4){const sysName='WH-'+Math.floor(Math.random()*900+100);
+        logComms('Science','★ Probe returned! Telemetry shows stable exit point. New system: '+sysName);
+        document.getElementById('sci-results').innerHTML=`<div style="color:#2ecc71;font-weight:bold">Probe Returned — New System Discovered</div><div style="color:#8a7aaa">${sysName} — coordinates logged to nav planner</div>`;
+        addDiscovery('wormhole','Wormhole probe returned — discovered system '+sysName+' on the other side');
+      } else if(roll<.7){logComms('Science','Probe returned — damaged. Telemetry corrupted. Partial data recovered.');
+        document.getElementById('sci-results').innerHTML=`<div style="color:#d4a03c;font-weight:bold">Probe Returned — Damaged</div><div style="color:#8a7aaa">Telemetry corrupted. High radiation environment detected on far side.</div>`;
+      } else {logComms('Science','⚠ Probe signal lost. No telemetry received. Probe presumed destroyed.');
+        document.getElementById('sci-results').innerHTML=`<div style="color:#e74c3c;font-weight:bold">Probe Lost</div><div style="color:#8a7aaa">No signal return. Wormhole may be unstable or one-way.</div>`;
+      }
+    }
+  },1000);
+}
+
+// === SOLAR OBSERVATORY ===
+let solarSunspots=[];
+function drawSolarObs(){
+  if(sciActiveTab!=='solar')return;
+  const cv=document.getElementById('sci-cv');if(!cv)return;
+  const cx=cv.getContext('2d');cv.width=cv.parentElement.offsetWidth*2||800;cv.height=cv.parentElement.offsetHeight*2||500;
+  const w=cv.width,h=cv.height,n=performance.now()*.001;
+  cx.fillStyle='rgba(2,4,8,.95)';cx.fillRect(0,0,w,h);
+  const cX=w*.45,cY=h*.5,sr=Math.min(w,h)*.3;
+  // Generate sunspots once
+  if(solarSunspots.length===0){for(let i=0;i<5+Math.floor(Math.random()*6);i++){
+    solarSunspots.push({lng:Math.random()*6.283,lat:(Math.random()-.5)*2,size:.02+Math.random()*.04,seed:Math.random()})}}
+  // Sun body
+  const sunGrad=cx.createRadialGradient(cX-sr*.15,cY-sr*.15,sr*.05,cX,cY,sr);
+  sunGrad.addColorStop(0,'rgba(255,240,200,.8)');sunGrad.addColorStop(.3,'rgba(255,180,60,.6)');
+  sunGrad.addColorStop(.7,'rgba(255,120,30,.4)');sunGrad.addColorStop(1,'rgba(200,60,20,.2)');
+  cx.fillStyle=sunGrad;cx.beginPath();cx.arc(cX,cY,sr,0,6.283);cx.fill();
+  // Convection cells
+  cx.save();cx.beginPath();cx.arc(cX,cY,sr,0,6.283);cx.clip();
+  for(let i=0;i<30;i++){
+    const a=n*.1+i*1.2,r2=sr*(.3+Math.sin(i*3)*.5);
+    const cx2=cX+Math.cos(a)*r2,cy2=cY+Math.sin(a)*r2*.7;
+    cx.fillStyle=`rgba(255,${200+Math.sin(n+i)*30},${100+Math.sin(n*.5+i*2)*40},${.03+Math.sin(n*.3+i)*.02})`;
+    cx.beginPath();cx.arc(cx2,cy2,sr*.08+Math.sin(i*7)*.02*sr,0,6.283);cx.fill();
+  }
+  // Sunspots
+  solarSunspots.forEach(sp=>{
+    const lng=sp.lng+n*.02;const litSide=Math.cos(lng);if(litSide<-.3)return;
+    const sx=cX+Math.cos(lng)*sr*.7*Math.cos(sp.lat);const sy=cY+Math.sin(sp.lat)*sr*.5;
+    cx.fillStyle=`rgba(40,20,10,${.3*litSide})`;cx.beginPath();cx.arc(sx,sy,sp.size*sr,0,6.283);cx.fill();
+    cx.fillStyle=`rgba(80,30,10,${.15*litSide})`;cx.beginPath();cx.arc(sx,sy,sp.size*sr*1.5,0,6.283);cx.fill();
+  });
+  cx.restore();
+  // Corona
+  const coronaGrad=cx.createRadialGradient(cX,cY,sr*.9,cX,cY,sr*1.6);
+  coronaGrad.addColorStop(0,'rgba(255,200,100,.05)');coronaGrad.addColorStop(.5,'rgba(255,150,50,.02)');coronaGrad.addColorStop(1,'transparent');
+  cx.fillStyle=coronaGrad;cx.beginPath();cx.arc(cX,cY,sr*1.6,0,6.283);cx.fill();
+  // Coronal loops
+  for(let l=0;l<3;l++){
+    const la=n*.3+l*2.1;const lx=cX+Math.cos(la)*sr*.6;const ly=cY+Math.sin(la)*sr*.4;
+    cx.strokeStyle=`rgba(255,200,100,${.06+Math.sin(n+l)*.03})`;cx.lineWidth=2;
+    cx.beginPath();cx.arc(lx,ly-sr*.3,sr*.25,Math.PI*.3,Math.PI*.7);cx.stroke();
+  }
+  // Prominence
+  const promA=n*.15;const promX=cX+Math.cos(promA)*sr;const promY=cY+Math.sin(promA)*sr*.6;
+  cx.strokeStyle='rgba(255,100,50,.08)';cx.lineWidth=3;
+  cx.beginPath();cx.moveTo(promX,promY);cx.quadraticCurveTo(promX+30*Math.cos(promA+.5),promY-40,promX+10,promY-20);cx.stroke();
+  // Readouts
+  const activity=Math.sin(n*.1)*.5+.5;const actLabel=activity>.7?'STORMY':activity>.3?'MODERATE':'CALM';
+  const actColor=activity>.7?'#ef5350':activity>.3?'#e8a840':'#4cdf80';
+  cx.fillStyle='rgba(255,180,60,.35)';cx.font=`bold ${Math.max(10,w*.013)}px 'Courier New'`;cx.textAlign='start';
+  cx.fillText('SOLAR OBSERVATORY',10,22);
+  cx.fillStyle=actColor;cx.fillText('Activity: '+actLabel,10,42);
+  cx.fillStyle='rgba(255,180,60,.2)';cx.font=`${Math.max(9,w*.011)}px 'Courier New'`;
+  cx.fillText('Sunspots: '+solarSunspots.length,10,58);
+  cx.fillText('Corona Temp: '+(1.5+Math.sin(n*.2)*.3).toFixed(1)+' MK',10,74);
+  cx.fillText('CME Risk: '+(activity*100).toFixed(0)+'%',10,90);
+  if(activity>.75){cx.fillStyle=`rgba(255,80,60,${.3+Math.sin(n*4)*.2})`;cx.font=`bold ${Math.max(10,w*.013)}px 'Courier New'`;
+    cx.fillText('⚠ CME WARNING — RAISE SHIELDS',10,110)}
+  sciAnimFrame=requestAnimationFrame(drawSolarObs);
+}
+
+// === SUBSPACE RESONANCE CHAMBER ===
+let subPingActive=false,subPingT=0,subPingResponse=false,subLayers=[];
+function drawSubspace(){
+  if(sciActiveTab!=='subspace')return;
+  const cv=document.getElementById('sci-cv');if(!cv)return;
+  const cx=cv.getContext('2d');cv.width=cv.parentElement.offsetWidth*2||800;cv.height=cv.parentElement.offsetHeight*2||500;
+  const w=cv.width,h=cv.height,n=performance.now()*.001;
+  cx.fillStyle='rgba(2,4,8,.95)';cx.fillRect(0,0,w,h);
+  // Init layers
+  if(subLayers.length===0){for(let i=0;i<8;i++)subLayers.push({y:h*.1+i*h*.1,freq:.5+Math.random()*2,amp:2+Math.random()*4,color:`hsla(${240+i*15},50%,${30+i*5}%,`,speed:.001+Math.random()*.003,entities:[]})}
+  // Draw strata layers
+  subLayers.forEach((l,li)=>{
+    const baseY=l.y;
+    cx.fillStyle=l.color+'.04)';cx.fillRect(0,baseY-h*.04,w,h*.08);
+    // Vibrating line
+    cx.strokeStyle=l.color+'.2)';cx.lineWidth=1.5;cx.beginPath();
+    for(let x=0;x<w;x+=3){
+      const vibY=baseY+Math.sin(x*l.freq*.01+n*l.speed*200)*l.amp;
+      x===0?cx.moveTo(x,vibY):cx.lineTo(x,vibY);
+    }cx.stroke();
+    // Occasional entity moving between layers
+    if(Math.random()<.001&&l.entities.length<2){l.entities.push({x:Math.random()*w,phase:0,lifespan:180})}
+    l.entities=l.entities.filter(e=>{
+      e.phase++;e.x+=Math.sin(e.phase*.05)*2;
+      const ey=baseY+Math.sin(e.phase*.03)*h*.05;
+      const alpha=Math.min(.3,e.phase*.005)*(1-e.phase/e.lifespan);
+      cx.fillStyle=`rgba(180,220,255,${alpha})`;cx.beginPath();cx.arc(e.x,ey,3+Math.sin(e.phase*.1),0,6.283);cx.fill();
+      return e.phase<e.lifespan;
+    });
+  });
+  // Ping ripple
+  if(subPingActive){
+    subPingT++;
+    const rippleR=subPingT*3;const rippleAlpha=Math.max(0,.3-subPingT*.003);
+    cx.strokeStyle=`rgba(180,120,255,${rippleAlpha})`;cx.lineWidth=2;
+    cx.beginPath();cx.arc(w/2,h/2,rippleR,0,6.283);cx.stroke();
+    cx.strokeStyle=`rgba(180,120,255,${rippleAlpha*.5})`;cx.lineWidth=1;
+    cx.beginPath();cx.arc(w/2,h/2,rippleR*.7,0,6.283);cx.stroke();
+    // Layers react to ping
+    subLayers.forEach(l=>{l.amp=Math.min(12,l.amp+.05*Math.max(0,1-Math.abs(l.y-h/2)/(h*.4)))});
+    if(subPingT>100){
+      subPingActive=false;subPingT=0;
+      subLayers.forEach(l=>l.amp=2+Math.random()*4);
+      // Response check
+      if(subPingResponse){
+        subPingResponse=false;
+        // Something pings back
+        setTimeout(()=>{
+          logComms('Science','⚠ Subspace ping returned. Something responded.');
+          addCrewEntry('Dr. Tanaka: "Did you see that? Something pinged us back. From subspace."');
+          document.getElementById('sci-results').innerHTML='<div style="color:#ff4444;font-weight:bold">⚠ SUBSPACE RESPONSE DETECTED</div><div style="color:#8a7aaa">An entity in subspace layer 4 responded to our ping. Nature unknown. Dr. Tanaka is documenting everything.</div>';
+          addDiscovery('subspace','Subspace response detected — something acknowledged our ping from layer 4');
+        },2000);
+      }
+    }
+  }
+  // Labels
+  cx.fillStyle='rgba(180,120,255,.3)';cx.font=`bold ${Math.max(10,w*.013)}px 'Courier New'`;cx.textAlign='start';
+  cx.fillText('SUBSPACE RESONANCE CHAMBER',10,22);
+  cx.fillStyle='rgba(180,120,255,.15)';cx.font=`${Math.max(8,w*.01)}px 'Courier New'`;
+  cx.fillText(subLayers.length+' layers detected — monitoring vibrations',10,38);
+  const entityCount=subLayers.reduce((s,l)=>s+l.entities.length,0);
+  if(entityCount>0){cx.fillStyle='rgba(180,220,255,.3)';cx.fillText('● '+entityCount+' transient entities observed',10,54)}
+  sciAnimFrame=requestAnimationFrame(drawSubspace);
+}
+function pingSubspace(){
+  if(subPingActive)return;
+  subPingActive=true;subPingT=0;
+  subPingResponse=Math.random()<.08;// 8% chance something responds
+  logComms('Science','Subspace ping transmitted on all layers.');
+  addCrewEntry('Dr. Tanaka: "Pinging subspace. Let\'s see what we get."');
+  if(engaged)clickSound();
+}
 
 // === ELECTRONIC WARFARE ===
 let ewJamming=false,ewJamTarget=null,ewJamTimer=0;
