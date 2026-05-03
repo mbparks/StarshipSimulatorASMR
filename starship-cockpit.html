@@ -1970,14 +1970,14 @@ body.red-alert #scope{border-color:rgba(231,76,60,.1)}
       <button class="helm-engage" id="helm-engage">► Engage</button>
       <div class="helm-status" id="helm-engage-status"></div>
     </div>
-    <div class="helm-attitude">
-      <div class="ha-title">Attitude Control</div>
-      <div class="helm-axes-row">
-        <div class="helm-ax"><div class="ax-label">Yaw</div><input type="range" id="fc-yaw" min="-100" max="100" value="0"><div class="ax-val" id="fc-yaw-val">0.0°</div></div>
-        <div class="helm-ax"><div class="ax-label">Pitch</div><input type="range" id="fc-pitch" min="-100" max="100" value="0"><div class="ax-val" id="fc-pitch-val">0.0°</div></div>
-      </div>
-      <div class="helm-axes-row">
-        <div class="helm-ax"><div class="ax-label">Roll</div><input type="range" id="fc-roll" min="-100" max="100" value="0"><div class="ax-val" id="fc-roll-val">0.0°</div></div>
+    <div class="helm-attitude" style="min-width:clamp(320px,35vw,500px)">
+      <div class="ha-title">Flight Controller <span style="color:#3a5a6a;font-size:clamp(6px,.5vw,8px)">(WASD+QE or drag)</span></div>
+      <canvas id="fc-canvas" style="width:100%;height:clamp(260px,35vh,380px);border:1px solid rgba(94,196,212,.06);border-radius:4px;background:rgba(4,8,12,.4);cursor:crosshair"></canvas>
+      <div style="display:flex;gap:16px;margin-top:6px">
+        <div class="ax-val" id="fc-yaw-val" style="color:#5ec4d4">Y: 0.0°</div>
+        <div class="ax-val" id="fc-pitch-val" style="color:#2ecc71">P: 0.0°</div>
+        <div class="ax-val" id="fc-roll-val" style="color:#d4a03c">R: 0.0°</div>
+        <div class="ax-val" id="fc-thr-val" style="color:#e74c3c">THR: 50%</div>
       </div>
     </div>
   </div>
@@ -8215,39 +8215,260 @@ document.getElementById('emer-thrust').addEventListener('click',()=>{
   if(engaged)clickSound();
 });
 
-// === HELM CONTROLS ===
+// === HELM CONTROLS — VISUAL FLIGHT CONTROLLER ===
 let flightYaw=0,flightPitch=0,flightRoll=0,courseMark=0;
-document.getElementById('fc-yaw').addEventListener('input',e=>{
-  flightYaw=e.target.value/100*30;
-  document.getElementById('fc-yaw-val').textContent=flightYaw.toFixed(1)+'°';
-  panTargetX=flightYaw*12;
-  hudHeading=(hudHeading+flightYaw*.02+360)%360;
-});
-document.getElementById('fc-pitch').addEventListener('input',e=>{
-  flightPitch=e.target.value/100*20;
-  document.getElementById('fc-pitch-val').textContent=flightPitch.toFixed(1)+'°';
-  panTargetY=flightPitch*10;
-});
-document.getElementById('fc-roll').addEventListener('input',e=>{
-  flightRoll=e.target.value/100*45;
-  document.getElementById('fc-roll-val').textContent=flightRoll.toFixed(1)+'°';
-});
-['fc-yaw','fc-pitch','fc-roll'].forEach(sid=>{
-  const el=document.getElementById(sid);
-  let dragging=false,returnInt=null;
-  el.addEventListener('mousedown',()=>{dragging=true;if(returnInt){clearInterval(returnInt);returnInt=null}});
-  el.addEventListener('touchstart',()=>{dragging=true;if(returnInt){clearInterval(returnInt);returnInt=null}});
-  function release(){
-    if(!dragging)return;dragging=false;
-    returnInt=setInterval(()=>{
-      const v=parseFloat(el.value);
-      if(Math.abs(v)<2){el.value=0;el.dispatchEvent(new Event('input'));clearInterval(returnInt);returnInt=null;return}
-      el.value=v*.82;el.dispatchEvent(new Event('input'));
-    },40);
+let fcJoyX=0,fcJoyY=0,fcThrottle=50,fcDragging=null;
+const fcCanvas=document.getElementById('fc-canvas');
+const fcCtx=fcCanvas?fcCanvas.getContext('2d'):null;
+let fcAnimFrame=0;
+
+function drawFlightController(){
+  if(!fcCanvas||!document.getElementById('flight-panel').classList.contains('show')){return}
+  fcCanvas.width=fcCanvas.offsetWidth*2||800;fcCanvas.height=fcCanvas.offsetHeight*2||500;
+  const cv=fcCanvas,cx=fcCtx,w=cv.width,h=cv.height,n=performance.now()*.001;
+  cx.fillStyle='rgba(4,8,12,.95)';cx.fillRect(0,0,w,h);
+
+  // === COMPASS ROSE (center area) ===
+  const roseX=w*.45,roseY=h*.45,roseR=Math.min(w,h)*.3;
+  // Outer ring
+  cx.strokeStyle='rgba(94,196,212,.15)';cx.lineWidth=2;
+  cx.beginPath();cx.arc(roseX,roseY,roseR,0,6.283);cx.stroke();
+  cx.strokeStyle='rgba(94,196,212,.06)';cx.lineWidth=1;
+  cx.beginPath();cx.arc(roseX,roseY,roseR*.7,0,6.283);cx.stroke();
+  cx.beginPath();cx.arc(roseX,roseY,roseR*.4,0,6.283);cx.stroke();
+  // Degree marks
+  for(let i=0;i<72;i++){
+    const a=(i*5-hudHeading)*Math.PI/180;
+    const major=i%18===0,med=i%9===0;
+    const inner=major?roseR-.5:med?roseR-8:roseR-5;
+    cx.strokeStyle=`rgba(94,196,212,${major?.2:med?.1:.06})`;cx.lineWidth=major?1.5:1;
+    cx.beginPath();cx.moveTo(roseX+Math.cos(a)*inner,roseY+Math.sin(a)*inner);
+    cx.lineTo(roseX+Math.cos(a)*roseR,roseY+Math.sin(a)*roseR);cx.stroke();
   }
-  addEventListener('mouseup',release);
-  addEventListener('touchend',release);
+  // Cardinal labels (rotate with heading)
+  const cardinals=[{l:'N',a:0},{l:'E',a:90},{l:'S',a:180},{l:'W',a:270}];
+  cx.font=`bold ${Math.max(12,w*.018)}px 'Courier New'`;cx.textAlign='center';cx.textBaseline='middle';
+  cardinals.forEach(c=>{
+    const a=(c.a-hudHeading)*Math.PI/180;
+    const lx=roseX+Math.cos(a)*(roseR+16),ly=roseY+Math.sin(a)*(roseR+16);
+    cx.fillStyle=c.l==='N'?'rgba(231,76,60,.5)':'rgba(94,196,212,.3)';
+    cx.fillText(c.l,lx,ly);
+  });
+  // Heading readout
+  cx.font=`bold ${Math.max(14,w*.02)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillStyle='rgba(94,196,212,.5)';cx.fillText(hudHeading.toFixed(1)+'°',roseX,roseY-roseR-30);
+  cx.fillStyle='rgba(94,196,212,.15)';cx.font=`${Math.max(8,w*.01)}px 'Courier New'`;
+  cx.fillText('HEADING',roseX,roseY-roseR-14);
+  // Heading bug (top triangle)
+  cx.fillStyle='rgba(94,196,212,.4)';cx.beginPath();
+  cx.moveTo(roseX,roseY-roseR+2);cx.lineTo(roseX-6,roseY-roseR-8);cx.lineTo(roseX+6,roseY-roseR-8);cx.closePath();cx.fill();
+
+  // === JOYSTICK (center of compass) ===
+  // Base plate
+  cx.fillStyle='rgba(20,30,40,.5)';cx.beginPath();cx.ellipse(roseX,roseY+roseR*.05,roseR*.25,roseR*.1,0,0,6.283);cx.fill();
+  cx.strokeStyle='rgba(94,196,212,.1)';cx.lineWidth=1;cx.beginPath();cx.ellipse(roseX,roseY+roseR*.05,roseR*.25,roseR*.1,0,0,6.283);cx.stroke();
+  // Stick shaft — tilts with input
+  const stickTipX=roseX+fcJoyX*roseR*.25;
+  const stickTipY=roseY-fcJoyY*roseR*.2-roseR*.15;
+  cx.strokeStyle='rgba(140,160,180,.35)';cx.lineWidth=4;
+  cx.beginPath();cx.moveTo(roseX,roseY+roseR*.05);cx.lineTo(stickTipX,stickTipY);cx.stroke();
+  // Grip (3D effect)
+  const gripR=roseR*.08;
+  const gripGrad=cx.createRadialGradient(stickTipX-gripR*.3,stickTipY-gripR*.3,0,stickTipX,stickTipY,gripR*1.2);
+  gripGrad.addColorStop(0,'rgba(100,120,140,.6)');gripGrad.addColorStop(.5,'rgba(60,80,100,.5)');gripGrad.addColorStop(1,'rgba(30,40,50,.4)');
+  cx.fillStyle=gripGrad;cx.beginPath();cx.arc(stickTipX,stickTipY,gripR,0,6.283);cx.fill();
+  cx.strokeStyle='rgba(94,196,212,.2)';cx.lineWidth=1.5;cx.beginPath();cx.arc(stickTipX,stickTipY,gripR,0,6.283);cx.stroke();
+  // Trigger button on grip
+  cx.fillStyle='rgba(231,76,60,.2)';cx.beginPath();cx.arc(stickTipX,stickTipY-gripR*.3,gripR*.25,0,6.283);cx.fill();
+  // Hat switch
+  cx.fillStyle='rgba(94,196,212,.15)';cx.fillRect(stickTipX-gripR*.15,stickTipY+gripR*.15,gripR*.3,gripR*.3);
+  // Deadzone indicator
+  cx.strokeStyle='rgba(94,196,212,.04)';cx.lineWidth=.5;cx.setLineDash([2,4]);
+  cx.beginPath();cx.arc(roseX,roseY,roseR*.05,0,6.283);cx.stroke();cx.setLineDash([]);
+  // Crosshair at current position
+  cx.strokeStyle=`rgba(46,204,113,${.15+Math.abs(fcJoyX+fcJoyY)*.1})`;cx.lineWidth=1;
+  cx.beginPath();cx.moveTo(stickTipX-10,stickTipY);cx.lineTo(stickTipX+10,stickTipY);cx.stroke();
+  cx.beginPath();cx.moveTo(stickTipX,stickTipY-10);cx.lineTo(stickTipX,stickTipY+10);cx.stroke();
+
+  // === THROTTLE LEVER (left side) ===
+  const thrX=w*.08,thrTop=h*.15,thrBot=h*.85,thrW=w*.04;
+  const thrY=thrBot-(fcThrottle/100)*(thrBot-thrTop);
+  // Track
+  cx.fillStyle='rgba(20,30,40,.4)';cx.fillRect(thrX-thrW/2,thrTop,thrW,thrBot-thrTop);
+  cx.strokeStyle='rgba(94,196,212,.08)';cx.lineWidth=1;cx.strokeRect(thrX-thrW/2,thrTop,thrW,thrBot-thrTop);
+  // Zone colors
+  const zoneH=(thrBot-thrTop)/3;
+  cx.fillStyle='rgba(46,204,113,.04)';cx.fillRect(thrX-thrW/2,thrBot-zoneH,thrW,zoneH);// low
+  cx.fillStyle='rgba(212,160,60,.04)';cx.fillRect(thrX-thrW/2,thrBot-zoneH*2,thrW,zoneH);// mid
+  cx.fillStyle='rgba(231,76,60,.04)';cx.fillRect(thrX-thrW/2,thrTop,thrW,zoneH);// high
+  // Tick marks
+  for(let p=0;p<=100;p+=10){
+    const ty=thrBot-(p/100)*(thrBot-thrTop);
+    cx.strokeStyle='rgba(94,196,212,.08)';cx.lineWidth=1;
+    cx.beginPath();cx.moveTo(thrX-thrW/2-4,ty);cx.lineTo(thrX-thrW/2,ty);cx.stroke();
+    if(p%25===0){cx.fillStyle='rgba(94,196,212,.15)';cx.font=`${Math.max(7,w*.009)}px 'Courier New'`;cx.textAlign='end';cx.fillText(p+'%',thrX-thrW/2-8,ty+3)}
+  }
+  // Fill bar
+  cx.fillStyle='rgba(231,76,60,.15)';cx.fillRect(thrX-thrW/2+2,thrY,thrW-4,thrBot-thrY);
+  // Handle
+  cx.fillStyle='rgba(180,60,60,.5)';cx.fillRect(thrX-thrW*.7,thrY-6,thrW*1.4,12);
+  cx.strokeStyle='rgba(231,76,60,.4)';cx.lineWidth=1;cx.strokeRect(thrX-thrW*.7,thrY-6,thrW*1.4,12);
+  // Grip lines on handle
+  for(let gl=-2;gl<=2;gl++){cx.strokeStyle='rgba(255,255,255,.05)';cx.beginPath();cx.moveTo(thrX-thrW*.5,thrY+gl*2);cx.lineTo(thrX+thrW*.5,thrY+gl*2);cx.stroke()}
+  // Label
+  cx.fillStyle='rgba(231,76,60,.25)';cx.font=`bold ${Math.max(8,w*.01)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillText('THR',thrX,thrBot+16);
+
+  // === ROLL DIAL (right side — bank indicator) ===
+  const rollCX=w*.82,rollCY=h*.45,rollR=Math.min(w,h)*.18;
+  // Outer ring
+  cx.strokeStyle='rgba(212,160,60,.25)';cx.lineWidth=3;
+  cx.beginPath();cx.arc(rollCX,rollCY,rollR,0,6.283);cx.stroke();
+  cx.strokeStyle='rgba(212,160,60,.08)';cx.lineWidth=1;
+  cx.beginPath();cx.arc(rollCX,rollCY,rollR+8,0,6.283);cx.stroke();
+  // Tick marks around full circle
+  for(let d=-180;d<180;d+=5){
+    const a=(d-90)*Math.PI/180;
+    const major=d%30===0,med=d%15===0;
+    const inner=major?rollR-12:med?rollR-7:rollR-4;
+    cx.strokeStyle=`rgba(212,160,60,${major?.3:med?.15:.06})`;cx.lineWidth=major?1.5:1;
+    cx.beginPath();cx.moveTo(rollCX+Math.cos(a)*inner,rollCY+Math.sin(a)*inner);
+    cx.lineTo(rollCX+Math.cos(a)*rollR,rollCY+Math.sin(a)*rollR);cx.stroke();
+    if(major&&d>=-90&&d<=90){
+      cx.fillStyle='rgba(212,160,60,.25)';cx.font=`${Math.max(8,w*.01)}px 'Courier New'`;cx.textAlign='center';
+      cx.fillText(d+'°',rollCX+Math.cos(a)*(rollR+18),rollCY+Math.sin(a)*(rollR+18)+3);
+    }
+  }
+  // Artificial horizon inside (tilts with roll)
+  cx.save();cx.beginPath();cx.arc(rollCX,rollCY,rollR-14,0,6.283);cx.clip();
+  cx.translate(rollCX,rollCY);cx.rotate(flightRoll*Math.PI/180);
+  // Sky half
+  cx.fillStyle='rgba(40,80,140,.15)';cx.fillRect(-rollR,-rollR,rollR*2,rollR);
+  // Ground half
+  cx.fillStyle='rgba(120,80,40,.12)';cx.fillRect(-rollR,0,rollR*2,rollR);
+  // Horizon line
+  cx.strokeStyle='rgba(212,160,60,.5)';cx.lineWidth=2;
+  cx.beginPath();cx.moveTo(-rollR,0);cx.lineTo(rollR,0);cx.stroke();
+  // Pitch ladder inside horizon
+  [-20,-10,10,20].forEach(p=>{
+    const py=-p*rollR/60;
+    cx.strokeStyle=`rgba(212,160,60,${Math.abs(p)===20?.12:.06})`;cx.lineWidth=1;
+    cx.setLineDash(p<0?[3,3]:[]);
+    cx.beginPath();cx.moveTo(-rollR*.3,py);cx.lineTo(rollR*.3,py);cx.stroke();
+    cx.setLineDash([]);
+  });
+  cx.restore();
+  // Fixed aircraft wings (center reference — doesn't rotate)
+  cx.strokeStyle='rgba(212,160,60,.6)';cx.lineWidth=2.5;
+  cx.beginPath();cx.moveTo(rollCX-rollR*.4,rollCY);cx.lineTo(rollCX-rollR*.15,rollCY);cx.stroke();
+  cx.beginPath();cx.moveTo(rollCX+rollR*.15,rollCY);cx.lineTo(rollCX+rollR*.4,rollCY);cx.stroke();
+  cx.fillStyle='rgba(212,160,60,.7)';cx.beginPath();cx.arc(rollCX,rollCY,3,0,6.283);cx.fill();
+  // Tail
+  cx.strokeStyle='rgba(212,160,60,.4)';cx.lineWidth=2;
+  cx.beginPath();cx.moveTo(rollCX,rollCY+rollR*.1);cx.lineTo(rollCX,rollCY+rollR*.2);cx.stroke();
+  // Roll pointer at top (fixed)
+  cx.fillStyle='rgba(212,160,60,.5)';
+  cx.beginPath();cx.moveTo(rollCX,rollCY-rollR+2);cx.lineTo(rollCX-5,rollCY-rollR-8);cx.lineTo(rollCX+5,rollCY-rollR-8);cx.closePath();cx.fill();
+  // Current roll value below
+  cx.fillStyle='rgba(212,160,60,.5)';cx.font=`bold ${Math.max(12,w*.016)}px 'Courier New'`;cx.textAlign='center';
+  cx.fillText(flightRoll.toFixed(1)+'°',rollCX,rollCY+rollR+28);
+  cx.fillStyle='rgba(212,160,60,.2)';cx.font=`${Math.max(8,w*.01)}px 'Courier New'`;
+  cx.fillText('BANK',rollCX,rollCY+rollR+42);
+  // Drag hint ring
+  if(fcDragging==='roll'){cx.strokeStyle='rgba(212,160,60,.15)';cx.lineWidth=rollR*.15;cx.beginPath();cx.arc(rollCX,rollCY,rollR+4,0,6.283);cx.stroke()}
+
+  // === KEYBOARD HINT ===
+  cx.fillStyle='rgba(94,196,212,.08)';cx.font=`${Math.max(8,w*.01)}px 'Courier New'`;cx.textAlign='end';
+  cx.fillText('W↑ S↓ A← D→ Q↶ E↷',w-10,h-8);
+
+  // Store regions for hit testing
+  fcCanvas._regions={joy:{x:roseX,y:roseY,r:roseR*.35},thr:{x:thrX,top:thrTop,bot:thrBot,w:thrW*2},roll:{x:rollCX,y:rollCY,r:rollR}};
+
+  // Update display values
+  document.getElementById('fc-yaw-val').textContent='Y: '+flightYaw.toFixed(1)+'°';
+  document.getElementById('fc-pitch-val').textContent='P: '+flightPitch.toFixed(1)+'°';
+  document.getElementById('fc-roll-val').textContent='R: '+flightRoll.toFixed(1)+'°';
+  document.getElementById('fc-thr-val').textContent='THR: '+Math.round(fcThrottle)+'%';
+
+  // Sync throttle slider
+  const thrEl=document.getElementById('throttle');if(thrEl)thrEl.value=fcThrottle;
+
+  fcAnimFrame=requestAnimationFrame(drawFlightController);
+}
+
+// Mouse interaction for flight controller
+if(fcCanvas){
+  fcCanvas.addEventListener('mousedown',e=>{
+    const rect=fcCanvas.getBoundingClientRect();
+    const mx=(e.clientX-rect.left)/rect.width*fcCanvas.width;
+    const my=(e.clientY-rect.top)/rect.height*fcCanvas.height;
+    const rg=fcCanvas._regions;if(!rg)return;
+    // Check joystick
+    const jd=Math.sqrt((mx-rg.joy.x)**2+(my-rg.joy.y)**2);
+    if(jd<rg.joy.r*2){fcDragging='joy';return}
+    // Check throttle
+    if(Math.abs(mx-rg.thr.x)<rg.thr.w&&my>=rg.thr.top-10&&my<=rg.thr.bot+10){fcDragging='thr';return}
+    // Check roll dial (right side circle)
+    const rd=Math.sqrt((mx-rg.roll.x)**2+(my-rg.roll.y)**2);
+    if(rd<rg.roll.r*1.4&&rd>rg.roll.r*.3){fcDragging='roll';fcCanvas._rollStartAngle=Math.atan2(my-rg.roll.y,mx-rg.roll.x);fcCanvas._rollStartVal=flightRoll;return}
+  });
+  fcCanvas.addEventListener('mousemove',e=>{
+    if(!fcDragging)return;
+    const rect=fcCanvas.getBoundingClientRect();
+    const mx=(e.clientX-rect.left)/rect.width*fcCanvas.width;
+    const my=(e.clientY-rect.top)/rect.height*fcCanvas.height;
+    const rg=fcCanvas._regions;if(!rg)return;
+    if(fcDragging==='joy'){
+      fcJoyX=Math.max(-1,Math.min(1,(mx-rg.joy.x)/(rg.joy.r*1.5)));
+      fcJoyY=Math.max(-1,Math.min(1,-(my-rg.joy.y)/(rg.joy.r*1.2)));
+    } else if(fcDragging==='thr'){
+      fcThrottle=Math.max(0,Math.min(100,(rg.thr.bot-my)/(rg.thr.bot-rg.thr.top)*100));
+    } else if(fcDragging==='roll'){
+      const curAngle=Math.atan2(my-rg.roll.y,mx-rg.roll.x);
+      let delta=(curAngle-fcCanvas._rollStartAngle)*180/Math.PI;
+      if(delta>180)delta-=360;if(delta<-180)delta+=360;
+      flightRoll=Math.max(-45,Math.min(45,fcCanvas._rollStartVal+delta));
+      fcCanvas._rollStartAngle=curAngle;fcCanvas._rollStartVal=flightRoll;
+    }
+  });
+  addEventListener('mouseup',()=>{fcDragging=null});
+}
+
+// WASD+QE keyboard controls
+const fcKeys={};
+addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  fcKeys[e.key.toLowerCase()]=true;
 });
+addEventListener('keyup',e=>{fcKeys[e.key.toLowerCase()]=false});
+setInterval(()=>{
+  if(!engaged)return;
+  let changed=false;
+  if(fcKeys['w']){fcJoyY=Math.min(1,fcJoyY+.05);changed=true}
+  if(fcKeys['s']){fcJoyY=Math.max(-1,fcJoyY-.05);changed=true}
+  if(fcKeys['a']){fcJoyX=Math.max(-1,fcJoyX-.05);changed=true}
+  if(fcKeys['d']){fcJoyX=Math.min(1,fcJoyX+.05);changed=true}
+  if(fcKeys['q']){flightRoll=Math.max(-45,flightRoll-1);changed=true}
+  if(fcKeys['e']){flightRoll=Math.min(45,flightRoll+1);changed=true}
+  // Roll spring-back when no key pressed
+  if(!fcKeys['q']&&!fcKeys['e']&&fcDragging!=='roll'){flightRoll*=.95;if(Math.abs(flightRoll)<.5)flightRoll=0}
+  // Joystick spring-back when no key pressed and not dragging
+  if(!fcKeys['w']&&!fcKeys['s']&&!fcKeys['a']&&!fcKeys['d']&&fcDragging!=='joy'){
+    fcJoyX*=.9;fcJoyY*=.9;if(Math.abs(fcJoyX)<.01)fcJoyX=0;if(Math.abs(fcJoyY)<.01)fcJoyY=0;
+  }
+  // Always apply flight values (works from any screen)
+  flightYaw=fcJoyX*30;flightPitch=fcJoyY*20;
+  panTargetX=flightYaw*12;panTargetY=flightPitch*10;
+  hudHeading=(hudHeading+flightYaw*.002+360)%360;
+  throttle=fcThrottle/100;
+},33);
+
+// Start drawing when flight panel opens
+const _origFlightShow=document.getElementById('flight-panel');
+const flightObserver=new MutationObserver(()=>{
+  if(_origFlightShow.classList.contains('show')){cancelAnimationFrame(fcAnimFrame);drawFlightController()}
+});
+flightObserver.observe(_origFlightShow,{attributes:true,attributeFilter:['class']});
 // Prevent keyboard events from bubbling when typing in number inputs
 document.querySelectorAll('.helm-course input[type=number]').forEach(inp=>{
   inp.addEventListener('keydown',e=>e.stopPropagation());
