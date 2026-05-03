@@ -10833,12 +10833,12 @@ function drawSciIdle(){
   for(let y=0;y<h;y+=h/10){cx.beginPath();cx.moveTo(0,y);cx.lineTo(w,y);cx.stroke()}
   // Axis labels
   cx.fillStyle='rgba(180,120,255,.3)';cx.font=`${Math.max(18,w*0.024)}px 'Courier New'`;cx.textAlign='center';
-  cx.fillText('WAVELENGTH (nm)',w/2,h-8);
+  cx.fillText('WAVELENGTH (nm)',w/2,h-14);
   cx.save();cx.translate(14,h/2);cx.rotate(-Math.PI/2);cx.fillText('INTENSITY',0,0);cx.restore();
   // Wavelength markers
   cx.font=`${Math.max(14,w*0.018)}px 'Courier New'`;
   ['380','450','520','590','660','730','780'].forEach((nm,i)=>{
-    cx.fillStyle='rgba(180,120,255,.2)';cx.fillText(nm,w*.1+i*w*.12,h-22);
+    cx.fillStyle='rgba(180,120,255,.2)';cx.fillText(nm,w*.1+i*w*.12,h-36);
   });
   // Idle message
   cx.fillStyle='rgba(180,120,255,.4)';cx.font=`${Math.max(22,w*0.030)}px 'Courier New'`;
@@ -10895,16 +10895,16 @@ function runSpectralAnalysis(sampleIdx){
       cx.beginPath();cx.arc(px,h*.4,p.width*w*3,0,6.283);cx.fill();
       // Element label
       cx.fillStyle=p.color+(p.unknown?'.9)':'.7)');cx.font=`${p.unknown?'bold ':''}${Math.max(16,w*0.020)}px 'Courier New'`;cx.textAlign='center';
-      cx.fillText(p.elem,px,h*.92+12);
-      if(p.unknown){cx.fillStyle='rgba(255,60,60,.3)';cx.fillText('⚠ UNKNOWN',px,h*.92+24)}
+      cx.fillText(p.elem,px,h*.85+12);
+      if(p.unknown){cx.fillStyle='rgba(255,60,60,.3)';cx.fillText('⚠ UNKNOWN',px,h*.85+36)}
     });
     // Wavelength axis
     cx.fillStyle='rgba(180,120,255,.2)';cx.font=`${Math.max(14,w*0.018)}px 'Courier New'`;
     ['380','450','520','590','660','730','780'].forEach((nm,i)=>{cx.fillText(nm,w*.1+i*w*.12,h-6)});
     // Progress
     cx.fillStyle='rgba(180,120,255,.45)';cx.font=`${Math.max(18,w*0.022)}px 'Courier New'`;cx.textAlign='start';
-    cx.fillText('ANALYSIS: '+Math.min(100,Math.round(elapsed/20*100))+'%',10,34);
-    cx.fillText(sample.name,10,78);
+    cx.fillText('ANALYSIS: '+Math.min(100,Math.round(elapsed/20*100))+'%',10,40);
+    cx.fillText(sample.name,10,120);
     if(elapsed>=20){
       clearInterval(analysisInt);sciAnalysisRunning=false;sample.analyzed=true;
       document.getElementById('sci-run-btn').textContent='◈ Run Analysis';document.getElementById('sci-run-btn').disabled=false;
@@ -11052,7 +11052,7 @@ function drawSignalDecoder(){
   const modes=['frequency','pattern','linguistic'];
   modes.forEach((m,i)=>{
     cx.fillStyle=sigMode===m?'rgba(180,120,255,.6)':'rgba(180,120,255,.25)';cx.font=`${Math.max(18,w*0.024)}px 'Courier New'`;cx.textAlign='center';
-    cx.fillText(m.toUpperCase(),w*.25+i*w*.25,34);
+    cx.fillText(m.toUpperCase(),w*.25+i*w*.25,40);
   });
   // Click mode selector
   if(!cv._sigModeClick){cv._sigModeClick=true;cv.addEventListener('click',e=>{
@@ -11069,7 +11069,7 @@ function drawSignalDecoder(){
       const bx=w*.05+i*(w*.9/40),bh=mag*h*.6;
       cx.fillStyle=`hsla(${270+i*2},65%,55%,${.3+mag*.4})`;cx.fillRect(bx,h*.85-bh,w*.9/42,bh);
     }
-    cx.fillStyle='rgba(180,120,255,.4)';cx.font=`${Math.max(16,w*0.020)}px 'Courier New'`;cx.textAlign='center';cx.fillText('FREQUENCY SPECTRUM (Hz)',w/2,h-6);
+    cx.fillStyle='rgba(180,120,255,.4)';cx.font=`${Math.max(16,w*0.020)}px 'Courier New'`;cx.textAlign='center';cx.fillText('FREQUENCY SPECTRUM (Hz)',w/2,h-14);
   } else if(sigMode==='pattern'){
     // Repeating blocks
     const blockW=w/50;
@@ -11081,7 +11081,7 @@ function drawSignalDecoder(){
     // Highlight repeating sequences
     cx.strokeStyle='rgba(46,204,113,.2)';cx.lineWidth=2;cx.setLineDash([4,4]);
     [30,80,140].forEach(s=>{cx.strokeRect(s*blockW+w*.02,h*.28,20*blockW,h*.44)});cx.setLineDash([]);
-    cx.fillStyle='rgba(46,204,113,.4)';cx.font=`${Math.max(16,w*0.020)}px 'Courier New'`;cx.textAlign='center';cx.fillText('PATTERN RECOGNITION — 3 repeating sequences detected',w/2,h-6);
+    cx.fillStyle='rgba(46,204,113,.4)';cx.font=`${Math.max(16,w*0.020)}px 'Courier New'`;cx.textAlign='center';cx.fillText('PATTERN RECOGNITION — 3 repeating sequences detected',w/2,h-14);
   } else {
     // Linguistic analysis
     const chars='αβγδεζηθικλμνξοπρστυφχψω'.split('');
@@ -11092,7 +11092,7 @@ function drawSignalDecoder(){
       cx.fillStyle=`rgba(60,255,140,${.08+brightness*.2})`;
       cx.fillText(chars[ci],w*.08+c*w*.045,h*.25+r*h*.1);
     }
-    cx.fillStyle='rgba(180,120,255,.45)';cx.font=`${Math.max(16,w*0.020)}px 'Courier New'`;cx.fillText('LINGUISTIC MAPPING — structure analysis in progress',w/2,h-6);
+    cx.fillStyle='rgba(180,120,255,.45)';cx.font=`${Math.max(16,w*0.020)}px 'Courier New'`;cx.fillText('LINGUISTIC MAPPING — structure analysis in progress',w/2,h-14);
   }
   // Oscilloscope waveform at top
   cx.strokeStyle='rgba(180,120,255,.5)';cx.lineWidth=2;cx.beginPath();
@@ -11222,12 +11222,12 @@ function drawCartography(){
   // Chart completion
   const pct=Math.round(cartoVisited.size/navWaypoints.length*100);
   cx.fillStyle='rgba(200,170,255,.8)';cx.font=`bold ${Math.max(22,w*0.028)}px 'Courier New'`;cx.textAlign='start';
-  cx.fillText('STELLAR CARTOGRAPHY — '+pct+'% CHARTED',14,34);
+  cx.fillText('STELLAR CARTOGRAPHY — '+pct+'% CHARTED',14,40);
   cx.fillStyle='rgba(200,170,255,.55)';cx.font=`${Math.max(18,w*0.022)}px 'Courier New'`;
-  cx.fillText(cartoVisited.size+' / '+navWaypoints.length+' systems surveyed  |  '+navWaypoints.length+' known systems',14,78);
+  cx.fillText(cartoVisited.size+' / '+navWaypoints.length+' systems surveyed  |  '+navWaypoints.length+' known systems',14,120);
   // Legend
   cx.fillStyle='rgba(94,230,255,.5)';cx.font=`${Math.max(14,w*0.016)}px 'Courier New'`;
-  cx.fillText('─── Hyperspace Lanes    ● Visited    ○ Uncharted    ◉ Your Ship',14,h-14);
+  cx.fillText('─── Hyperspace Lanes    ● Visited    ○ Uncharted    ◉ Your Ship',14,h-20);
   // Drag handler
   if(!cv._cartoDrag){cv._cartoDrag=true;
     cv.addEventListener('mousedown',e=>{if(sciActiveTab!=='cartography')return;cartoDrag=true;cartoLastMX=e.clientX;cartoLastMY=e.clientY});
@@ -11248,8 +11248,8 @@ function drawWormhole(){
   const cX=w/2,cY=h/2;
   if(!wormholeDiscovered){
     cx.fillStyle='rgba(180,120,255,.35)';cx.font=`${Math.max(22,w*0.030)}px 'Courier New'`;cx.textAlign='center';
-    cx.fillText('No wormhole discovered yet',cX,cY-20);cx.fillStyle='rgba(180,120,255,.2)';cx.font=`${Math.max(18,w*0.022)}px 'Courier New'`;
-    cx.fillText('Investigate gravitational anomalies to discover wormholes',cX,cY+30);
+    cx.fillText('No wormhole discovered yet',cX,cY-40);cx.fillStyle='rgba(180,120,255,.2)';cx.font=`${Math.max(18,w*0.022)}px 'Courier New'`;
+    cx.fillText('Investigate gravitational anomalies to discover wormholes',cX,cY+40);
     sciAnimFrame=requestAnimationFrame(drawWormhole);return;
   }
   // Wormhole funnel
@@ -11275,12 +11275,12 @@ function drawWormhole(){
   cx.fillStyle=coreGrad;cx.beginPath();cx.arc(cX,cY,w*.12,0,6.283);cx.fill();
   // Readings
   cx.fillStyle='rgba(180,120,255,.55)';cx.font=`bold ${Math.max(20,w*0.026)}px 'Courier New'`;cx.textAlign='start';
-  cx.fillText('WORMHOLE STABILITY ANALYZER',10,34);
+  cx.fillText('WORMHOLE STABILITY ANALYZER',10,40);
   const stColor=wormholeStability>70?'rgba(46,204,113,.5)':wormholeStability>50?'rgba(212,160,60,.5)':'rgba(231,76,60,.5)';
-  cx.fillStyle=stColor;cx.fillText('Stability: '+wormholeStability.toFixed(1)+'%',10,78);
+  cx.fillStyle=stColor;cx.fillText('Stability: '+wormholeStability.toFixed(1)+'%',10,120);
   cx.fillStyle='rgba(180,140,255,.5)';cx.font=`${Math.max(18,w*0.022)}px 'Courier New'`;
-  cx.fillText('Transit Probability: '+(wormholeStability*.85).toFixed(1)+'%',10,118);
-  cx.fillStyle='rgba(180,140,255,.5)';cx.fillText('Throat Diameter: '+(120+Math.sin(n*.2)*30).toFixed(0)+' km',10,158);
+  cx.fillText('Transit Probability: '+(wormholeStability*.85).toFixed(1)+'%',10,200);
+  cx.fillStyle='rgba(180,140,255,.5)';cx.fillText('Throat Diameter: '+(120+Math.sin(n*.2)*30).toFixed(0)+' km',10,280);
   sciAnimFrame=requestAnimationFrame(drawWormhole);
 }
 function probeWormhole(){
@@ -11356,14 +11356,14 @@ function drawSolarObs(){
   const activity=Math.sin(n*.1)*.5+.5;const actLabel=activity>.7?'STORMY':activity>.3?'MODERATE':'CALM';
   const actColor=activity>.7?'#ef5350':activity>.3?'#e8a840':'#4cdf80';
   cx.fillStyle='rgba(255,200,80,.55)';cx.font=`bold ${Math.max(20,w*0.026)}px 'Courier New'`;cx.textAlign='start';
-  cx.fillText('SOLAR OBSERVATORY',10,34);
-  cx.fillStyle=actColor;cx.fillText('Activity: '+actLabel,10,78);
+  cx.fillText('SOLAR OBSERVATORY',10,40);
+  cx.fillStyle=actColor;cx.fillText('Activity: '+actLabel,10,120);
   cx.fillStyle='rgba(255,200,80,.5)';cx.font=`${Math.max(18,w*0.022)}px 'Courier New'`;
-  cx.fillText('Sunspots: '+solarSunspots.length,10,118);
-  cx.fillText('Corona Temp: '+(1.5+Math.sin(n*.2)*.3).toFixed(1)+' MK',10,158);
-  cx.fillText('CME Risk: '+(activity*100).toFixed(0)+'%',10,198);
+  cx.fillText('Sunspots: '+solarSunspots.length,10,200);
+  cx.fillText('Corona Temp: '+(1.5+Math.sin(n*.2)*.3).toFixed(1)+' MK',10,280);
+  cx.fillText('CME Risk: '+(activity*100).toFixed(0)+'%',10,360);
   if(activity>.75){cx.fillStyle=`rgba(255,80,60,${.3+Math.sin(n*4)*.2})`;cx.font=`bold ${Math.max(20,w*0.026)}px 'Courier New'`;
-    cx.fillText('⚠ CME WARNING — RAISE SHIELDS',10,240)}
+    cx.fillText('⚠ CME WARNING — RAISE SHIELDS',10,440)}
   sciAnimFrame=requestAnimationFrame(drawSolarObs);
 }
 
@@ -11426,11 +11426,11 @@ function drawSubspace(){
   }
   // Labels
   cx.fillStyle='rgba(200,160,255,.65)';cx.font=`bold ${Math.max(22,w*.028)}px 'Courier New'`;cx.textAlign='start';
-  cx.fillText('SUBSPACE RESONANCE CHAMBER',10,34);
+  cx.fillText('SUBSPACE RESONANCE CHAMBER',10,40);
   cx.fillStyle='rgba(180,160,255,.5)';cx.font=`${Math.max(18,w*.022)}px 'Courier New'`;
-  cx.fillText(subLayers.length+' layers detected — monitoring vibrations',10,78);
+  cx.fillText(subLayers.length+' layers detected — monitoring vibrations',10,120);
   const entityCount=subLayers.reduce((s,l)=>s+l.entities.length,0);
-  if(entityCount>0){cx.fillStyle='rgba(180,230,255,.65)';cx.font=`bold ${Math.max(18,w*.022)}px 'Courier New'`;cx.fillText('● '+entityCount+' transient entities observed',10,118)}
+  if(entityCount>0){cx.fillStyle='rgba(180,230,255,.65)';cx.font=`bold ${Math.max(18,w*.022)}px 'Courier New'`;cx.fillText('● '+entityCount+' transient entities observed',10,200)}
   sciAnimFrame=requestAnimationFrame(drawSubspace);
 }
 function pingSubspace(){
